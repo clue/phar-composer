@@ -84,7 +84,9 @@ class PharComposer
     {
         // var_dump($this->package);
 
-        $box = Box::create($this->getTarget());
+        $target = $this->getTarget();
+        echo 'Start creating "'.$target.'"...' . PHP_EOL;
+        $box = Box::create($target);
 
         $main = $this->getMain();
         if ($main !== null) {
@@ -112,9 +114,9 @@ class PharComposer
 
     private function addDirectory(Box $box, $dir)
     {
-        $local = (realpath($dir . '/../'));
+        $dir = rtrim($dir, '/') . '/';
 
-        echo 'adding directory "' . $dir .'" under "' . $local.'"...';
+        echo 'adding "' . $dir .'" as "' . $this->getPathLocalToBase($dir).'"...';
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator(
                 $dir,
@@ -124,7 +126,7 @@ class PharComposer
             )
         );
 
-        $box->buildFromIterator($iterator, $local);
+        $box->buildFromIterator($iterator, (realpath($dir . '/../')));
         echo ' ok' . PHP_EOL;
     }
 
