@@ -17,6 +17,7 @@ class Build extends Command
         $this->setName('build')
              ->setDescription('Build phar for the given composer project')
              ->addArgument('path', InputArgument::OPTIONAL, 'Path to project directory or composer.json', '.')
+             ->addArgument('target', InputArgument::OPTIONAL, 'Path to write phar output to (defaults to project name)')
            /*->addOption('dev', null, InputOption::VALUE_NONE, 'If set, Whether require-dev dependencies should be shown') */;
     }
 
@@ -31,6 +32,12 @@ class Build extends Command
         }
 
         $pharcomposer = new PharComposer($path);
+
+        $target = $input->getArgument('target');
+        if ($target !== null) {
+            $pharcomposer->setTarget($target);
+        }
+
         $pharcomposer->build();
     }
 }
