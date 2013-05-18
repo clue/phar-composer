@@ -130,6 +130,7 @@ class PharComposer
                     $this->addDirectory($box, $this->getAbsolutePathForComposerPath($path));
                 }
             }
+
             if (isset($this->package['autoload']['classmap'])) {
                 foreach($this->package['autoload']['classmap'] as $path) {
                     $path = $this->getAbsolutePathForComposerPath($path);
@@ -140,7 +141,12 @@ class PharComposer
                     }
                 }
             }
-            // TODO: other autoloaders
+
+            if (isset($tis->package['autoload']['files'])) {
+                foreach($this->package['autoload']['classmap'] as $path) {
+                    $this->addFile($box, $this->getAbsolutePathForComposerPath($path));
+                }
+            }
         }
 
         $this->addDirectory($box, $this->getAbsolutePathForComposerPath('vendor'));
