@@ -110,8 +110,24 @@ class PharComposer
 
         if (isset($this->package['autoload'])) {
             if (isset($this->package['autoload']['psr-0'])) {
-                foreach ($this->package['autoload']['psr-0'] as $path) {
-                    $this->addDirectory($box,$this->getAbsolutePathForComposerPath($path));
+                foreach ($this->package['autoload']['psr-0'] as $namespace => $path) {
+                    if ($namespace !== '') {
+                        // namespace given, add it to the path
+                        $namespace = str_replace('\\', '/', $namespace);
+
+                        if ($path === '') {
+                            // namespace in project root => namespace is path
+                            $path = $namespace;
+                        } else {
+                            // namespace in sub-directory => add namespace to path
+                            $path = rtrim($path, '/') . '/' . $namespace;
+                        }
+                    }
+
+                    // TODO: this is not correct actually... should work for most repos nevertheless
+                    // TODO: we have to take target-dir into account
+
+                    $this->addDirectory($box, $this->getAbsolutePathForComposerPath($path));
                 }
             }
             // TODO: other autoloaders
