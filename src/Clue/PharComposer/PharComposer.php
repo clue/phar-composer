@@ -52,13 +52,15 @@ class PharComposer
     public function getMain()
     {
         if ($this->main === null) {
-            foreach ($this->package['bin'] as $path) {
-                $path = $this->getAbsolutePathForComposerPath($path);
-                if (!file_exists($path)) {
-                    throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
+            if (isset($this->package['bin'])) {
+                foreach ($this->package['bin'] as $path) {
+                    $path = $this->getAbsolutePathForComposerPath($path);
+                    if (!file_exists($path)) {
+                        throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
+                    }
+                    $this->main = $path;
+                    break;
                 }
-                $this->main = $path;
-                break;
             }
         }
         return $this->main;
@@ -97,7 +99,9 @@ class PharComposer
         $box = Box::create($target);
 
         $main = $this->getMain();
-        if ($main !== null) {
+        if ($main === null) {
+            echo 'WARNING: No main bin file defined! Resulting phar will NOT be executable' . PHP_EOL;
+        } else {
             $this->addFile($box, $main);
             // $box->addFile($main);
             $box->getPhar()->setStub(
