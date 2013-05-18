@@ -86,6 +86,14 @@ class PharComposer
 
         $target = $this->getTarget();
         echo 'Start creating "'.$target.'"...' . PHP_EOL;
+        if (file_exists($target)) {
+            echo 'Remove existing file...';
+            if(unlink($target) === false) {
+                throw new UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
+            } else {
+                echo ' ok'. PHP_EOL;
+            }
+        }
         $box = Box::create($target);
 
         $main = $this->getMain();
