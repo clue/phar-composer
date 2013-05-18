@@ -34,7 +34,8 @@ class PharComposer
     {
         if ($this->target === null) {
             if (isset($this->package['name'])) {
-                $this->target = str_replace('/', '-', $this->package['name']);
+                // skip vendor name from package name
+                $this->target = substr($this->package['name'], strpos($this->package['name'], '/') + 1);
             } else {
                 $this->target = basename($this->pathProject);
             }
