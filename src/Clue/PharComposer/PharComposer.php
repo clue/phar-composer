@@ -14,6 +14,7 @@ class PharComposer
 {
     private $pathProject;
     private $package;
+    private $main = null;
     private $target = null;
 
     public function __construct($path)
@@ -48,21 +49,33 @@ class PharComposer
         return $this;
     }
 
+    public function getMain()
+    {
+        if ($this->main === null) {
+            foreach ($this->package['bin'] as $path) {
+                if (!file_exists($path)) {
+                    throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
+                }
+                $this->main = $path;
+                break;
+            }
+        }
+        return $this->main;
+    }
+
+    public function setMain($main)
+    {
+        $this->main = $main;
+        return $this;
+    }
+
     public function build()
     {
         // var_dump($this->package);
 
         $box = Box::create($this->getTarget());
 
-        $main = null;
-        foreach ($this->package['bin'] as $path) {
-            if (!file_exists($path)) {
-                throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
-            }
-            $main = $path;
-            break;
-        }
-
+        $main = $this->getMain();
         if ($main !== null) {
             $box->addFile($main);
             $box->getPhar()->setStub(
