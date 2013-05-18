@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Clue\PharComposer\PharComposer;
+use InvalidArgumentException;
 
 class Build extends Command
 {
@@ -22,6 +23,12 @@ class Build extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $path = $input->getArgument('path');
+        if (is_dir($path)) {
+            $path = rtrim($path, '/') . '/composer.json';
+        }
+        if (!is_file($path)) {
+            throw new InvalidArgumentException('The given path "' . $path . '" is not a readable file');
+        }
 
         $pharcomposer = new PharComposer($path);
         $pharcomposer->build();
