@@ -14,7 +14,7 @@ class PharComposer
 {
     private $pathProject;
     private $package;
-    private $target;
+    private $target = null;
 
     public function __construct($path)
     {
@@ -25,15 +25,34 @@ class PharComposer
             var_dump(json_last_error(), JSON_ERROR_SYNTAX);
             throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
         }
-        $this->target = str_replace('/', '-', $this->package['name']) . '.phar';
+
         $this->pathProject = dirname($path) . '/';
+    }
+
+    public function getTarget()
+    {
+        if ($this->target === null) {
+            if (isset($this->package['name'])) {
+                $this->target = str_replace('/', '-', $this->package['name']);
+            } else {
+                $this->target = basename($this->pathProject);
+            }
+            $this->target .= '.phar';
+        }
+        return $this->target;
+    }
+
+    public function setTarget($target)
+    {
+        $this->target = $target;
+        return $this;
     }
 
     public function build()
     {
         // var_dump($this->package);
 
-        $box = Box::create($this->target);
+        $box = Box::create($this->getTarget());
 
         $main = null;
         foreach ($this->package['bin'] as $path) {
