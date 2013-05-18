@@ -1,0 +1,15 @@
+{
+    "name": "clue/phar-composer",
+    "description": "Simple phar creation for your projects managed via composer",
+    "keywords": ["executable phar", "build process", "bundle dependencies"],
+    "homepage": "https://github.com/clue/phar-composer",
+    "license": "MIT",
+    "require": {
+        "herrera-io/box": "1.*",
+        "symfony/console": "~2.1"
+    },
+    "autoload": {
+        "psr-0": {"Clue": "src/"}
+    },
+    "bin": ["bin/phar-composer"]
+}
