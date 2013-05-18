@@ -174,7 +174,7 @@ class PharComposer
             )
         );
 
-        $box->buildFromIterator($iterator, (realpath($dir . '/../')));
+        $box->buildFromIterator($iterator, $this->pathProject);
         echo ' ok' . PHP_EOL;
     }
 
