@@ -142,14 +142,18 @@ class PharComposer
                 }
             }
 
-            if (isset($tis->package['autoload']['files'])) {
+            if (isset($this->package['autoload']['files'])) {
                 foreach($this->package['autoload']['classmap'] as $path) {
                     $this->addFile($box, $this->getAbsolutePathForComposerPath($path));
                 }
             }
         }
 
-        $this->addDirectory($box, $this->getAbsolutePathForComposerPath('vendor'));
+        $vendor = 'vendor';
+        if (isset($this->package['config']['vendor-dir'])) {
+            $vendor = $this->package['config']['vendor-dir'];
+        }
+        $this->addDirectory($box, $this->getAbsolutePathForComposerPath($vendor));
     }
 
     private function addDirectory(Box $box, $dir)
