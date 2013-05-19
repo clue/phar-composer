@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/bin/env php -d phar.readonly=off
 <?php
 
 require __DIR__ . '/../vendor/autoload.php';
