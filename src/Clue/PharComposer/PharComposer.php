@@ -9,6 +9,7 @@ use Herrera\Box\StubGenerator;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use FilesystemIterator;
+use RuntimeException;
 
 class PharComposer
 {
@@ -83,9 +84,26 @@ class PharComposer
         return $this->pathProject;
     }
 
+    /**
+     * get absolute path to vendor directory
+     *
+     * @return string
+     */
+    public function getPathVendor()
+    {
+        $vendor = 'vendor';
+        if (isset($this->package['config']['vendor-dir'])) {
+            $vendor = $this->package['config']['vendor-dir'];
+        }
+        return $this->getAbsolutePathForComposerPath($vendor) . '/';
+    }
+
     public function build()
     {
-        // var_dump($this->package);
+        $pathVendor = $this->getPathVendor();
+        if (!is_dir($pathVendor)) {
+            throw new RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
+        }
 
         $target = $this->getTarget();
         echo 'Start creating "'.$target.'"...' . PHP_EOL;
@@ -154,11 +172,11 @@ class PharComposer
             }
         }
 
-        $vendor = 'vendor';
-        if (isset($this->package['config']['vendor-dir'])) {
-            $vendor = $this->package['config']['vendor-dir'];
+        if ($this->package['name'] === 'composer/composer') {
+            $this->addFile($box, $this->getAbsolutePathForComposerPath('src/bootstrap.php'));
         }
-        $this->addDirectory($box, $this->getAbsolutePathForComposerPath($vendor));
+
+        $this->addDirectory($box, $pathVendor);
     }
 
     private function addDirectory(Box $box, $dir)
