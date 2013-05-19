@@ -2,6 +2,8 @@
 
 namespace Clue\PharComposer\Command;
 
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Command\Command;
@@ -31,7 +33,36 @@ class Build extends Command
             throw new InvalidArgumentException('The given path "' . $path . '" is not a readable file');
         }
 
+
+        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
+
         $pharcomposer = new PharComposer($path);
+
+        $pathVendor = $pharcomposer->getPathVendor();
+        if (!is_dir($pathVendor)) {
+//             if ($input->isInteractive()) {
+//                 /** @var $dialog DialogHelper */
+//                 $dialog = $this->getHelperSet()->get('dialog');
+
+//                 $output->writeln('<warning>Vendor directory does not exist, looks like project was not properly installed via "composer install"</warning>');
+
+//                 if ($dialog->askConfirmation($output, '<question>Install project via composer (execute "composer install")?</question>', true)) {
+//                     $output->writeln('<info>Let\'s try to install..</info>');
+//                 } else {
+//                     $output->writeln('<info>Aborting...</info>');
+//                     return;
+//                 }
+//             } else {
+                $output->writeln('<error>Project is not installed via composer. Run "composer install" manually</error>');
+                return;
+//             }
+        }
+
+//         $timeinstalled = @filemtime($pathVendor . '/autoload.php');
+
+//         if (filemtime($this->pathProject . '/composer.json') >= $timeinstalled) {
+//             throw new RuntimeException('Looks like your "composer.json" was modified after the project was installed, try running "composer update"?');
+//         }
 
         $target = $input->getArgument('target');
         if ($target !== null) {
