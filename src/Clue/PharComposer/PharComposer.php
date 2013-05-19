@@ -2,16 +2,13 @@
 
 namespace Clue\PharComposer;
 
-use UnexpectedValueException;
-use InvalidArgumentException;
 use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
-use FilesystemIterator;
-use RuntimeException;
 use Clue\PharComposer\Bundler\BundlerInterface;
 use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
+use UnexpectedValueException;
+use InvalidArgumentException;
+use RuntimeException;
 
 class PharComposer
 {
