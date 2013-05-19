@@ -10,6 +10,8 @@ use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use FilesystemIterator;
 use RuntimeException;
+use Clue\PharComposer\Bundler\BundlerInterface;
+use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
 
 class PharComposer
 {
@@ -17,6 +19,7 @@ class PharComposer
     private $package;
     private $main = null;
     private $target = null;
+    private $bundler = null;
 
     public function __construct($path)
     {
@@ -98,6 +101,21 @@ class PharComposer
         return $this->getAbsolutePathForComposerPath($vendor) . '/';
     }
 
+    public function getBundler()
+    {
+        if ($this->bundler === null) {
+            $this->bundler = new ExplicitBundler();
+        }
+        return $this->bundler;
+    }
+
+    public function setBundler(BundlerInterface $bundler)
+    {
+        $this->bundler = $bundler;
+
+        return $this;
+    }
+
     public function build()
     {
         $pathVendor = $this->getPathVendor();
@@ -115,14 +133,13 @@ class PharComposer
                 echo ' ok'. PHP_EOL;
             }
         }
+
         $box = Box::create($target);
 
         $main = $this->getMain();
         if ($main === null) {
             echo 'WARNING: No main bin file defined! Resulting phar will NOT be executable' . PHP_EOL;
         } else {
-            $this->addFile($box, $main);
-            // $box->addFile($main);
             $box->getPhar()->setStub(
                 StubGenerator::create()
                 ->alias('default.phar')
@@ -131,78 +148,12 @@ class PharComposer
             );
         }
 
-        if (isset($this->package['autoload'])) {
-            if (isset($this->package['autoload']['psr-0'])) {
-                foreach ($this->package['autoload']['psr-0'] as $namespace => $path) {
-                    if ($namespace !== '') {
-                        // namespace given, add it to the path
-                        $namespace = str_replace('\\', '/', $namespace);
-
-                        if ($path === '') {
-                            // namespace in project root => namespace is path
-                            $path = $namespace;
-                        } else {
-                            // namespace in sub-directory => add namespace to path
-                            $path = rtrim($path, '/') . '/' . $namespace;
-                        }
-                    }
-
-                    // TODO: this is not correct actually... should work for most repos nevertheless
-                    // TODO: we have to take target-dir into account
-
-                    $this->addDirectory($box, $this->getAbsolutePathForComposerPath($path));
-                }
-            }
-
-            if (isset($this->package['autoload']['classmap'])) {
-                foreach($this->package['autoload']['classmap'] as $path) {
-                    $path = $this->getAbsolutePathForComposerPath($path);
-                    if (is_dir($path)) {
-                        $this->addDirectory($box, $path);
-                    } else {
-                        $this->addFile($box, $path);
-                    }
-                }
-            }
-
-            if (isset($this->package['autoload']['files'])) {
-                foreach($this->package['autoload']['classmap'] as $path) {
-                    $this->addFile($box, $this->getAbsolutePathForComposerPath($path));
-                }
-            }
-        }
-
-        if ($this->package['name'] === 'composer/composer') {
-            $this->addFile($box, $this->getAbsolutePathForComposerPath('src/bootstrap.php'));
-        }
-
-        $this->addDirectory($box, $pathVendor);
+        $this->getBundler()->build($this, $box);
     }
 
-    private function addDirectory(Box $box, $dir)
+    public function getPackageAutoload()
     {
-        $dir = rtrim($dir, '/') . '/';
-
-        echo 'adding "' . $dir .'" as "' . $this->getPathLocalToBase($dir).'"...';
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $dir,
-                FilesystemIterator::KEY_AS_PATHNAME
-                | FilesystemIterator::CURRENT_AS_FILEINFO
-                | FilesystemIterator::SKIP_DOTS
-            )
-        );
-
-        $box->buildFromIterator($iterator, $this->pathProject);
-        echo ' ok' . PHP_EOL;
-    }
-
-    private function addFile(Box $box, $file)
-    {
-        $local = $this->getPathLocalToBase($file);
-        echo 'adding "' . $file .'" as "' . $local.'"...';
-        $box->addFile($file, $local);
-        echo ' ok' . PHP_EOL;
+        return isset($this->package['autoload']) ? $this->package['autoload'] : null;
     }
 
     /**
@@ -210,13 +161,13 @@ class PharComposer
      * @param string $path
      * @return string
      */
-    private function getAbsolutePathForComposerPath($path)
+    public function getAbsolutePathForComposerPath($path)
     {
         // return $path;
         return $this->pathProject . rtrim($path, '/');
     }
 
-    private function getPathLocalToBase($path)
+    public function getPathLocalToBase($path)
     {
         if (strpos($path, $this->pathProject) !== 0) {
             throw new UnexpectedValueException('Path "' . $path . '" is not within base project path "' . $this->pathProject . '"');
