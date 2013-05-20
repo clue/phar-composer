@@ -13,6 +13,7 @@ class Complete implements BundlerInterface
         $iterator = Finder::create()
             ->files()
             ->ignoreVCS(true)
+            ->filter($pharcomposer->getBlacklistFilter())
             ->in($pharcomposer->getBase());
 
         $box->buildFromIterator($iterator, $pharcomposer->getBase());

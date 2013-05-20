@@ -2,6 +2,7 @@
 
 namespace Clue\PharComposer;
 
+
 use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
 use Clue\PharComposer\Bundler\BundlerInterface;
@@ -10,6 +11,7 @@ use Clue\PharComposer\Bundler\Complete as CompleteBundler;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\Finder\SplFileInfo;
 
 class PharComposer
 {
@@ -162,6 +164,28 @@ class PharComposer
     public function getPackageAutoload()
     {
         return isset($this->package['autoload']) ? $this->package['autoload'] : null;
+    }
+
+    public function getBlacklist()
+    {
+        return array(
+            $this->getAbsolutePathForComposerPath('composer.phar'),
+            $this->getAbsolutePathForComposerPath('phar-composer.phar')
+        );
+    }
+
+    /**
+     *
+     * @return Closure
+     * @uses self::getBlacklist()
+     */
+    public function getBlacklistFilter()
+    {
+        $blacklist = $this->getBlacklist();
+
+        return function (SplFileInfo $file) use ($blacklist) {
+            return in_array($file->getPathname(), $blacklist) ? false : null;
+        };
     }
 
     /**
