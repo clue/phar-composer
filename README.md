@@ -21,6 +21,14 @@ Once clue/phar-composer is [installed](#install), you can simply invoke it via c
 $ php phar-composer.phar build ~/path/to/your/project
 ```
 
+> As an example, this projet itself is bundled via phar-composer
+([google recursion](https://www.google.com/search?q=recursion)). So instead of downloading the
+below mentioned `phar-composer.phar`, you can build one yourself by issuing:
+>
+> ```bash
+> $ php bin/phar-composer build ~/workspace/phar-composer
+> ```
+
 ## Install
 
 You can grab a copy of clue/phar-composer in either of the following ways.
