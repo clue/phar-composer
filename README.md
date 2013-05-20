@@ -7,7 +7,11 @@ for your project among with its bundled dependencies.
 
 * Create a single executable phar archive, including its dependencies
 * Automated build process
-* Zero additional configuration
+* Zero additional configuration 
+
+> Note: This project is in early alpha stage! It's been tested against a wide range
+of packages and we have yet to find any major issues. Given the current lack of unit
+tests, it's likely we're missing some edge cases though. Feel free to report any issues you encounter.
 
 ## Usage
 
