@@ -25,6 +25,22 @@ class Build extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (ini_get('phar.readonly') === "1") {
+            if (!function_exists('pcntl_exec')) {
+                $output->writeln('<error>Your configuration disabled writing phar files (phar.readonly = On), please update your configuration or run with "php -d phar.readonly=off ' . $_SERVER['argv'][0].'"</error>');
+                return;
+            }
+
+            $output->writeln('<info>Your configuration disables writing phar files (phar.readonly = On), trying to re-spawn with correct config...');
+            sleep(1);
+
+            $args = array_merge(array('php', '-d phar.readonly=off'), $_SERVER['argv']);
+            if (pcntl_exec('/usr/bin/env', $args) === false) {
+                $output->writeln('<error>Unable to switch into new configuration</error>');
+                return;
+            }
+        }
+
         $path = $input->getArgument('path');
         if (is_dir($path)) {
             $path = rtrim($path, '/') . '/composer.json';
