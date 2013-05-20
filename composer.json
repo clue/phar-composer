@@ -18,5 +18,10 @@
     "autoload": {
         "psr-0": {"Clue": "src/"}
     },
-    "bin": ["bin/phar-composer"]
+    "bin": ["bin/phar-composer"],
+    "extra": {
+        "phar": {
+            "bundler": "composer"
+        }    
+    }
 }

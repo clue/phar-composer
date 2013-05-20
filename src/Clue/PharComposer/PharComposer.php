@@ -2,7 +2,6 @@
 
 namespace Clue\PharComposer;
 
-
 use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
 use Clue\PharComposer\Bundler\BundlerInterface;
@@ -104,7 +103,18 @@ class PharComposer
     public function getBundler()
     {
         if ($this->bundler === null) {
-            $this->bundler = new CompleteBundler();
+            if (isset($this->package['extra']['phar']['bundler'])) {
+                $bundler = $this->package['extra']['phar']['bundler'];
+                if ($bundler === 'composer') {
+                    $this->bundler = new ExplicitBundler();
+                } elseif ($bundler === 'complete') {
+                    $this->bundler = new CompleteBundler();
+                } else {
+                    throw new UnexpectedValueException('Invalid bundler "' . $bundler . '" specified');
+                }
+            } else {
+                $this->bundler = new CompleteBundler();
+            }
         }
         return $this->bundler;
     }
