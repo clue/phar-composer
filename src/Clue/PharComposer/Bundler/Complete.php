@@ -16,6 +16,7 @@ class Complete implements BundlerInterface
             ->filter($pharcomposer->getBlacklistFilter())
             ->in($pharcomposer->getBase());
 
+        $pharcomposer->log('Adding whole project directory "' . $pharcomposer->getBase() . '"...');
         $box->buildFromIterator($iterator, $pharcomposer->getBase());
     }
 }

@@ -37,23 +37,20 @@ abstract class Base implements BundlerInterface
     {
         $dir = rtrim($dir, '/') . '/';
 
-        echo 'adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir).'"...';
-
         $iterator = Finder::create()
             ->files()
             //->filter($this->getBlacklistFilter())
             ->ignoreVCS(true)
             ->in($dir);
 
+        $this->pharcomposer->log('adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir).'"...');
         $this->box->buildFromIterator($iterator, $this->pharcomposer->getBase());
-        echo ' ok' . PHP_EOL;
     }
 
     protected function addFile($file)
     {
         $local = $this->pharcomposer->getPathLocalToBase($file);
-        echo 'adding "' . $file .'" as "' . $local.'"...';
+        $this->pharcomposer->log('adding "' . $file .'" as "' . $local.'"...');
         $this->box->addFile($file, $local);
-        echo ' ok' . PHP_EOL;
     }
 }

@@ -134,13 +134,11 @@ class PharComposer
         }
 
         $target = $this->getTarget();
-        echo 'Start creating "'.$target.'"...' . PHP_EOL;
+        $this->log('Start creating "'.$target.'"...');
         if (file_exists($target)) {
-            echo 'Remove existing file...';
+            $this->log('Remove existing file...');
             if(unlink($target) === false) {
                 throw new UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
-            } else {
-                echo ' ok'. PHP_EOL;
             }
         }
 
@@ -152,7 +150,7 @@ class PharComposer
         $chmod = 0755;
         $main = $this->getMain();
         if ($main === null) {
-            echo 'WARNING: No main bin file defined! Resulting phar will NOT be executable' . PHP_EOL;
+            $this->log('WARNING: No main bin file defined! Resulting phar will NOT be executable');
         } else {
             $generator = StubGenerator::create()
                 ->index($this->getPathLocalToBase($main))
@@ -160,7 +158,7 @@ class PharComposer
 
             $lines = file($main, FILE_IGNORE_NEW_LINES);
             if (substr($lines[0], 0, 2) === '#!') {
-                echo 'Using referenced shebang "'. $lines[0] . '"' . PHP_EOL;
+                $this->log('Using referenced shebang "'. $lines[0] . '"');
                 $generator->shebang($lines[0]);
 
                 // remove shebang from main file and add (overwrite)
@@ -171,17 +169,16 @@ class PharComposer
             $box->getPhar()->setStub($generator->generate());
 
             $chmod = octdec(substr(decoct(fileperms($main)),-4));
-            echo 'Using referenced chmod ' . sprintf('%04o', $chmod) . PHP_EOL;
+            $this->log('Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
         $box->getPhar()->stopBuffering();
 
         if ($chmod !== null) {
-            echo 'Applying chmod ' . sprintf('%04o', $chmod) . '...';
+            $this->log('Applying chmod ' . sprintf('%04o', $chmod) . '...');
             if (chmod($target, $chmod) === false) {
                 throw new UnexpectedValueException('Unable to chmod target file "' . $target .'"');
             }
-            echo ' ok' . PHP_EOL;
         }
     }
 
@@ -229,5 +226,10 @@ class PharComposer
             throw new UnexpectedValueException('Path "' . $path . '" is not within base project path "' . $this->pathProject . '"');
         }
         return substr($path, strlen($this->pathProject));
+    }
+
+    public function log($message)
+    {
+        echo $message . PHP_EOL;
     }
 }
