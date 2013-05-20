@@ -6,6 +6,7 @@ use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
 use Clue\PharComposer\Bundler\BundlerInterface;
 use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
+use Clue\PharComposer\Bundler\Complete as CompleteBundler;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
@@ -101,7 +102,7 @@ class PharComposer
     public function getBundler()
     {
         if ($this->bundler === null) {
-            $this->bundler = new ExplicitBundler();
+            $this->bundler = new CompleteBundler();
         }
         return $this->bundler;
     }
