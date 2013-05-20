@@ -149,6 +149,7 @@ class PharComposer
 
         $this->getBundler()->build($this, $box);
 
+        $chmod = 0755;
         $main = $this->getMain();
         if ($main === null) {
             echo 'WARNING: No main bin file defined! Resulting phar will NOT be executable' . PHP_EOL;
@@ -169,9 +170,20 @@ class PharComposer
             }
 
             $box->getPhar()->setStub($generator->generate());
+
+            $chmod = octdec(substr(decoct(fileperms($main)),-4));
+            echo 'Using referenced chmod ' . sprintf('%04o', $chmod) . PHP_EOL;
         }
 
         $box->getPhar()->stopBuffering();
+
+        if ($chmod !== null) {
+            echo 'Applying chmod ' . sprintf('%04o', $chmod) . '...';
+            if (chmod($target, $chmod) === false) {
+                throw new UnexpectedValueException('Unable to chmod target file "' . $target .'"');
+            }
+            echo ' ok' . PHP_EOL;
+        }
     }
 
     public function getPackageAutoload()
