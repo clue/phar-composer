@@ -2,6 +2,7 @@
 
 namespace Clue\PharComposer\Bundler;
 
+use Symfony\Component\Finder\Finder;
 use Clue\PharComposer\PharComposer;
 use Herrera\Box\Box;
 use RecursiveIteratorIterator;
@@ -37,14 +38,12 @@ abstract class Base implements BundlerInterface
         $dir = rtrim($dir, '/') . '/';
 
         echo 'adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir).'"...';
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $dir,
-                FilesystemIterator::KEY_AS_PATHNAME
-                | FilesystemIterator::CURRENT_AS_FILEINFO
-                | FilesystemIterator::SKIP_DOTS
-            )
-        );
+
+        $iterator = Finder::create()
+            ->files()
+            //->filter($this->getBlacklistFilter())
+            ->ignoreVCS(true)
+            ->in($dir);
 
         $this->box->buildFromIterator($iterator, $this->pharcomposer->getBase());
         echo ' ok' . PHP_EOL;
