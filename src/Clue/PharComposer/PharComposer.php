@@ -133,6 +133,8 @@ class PharComposer
 
         $box = Box::create($target);
 
+        $this->getBundler()->build($this, $box);
+
         $main = $this->getMain();
         if ($main === null) {
             echo 'WARNING: No main bin file defined! Resulting phar will NOT be executable' . PHP_EOL;
@@ -142,10 +144,18 @@ class PharComposer
                 ->index($this->getPathLocalToBase($main))
                 ->banner("Bundled by phar-composer with the help of php-box.\n\n@link https://github.com/clue/phar-composer");
 
+            $lines = file($main, FILE_IGNORE_NEW_LINES);
+            if (substr($lines[0], 0, 2) === '#!') {
+                echo 'Using referenced shebang "'. $lines[0] . '"' . PHP_EOL;
+                $generator->shebang($lines[0]);
+
+                // remove shebang from main file and add (overwrite)
+                unset($lines[0]);
+                $box->addFromString($this->getPathLocalToBase($main), implode("\n", $lines));
+            }
+
             $box->getPhar()->setStub($generator->generate());
         }
-
-        $this->getBundler()->build($this, $box);
     }
 
     public function getPackageAutoload()
