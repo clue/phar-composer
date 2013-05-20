@@ -137,12 +137,12 @@ class PharComposer
         if ($main === null) {
             echo 'WARNING: No main bin file defined! Resulting phar will NOT be executable' . PHP_EOL;
         } else {
-            $box->getPhar()->setStub(
-                StubGenerator::create()
-                ->alias('default.phar')
+            $generator = StubGenerator::create()
+                ->alias('default.phar') // TODO: remove me?
                 ->index($this->getPathLocalToBase($main))
-                ->generate()
-            );
+                ->banner("Bundled by phar-composer with the help of php-box.\n\n@link https://github.com/clue/phar-composer");
+
+            $box->getPhar()->setStub($generator->generate());
         }
 
         $this->getBundler()->build($this, $box);
