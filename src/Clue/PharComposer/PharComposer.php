@@ -135,6 +135,7 @@ class PharComposer
         }
 
         $box = Box::create($target);
+        $box->getPhar()->startBuffering();
 
         $this->getBundler()->build($this, $box);
 
@@ -159,6 +160,8 @@ class PharComposer
 
             $box->getPhar()->setStub($generator->generate());
         }
+
+        $box->getPhar()->stopBuffering();
     }
 
     public function getPackageAutoload()
