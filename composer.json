@@ -5,16 +5,10 @@
     "homepage": "https://github.com/clue/phar-composer",
     "license": "MIT",
     "require": {
-        "herrera-io/box": "dev-dev",
+        "herrera-io/box": "~1.2",
         "symfony/console": "~2.1",
         "symfony/finder": "~2.1"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/clue/php-box"
-        }
-    ],
     "autoload": {
         "psr-0": {"Clue": "src/"}
     },
