@@ -8,12 +8,11 @@ class Explicit extends Base
 {
     protected function bundle()
     {
-        $main = $this->pharcomposer->getMain();
-        if ($main !== null) {
-            $this->addFile($main);
+        foreach ($this->package->getBins() as $bin) {
+            $this->addFile($bin);
         }
 
-        $autoload = $this->pharcomposer->getPackageAutoload();
+        $autoload = $this->package->getAutoload();
 
         if ($autoload !== null) {
             if (isset($autoload['psr-0'])) {
@@ -39,14 +38,14 @@ class Explicit extends Base
                         // TODO: this is not correct actually... should work for most repos nevertheless
                         // TODO: we have to take target-dir into account
 
-                        $this->addDirectory($this->pharcomposer->getAbsolutePathForComposerPath($path));
+                        $this->addDirectory($this->package->getAbsolutePath($path));
                     }
                 }
             }
 
             if (isset($autoload['classmap'])) {
                 foreach($autoload['classmap'] as $path) {
-                    $path = $this->getAbsolutePathForComposerPath($path);
+                    $path = $this->package->getAbsolutePath($path);
                     if (is_dir($path)) {
                         $this->addDirectory($path);
                     } else {
@@ -57,11 +56,9 @@ class Explicit extends Base
 
             if (isset($autoload['files'])) {
                 foreach($autoload['classmap'] as $path) {
-                    $this->addFile($this->pharcomposer->getAbsolutePathForComposerPath($path));
+                    $this->addFile($this->package->getAbsolutePath($path));
                 }
             }
         }
-
-        $this->addDirectory($this->pharcomposer->getPathVendor());
     }
 }

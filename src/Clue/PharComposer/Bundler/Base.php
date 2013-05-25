@@ -2,6 +2,7 @@
 
 namespace Clue\PharComposer\Bundler;
 
+use Clue\PharComposer\Package;
 use Symfony\Component\Finder\Finder;
 use Clue\PharComposer\PharComposer;
 use Herrera\Box\Box;
@@ -23,10 +24,17 @@ abstract class Base implements BundlerInterface
      */
     protected $pharcomposer;
 
-    public function build(PharComposer $pharcomposer, Box $box)
+    /**
+     *
+     * @var Package
+     */
+    protected $package;
+
+    public function build(PharComposer $pharcomposer, Box $box, Package $package)
     {
         $this->pharcomposer = $pharcomposer;
-        $this->box = $box;
+        $this->box          = $box;
+        $this->package      = $package;
 
         $this->bundle();
     }
