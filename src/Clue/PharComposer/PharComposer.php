@@ -6,9 +6,6 @@ use Symfony\Component\Finder\Finder;
 
 use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
-use Clue\PharComposer\Bundler\BundlerInterface;
-use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
-use Clue\PharComposer\Bundler\Complete as CompleteBundler;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
@@ -20,7 +17,6 @@ class PharComposer
     private $package;
     private $main = null;
     private $target = null;
-    private $bundler = null;
 
     public function __construct($path)
     {
@@ -53,15 +49,12 @@ class PharComposer
     public function getMain()
     {
         if ($this->main === null) {
-            if (isset($this->package['bin'])) {
-                foreach ($this->package['bin'] as $path) {
-                    $path = $this->getAbsolutePathForComposerPath($path);
-                    if (!file_exists($path)) {
-                        throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
-                    }
-                    $this->main = $path;
-                    break;
+            foreach ($this->getPackageRoot()->getBins() as $path) {
+                if (!file_exists($path)) {
+                    throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
                 }
+                $this->main = $path;
+                break;
             }
         }
         return $this->main;
@@ -90,37 +83,41 @@ class PharComposer
      */
     public function getPathVendor()
     {
-        $vendor = 'vendor';
-        if (isset($this->package['config']['vendor-dir'])) {
-            $vendor = $this->package['config']['vendor-dir'];
-        }
-        return $this->getAbsolutePathForComposerPath($vendor) . '/';
+        return $this->getPackageRoot()->getPathVendor();
     }
 
-    public function getBundler()
+    /**
+     *
+     * @return Package
+     */
+    public function getPackageRoot()
     {
-        if ($this->bundler === null) {
-            if (isset($this->package['extra']['phar']['bundler'])) {
-                $bundler = $this->package['extra']['phar']['bundler'];
-                if ($bundler === 'composer') {
-                    $this->bundler = new ExplicitBundler();
-                } elseif ($bundler === 'complete') {
-                    $this->bundler = new CompleteBundler();
-                } else {
-                    throw new UnexpectedValueException('Invalid bundler "' . $bundler . '" specified');
-                }
-            } else {
-                $this->bundler = new CompleteBundler();
+        return new Package($this->package, $this->pathProject);
+    }
+
+    /**
+     *
+     * @return Package[]
+     */
+    public function getPackagesDependencies()
+    {
+        $packages = array();
+
+        $pathVendor = $this->getPathVendor();
+
+        // load all installed packages (use installed.json which also includes version instead of composer.lock)
+        $installed = $this->loadJson($pathVendor . 'composer/installed.json');
+        foreach ($installed as $package) {
+            $dir = $package['name'] . '/';
+            if (isset($package['target-dir'])) {
+                $dir .= trim($package['target-dir'], '/') . '/';
             }
+
+            $dir = $pathVendor . $dir;
+            $packages []= new Package($package, $dir);
         }
-        return $this->bundler;
-    }
 
-    public function setBundler(BundlerInterface $bundler)
-    {
-        $this->bundler = $bundler;
-
-        return $this;
+        return $packages;
     }
 
     public function build()
@@ -143,7 +140,7 @@ class PharComposer
         $box->getPhar()->startBuffering();
 
         $this->log('Adding main package...');
-        $this->addPackage($this->getBase(), $box, $this->getPackage());
+        $this->addPackage($this->getPackageRoot(), $box);
 
         $this->log('Adding composer base files...');
         // explicitly add composer autoloader
@@ -155,18 +152,9 @@ class PharComposer
         $box->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME), $this->getBase());
 
         $this->log('Adding dependencies...');
-        // load all installed packages (use installed.json which also includes version instead of composer.lock)
-        $installed = $this->loadJson($pathVendor . 'composer/installed.json');
-        foreach ($installed as $package) {
-            $dir = $package['name'];
-            if (isset($package['target-dir'])) {
-                $dir .= '/' . trim($package['target-dir'], '/');
-            }
-
-            $dir = $pathVendor . $dir;
-
-            $this->log('Adding dependency "' . $package['name'] . '" from "' . $dir .'"...');
-            $this->addPackage($dir, $box, $package);
+        foreach ($this->getPackagesDependencies() as $package) {
+            $this->log('Adding dependency "' . $package->getName() . '" from "' . $package->getDirectory() .'"...');
+            $this->addPackage($package, $box);
         }
 
 
@@ -205,44 +193,6 @@ class PharComposer
         }
     }
 
-    public function getPackageAutoload()
-    {
-        return isset($this->package['autoload']) ? $this->package['autoload'] : null;
-    }
-
-    public function getBlacklist()
-    {
-        return array(
-            $this->getAbsolutePathForComposerPath('composer.phar'),
-            $this->getAbsolutePathForComposerPath('phar-composer.phar')
-        );
-    }
-
-    /**
-     *
-     * @return Closure
-     * @uses self::getBlacklist()
-     */
-    public function getBlacklistFilter()
-    {
-        $blacklist = $this->getBlacklist();
-
-        return function (SplFileInfo $file) use ($blacklist) {
-            return in_array($file->getPathname(), $blacklist) ? false : null;
-        };
-    }
-
-    /**
-     *
-     * @param string $path
-     * @return string
-     */
-    public function getAbsolutePathForComposerPath($path)
-    {
-        // return $path;
-        return $this->pathProject . rtrim($path, '/');
-    }
-
     public function getPathLocalToBase($path)
     {
         if (strpos($path, $this->pathProject) !== 0) {
@@ -266,31 +216,12 @@ class PharComposer
         return $ret;
     }
 
-    private function getPackage()
+    private function addPackage(Package $package, Box $box)
     {
-        return $this->package;
-    }
-
-    private function addPackage($dir, Box $box, array $package)
-    {
-        $dir = rtrim($dir, '/') . '/';
-
-        $vendor = 'vendor';
-        if (isset($package['config']['vendor-dir'])) {
-            $vendor = $package['config']['vendor-dir'];
-        }
-
-        $iterator = Finder::create()
-            ->files()
-            //->filter($this->getBlacklistFilter())
-            ->exclude($dir . $vendor)
-            ->ignoreVCS(true)
-            ->in($dir);
-
-        // TODO: replace with bundler
-        // $this->getBundler()->build($this, $box);
+        $dir = $package->getDirectory();
 
         $this->log('adding "' . $dir .'" as "' . $this->getPathLocalToBase($dir).'"...');
-        $box->buildFromIterator($iterator, $this->getBase());
+
+        $package->getBundler()->build($this, $box, $package);
     }
 }
