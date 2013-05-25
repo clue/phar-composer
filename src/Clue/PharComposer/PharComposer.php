@@ -2,6 +2,8 @@
 
 namespace Clue\PharComposer;
 
+use Symfony\Component\Finder\Finder;
+
 use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
 use Clue\PharComposer\Bundler\BundlerInterface;
@@ -24,12 +26,7 @@ class PharComposer
     {
         $path = realpath($path);
 
-        $this->package = json_decode(file_get_contents($path), true);
-        if ($this->package === null) {
-            var_dump(json_last_error(), JSON_ERROR_SYNTAX);
-            throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
-        }
-
+        $this->package = $this->loadJson($path);
         $this->pathProject = dirname($path) . '/';
     }
 
@@ -145,7 +142,33 @@ class PharComposer
         $box = Box::create($target);
         $box->getPhar()->startBuffering();
 
-        $this->getBundler()->build($this, $box);
+        $this->log('Adding main package...');
+        $this->addPackage($this->getBase(), $box, $this->getPackage());
+
+        $this->log('Adding composer base files...');
+        // explicitly add composer autoloader
+        $box->addFile($pathVendor . 'autoload.php');
+
+        // TODO: check for vendor/bin !
+
+        // only add composer base directory (no sub-directories!)
+        $box->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME), $this->getBase());
+
+        $this->log('Adding dependencies...');
+        // load all installed packages (use installed.json which also includes version instead of composer.lock)
+        $installed = $this->loadJson($pathVendor . 'composer/installed.json');
+        foreach ($installed as $package) {
+            $dir = $package['name'];
+            if (isset($package['target-dir'])) {
+                $dir .= '/' . trim($package['target-dir'], '/');
+            }
+
+            $dir = $pathVendor . $dir;
+
+            $this->log('Adding dependency "' . $package['name'] . '" from "' . $dir .'"...');
+            $this->addPackage($dir, $box, $package);
+        }
+
 
         $chmod = 0755;
         $main = $this->getMain();
@@ -231,5 +254,43 @@ class PharComposer
     public function log($message)
     {
         echo $message . PHP_EOL;
+    }
+
+    private function loadJson($path)
+    {
+        $ret = json_decode(file_get_contents($path), true);
+        if ($ret === null) {
+            var_dump(json_last_error(), JSON_ERROR_SYNTAX);
+            throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
+        }
+        return $ret;
+    }
+
+    private function getPackage()
+    {
+        return $this->package;
+    }
+
+    private function addPackage($dir, Box $box, array $package)
+    {
+        $dir = rtrim($dir, '/') . '/';
+
+        $vendor = 'vendor';
+        if (isset($package['config']['vendor-dir'])) {
+            $vendor = $package['config']['vendor-dir'];
+        }
+
+        $iterator = Finder::create()
+            ->files()
+            //->filter($this->getBlacklistFilter())
+            ->exclude($dir . $vendor)
+            ->ignoreVCS(true)
+            ->in($dir);
+
+        // TODO: replace with bundler
+        // $this->getBundler()->build($this, $box);
+
+        $this->log('adding "' . $dir .'" as "' . $this->getPathLocalToBase($dir).'"...');
+        $box->buildFromIterator($iterator, $this->getBase());
     }
 }
