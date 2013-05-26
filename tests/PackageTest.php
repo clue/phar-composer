@@ -43,4 +43,20 @@ class PackageTest extends TestCase
 
         $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit', $package->getBundler());
     }
+
+    /**
+     * @expectedException UnexpectedValueException
+     */
+    public function testConstructorBundlerInvalid()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'bundler' => 'invalid'
+                )
+            )
+        ), 'dir/');
+
+        $package->getBundler();
+    }
 }
