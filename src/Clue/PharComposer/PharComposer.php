@@ -106,15 +106,19 @@ class PharComposer
         $pathVendor = $this->getPathVendor();
 
         // load all installed packages (use installed.json which also includes version instead of composer.lock)
-        $installed = $this->loadJson($pathVendor . 'composer/installed.json');
-        foreach ($installed as $package) {
-            $dir = $package['name'] . '/';
-            if (isset($package['target-dir'])) {
-                $dir .= trim($package['target-dir'], '/') . '/';
-            }
+        if (is_file($pathVendor . 'composer/installed.json')) {
+            // file does not exist if there's nothing to be installed
+            $installed = $this->loadJson($pathVendor . 'composer/installed.json');
 
-            $dir = $pathVendor . $dir;
-            $packages []= new Package($package, $dir);
+            foreach ($installed as $package) {
+                $dir = $package['name'] . '/';
+                if (isset($package['target-dir'])) {
+                    $dir .= trim($package['target-dir'], '/') . '/';
+                }
+
+                $dir = $pathVendor . $dir;
+                $packages []= new Package($package, $dir);
+            }
         }
 
         return $packages;
