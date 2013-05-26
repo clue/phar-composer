@@ -72,6 +72,12 @@ $ curl -s https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
 
+> As an example, you can now build the above mentioned `phar-composer.phar` yourself by issuing:
+>
+> ```bash
+> $ php bin/phar-composer build
+> ```
+
 #### Updating manually
 ```bash
 $ git pull
