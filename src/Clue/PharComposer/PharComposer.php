@@ -151,17 +151,17 @@ class PharComposer
         // only add composer base directory (no sub-directories!)
         $box->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME), $this->getBase());
 
-        $this->log('Adding dependencies...');
         foreach ($this->getPackagesDependencies() as $package) {
-            $this->log('Adding dependency "' . $package->getName() . '" from "' . $package->getDirectory() .'"...');
+            $this->log('Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) .'"...');
             $this->addPackage($package, $box);
         }
 
 
+        $this->log('Setting main/stub...');
         $chmod = 0755;
         $main = $this->getMain();
         if ($main === null) {
-            $this->log('WARNING: No main bin file defined! Resulting phar will NOT be executable');
+            $this->log('    WARNING: No main bin file defined! Resulting phar will NOT be executable');
         } else {
             $generator = StubGenerator::create()
                 ->index($this->getPathLocalToBase($main))
@@ -169,7 +169,7 @@ class PharComposer
 
             $lines = file($main, FILE_IGNORE_NEW_LINES);
             if (substr($lines[0], 0, 2) === '#!') {
-                $this->log('Using referenced shebang "'. $lines[0] . '"');
+                $this->log('    Using referenced shebang "'. $lines[0] . '"');
                 $generator->shebang($lines[0]);
 
                 // remove shebang from main file and add (overwrite)
@@ -180,13 +180,13 @@ class PharComposer
             $box->getPhar()->setStub($generator->generate());
 
             $chmod = octdec(substr(decoct(fileperms($main)),-4));
-            $this->log('Using referenced chmod ' . sprintf('%04o', $chmod));
+            $this->log('    Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
         $box->getPhar()->stopBuffering();
 
         if ($chmod !== null) {
-            $this->log('Applying chmod ' . sprintf('%04o', $chmod) . '...');
+            $this->log('    Applying chmod ' . sprintf('%04o', $chmod) . '...');
             if (chmod($target, $chmod) === false) {
                 throw new UnexpectedValueException('Unable to chmod target file "' . $target .'"');
             }
@@ -218,10 +218,6 @@ class PharComposer
 
     private function addPackage(Package $package, Box $box)
     {
-        $dir = $package->getDirectory();
-
-        $this->log('adding "' . $dir .'" as "' . $this->getPathLocalToBase($dir).'"...');
-
         $package->getBundler()->build($this, $box, $package);
     }
 }

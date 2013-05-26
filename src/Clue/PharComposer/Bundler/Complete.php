@@ -19,7 +19,7 @@ class Complete implements BundlerInterface
             ->exclude($package->getPathVendor())
             ->in($package->getDirectory());
 
-        $pharcomposer->log('Adding whole project directory "' . $package->getDirectory() . '"...');
+        $pharcomposer->log('    Adding whole project directory "' . $package->getDirectory() . '"...');
         $box->buildFromIterator($iterator, $pharcomposer->getBase());
     }
 }
