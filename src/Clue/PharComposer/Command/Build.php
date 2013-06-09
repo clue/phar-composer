@@ -48,11 +48,10 @@ class Build extends Command
                 $output->writeln('<info>There\'s also a directory with the given name</info>');
             }
             $package = $path;
-            $version = null;
             $path = 'temporary' . mt_rand(0,9);
 
             $output->writeln('Installing <info>' . $package . '</info> to <info>' . $path . '...');
-            $return = shell_exec('php composer.phar create-project ' . escapeshellarg($package . ':' . $version) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-progress');
+            $return = shell_exec('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts');
             $output->write($return);
         }
 
@@ -104,7 +103,6 @@ class Build extends Command
 
     private function isPackageName($path)
     {
-        // TODO:
-        return true;
+        return !!preg_match('/^[^\s\/]+\/[^\s\/]+(\:[^\s]+)?$/i', $path);
     }
 }
