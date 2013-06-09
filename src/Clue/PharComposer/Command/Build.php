@@ -42,6 +42,20 @@ class Build extends Command
         }
 
         $path = $input->getArgument('path');
+
+        if ($this->isPackageName($path)) {
+            if (is_dir($path)) {
+                $output->writeln('<info>There\'s also a directory with the given name</info>');
+            }
+            $package = $path;
+            $version = null;
+            $path = 'temporary' . mt_rand(0,9);
+
+            $output->writeln('Installing <info>' . $package . '</info> to <info>' . $path . '...');
+            $return = shell_exec('php composer.phar create-project ' . escapeshellarg($package . ':' . $version) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-progress');
+            $output->write($return);
+        }
+
         if (is_dir($path)) {
             $path = rtrim($path, '/') . '/composer.json';
         }
@@ -86,5 +100,11 @@ class Build extends Command
         }
 
         $pharcomposer->build();
+    }
+
+    private function isPackageName($path)
+    {
+        // TODO:
+        return true;
     }
 }
