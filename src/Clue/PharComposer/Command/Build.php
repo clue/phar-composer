@@ -2,6 +2,8 @@
 
 namespace Clue\PharComposer\Command;
 
+use Symfony\Component\Process\Process;
+
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,8 +53,14 @@ class Build extends Command
             $path = 'temporary' . mt_rand(0,9);
 
             $output->writeln('Installing <info>' . $package . '</info> to <info>' . $path . '...');
-            $return = shell_exec('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts');
-            $output->write($return);
+
+            $process = new Process('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts');
+            $process->start();
+            $process->wait(function($type, $data) use ($output) {
+                if ($type === Process::OUT) {
+                    $output->write($data);
+                }
+            });
         }
 
         if (is_dir($path)) {
