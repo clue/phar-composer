@@ -50,7 +50,11 @@ class Build extends Command
                 $output->writeln('<info>There\'s also a directory with the given name</info>');
             }
             $package = $path;
-            $path = 'temporary' . mt_rand(0,9);
+
+            $path = sys_get_temp_dir() . '/phar-composer' . mt_rand(0,9);
+            while (is_dir($path)) {
+                $path .= mt_rand(0, 9);
+            }
 
             $output->writeln('Installing <info>' . $package . '</info> to <info>' . $path . '...');
 
