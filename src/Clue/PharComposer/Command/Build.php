@@ -2,7 +2,6 @@
 
 namespace Clue\PharComposer\Command;
 
-use Symfony\Component\Process\Process;
 
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\DialogHelper;
@@ -13,6 +12,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Clue\PharComposer\PharComposer;
 use InvalidArgumentException;
+use UnexpectedValueException;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Process\Process;
 
 class Build extends Command
 {
@@ -58,13 +60,22 @@ class Build extends Command
 
             $output->writeln('Installing <info>' . $package . '</info> to <info>' . $path . '...');
 
+            $ok = true;
+
             $process = new Process('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts');
             $process->start();
-            $process->wait(function($type, $data) use ($output) {
+            $process->wait(function($type, $data) use ($output, &$ok) {
                 if ($type === Process::OUT) {
                     $output->write($data);
+                } else {
+                    $output->write($data);
+                    $ok = false;
                 }
             });
+
+            if (!$ok) {
+                throw new UnexpectedValueException('Error running composer');
+            }
         }
 
         if (is_dir($path)) {
