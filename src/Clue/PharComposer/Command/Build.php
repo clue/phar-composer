@@ -60,12 +60,16 @@ class Build extends Command
 
             $output->write('Installing <info>' . $package . '</info> to <info>' . $path . '</info>...');
 
+            $time = microtime(true);
             try {
                 $this->exec('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts', $output);
             }
             catch (UnexpectedValueException $e) {
                 throw new UnexpectedValueException('Installing package via composer failed', 0, $e);
             }
+
+            $time = max(microtime(true) - $time, 0);
+            $output->writeln('    <info>OK</info> - Downloading package completed after ' . round($time, 1) . 's');
         }
 
         if (is_dir($path)) {
@@ -111,7 +115,11 @@ class Build extends Command
             $pharcomposer->setTarget($target);
         }
 
+        $time = microtime(true);
         $pharcomposer->build();
+
+        $time = max(microtime(true) - $time, 0);
+        $output->writeln('    <info>OK</info> - Creating <info>' . $pharcomposer->getTarget() .'</info> completed after ' . round($time, 1) . 's');
     }
 
     private function isPackageName($path)
