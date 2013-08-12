@@ -51,14 +51,14 @@ abstract class Base implements BundlerInterface
             ->ignoreVCS(true)
             ->in($dir);
 
-        $this->pharcomposer->log('    adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir).'"...');
+        $this->pharcomposer->log('    adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir) . '"');
         $this->box->buildFromIterator($iterator, $this->pharcomposer->getBase());
     }
 
     protected function addFile($file)
     {
         $local = $this->pharcomposer->getPathLocalToBase($file);
-        $this->pharcomposer->log('    adding "' . $file .'" as "' . $local.'"...');
+        $this->pharcomposer->log('    adding "' . $file .'" as "' . $local . '"');
         $this->box->addFile($file, $local);
     }
 }

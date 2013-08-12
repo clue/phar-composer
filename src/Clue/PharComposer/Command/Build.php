@@ -35,7 +35,7 @@ class Build extends Command
                 return;
             }
 
-            $output->writeln('<info>Your configuration disables writing phar files (phar.readonly = On), trying to re-spawn with correct config...');
+            $output->writeln('<info>Your configuration disables writing phar files (phar.readonly = On), trying to re-spawn with correct config');
             sleep(1);
 
             $args = array_merge(array('php', '-d phar.readonly=off'), $_SERVER['argv']);
@@ -58,7 +58,7 @@ class Build extends Command
                 $path .= mt_rand(0, 9);
             }
 
-            $output->write('Installing <info>' . $package . '</info> to <info>' . $path . '</info>...');
+            $output->write('Installing <info>' . $package . '</info> to <info>' . $path . '</info>');
 
             $time = microtime(true);
             try {
@@ -69,6 +69,7 @@ class Build extends Command
             }
 
             $time = max(microtime(true) - $time, 0);
+            $output->writeln('');
             $output->writeln('    <info>OK</info> - Downloading package completed after ' . round($time, 1) . 's');
         }
 
@@ -119,6 +120,7 @@ class Build extends Command
         $pharcomposer->build();
 
         $time = max(microtime(true) - $time, 0);
+        $output->writeln('');
         $output->writeln('    <info>OK</info> - Creating <info>' . $pharcomposer->getTarget() .'</info> completed after ' . round($time, 1) . 's');
     }
 
