@@ -58,13 +58,24 @@ class Build extends Command
                 $path .= mt_rand(0, 9);
             }
 
-            $output->writeln('Installing <info>' . $package . '</info> to <info>' . $path . '...');
+            $output->write('Installing <info>' . $package . '</info> to <info>' . $path . '...');
 
             $ok = true;
+            $nl = true;
 
             $process = new Process('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts');
             $process->start();
-            $process->wait(function($type, $data) use ($output, &$ok) {
+            $process->wait(function($type, $data) use ($output, &$ok, &$nl) {
+                if ($nl === true) {
+                    $data = "\n" . $data;
+                    $nl = false;
+                }
+                if (substr($data, -1) === "\n") {
+                    $nl = true;
+                    $data = substr($data, 0, -1);
+                }
+                $data = str_replace("\n", "\n    ", $data);
+
                 if ($type === Process::OUT) {
                     $output->write($data);
                 } else {
@@ -72,6 +83,9 @@ class Build extends Command
                     $ok = false;
                 }
             });
+            if ($nl) {
+                $output->writeln('');
+            }
 
             if (!$ok) {
                 throw new UnexpectedValueException('Error running composer');
