@@ -58,9 +58,14 @@ class Build extends Command
                 $path .= mt_rand(0, 9);
             }
 
-            $output->write('Installing <info>' . $package . '</info> to <info>' . $path . '...');
+            $output->write('Installing <info>' . $package . '</info> to <info>' . $path . '</info>...');
 
-            $this->exec('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts', $output);
+            try {
+                $this->exec('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts', $output);
+            }
+            catch (UnexpectedValueException $e) {
+                throw new UnexpectedValueException('Installing package via composer failed', 0, $e);
+            }
         }
 
         if (is_dir($path)) {
@@ -121,7 +126,7 @@ class Build extends Command
 
         $process = new Process($cmd);
         $process->start();
-        $process->wait(function($type, $data) use ($output, &$ok, &$nl) {
+        $code = $process->wait(function($type, $data) use ($output, &$ok, &$nl) {
             if ($nl === true) {
                 $data = "\n" . $data;
                 $nl = false;
@@ -143,8 +148,12 @@ class Build extends Command
             $output->writeln('');
         }
 
+        if ($code !== 0) {
+            throw new UnexpectedValueException('Error status code: ' . $process->getExitCodeText() . ' (code ' . $code . ')');
+        }
+
         if (!$ok) {
-            throw new UnexpectedValueException('Error running composer');
+            throw new UnexpectedValueException('Error output present');
         }
     }
 }
