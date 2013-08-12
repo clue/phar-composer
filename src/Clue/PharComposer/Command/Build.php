@@ -2,7 +2,6 @@
 
 namespace Clue\PharComposer\Command;
 
-
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,6 +14,7 @@ use InvalidArgumentException;
 use UnexpectedValueException;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ExecutableFinder;
 
 class Build extends Command
 {
@@ -58,11 +58,21 @@ class Build extends Command
                 $path .= mt_rand(0, 9);
             }
 
-            $output->write('Installing <info>' . $package . '</info> to <info>' . $path . '</info>');
+            $finder = new ExecutableFinder();
+            if (is_file('composer.phar')) {
+                $command = $finder->find('php', '/usr/bin/php') . ' composer.phar';
+            } else {
+                $command = $finder->find('composer', '/usr/bin/composer');
+            }
+
+            $output->write('Installing <info>' . $package . '</info> to temporary directory <info>' . $path . '</info> (using <info>' . $command . '</info>)');
+
+
+            $command .= ' create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts';
 
             $time = microtime(true);
             try {
-                $this->exec('php composer.phar create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts', $output);
+                $this->exec($command, $output);
             }
             catch (UnexpectedValueException $e) {
                 throw new UnexpectedValueException('Installing package via composer failed', 0, $e);
