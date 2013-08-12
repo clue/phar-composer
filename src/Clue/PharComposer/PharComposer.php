@@ -132,9 +132,9 @@ class PharComposer
         }
 
         $target = $this->getTarget();
-        $this->log('Start creating "'.$target.'"...');
+        $this->log('Start creating "'.$target.'"');
         if (file_exists($target)) {
-            $this->log('Remove existing file...');
+            $this->log('  - Remove existing file');
             if(unlink($target) === false) {
                 throw new UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
             }
@@ -143,10 +143,10 @@ class PharComposer
         $box = Box::create($target);
         $box->getPhar()->startBuffering();
 
-        $this->log('Adding main package...');
+        $this->log('  - Adding main package');
         $this->addPackage($this->getPackageRoot(), $box);
 
-        $this->log('Adding composer base files...');
+        $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
         $box->addFile($pathVendor . 'autoload.php');
 
@@ -156,12 +156,12 @@ class PharComposer
         $box->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME), $this->getBase());
 
         foreach ($this->getPackagesDependencies() as $package) {
-            $this->log('Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) .'"...');
+            $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
             $this->addPackage($package, $box);
         }
 
 
-        $this->log('Setting main/stub...');
+        $this->log('  - Setting main/stub');
         $chmod = 0755;
         $main = $this->getMain();
         if ($main === null) {
@@ -190,7 +190,7 @@ class PharComposer
         $box->getPhar()->stopBuffering();
 
         if ($chmod !== null) {
-            $this->log('    Applying chmod ' . sprintf('%04o', $chmod) . '...');
+            $this->log('    Applying chmod ' . sprintf('%04o', $chmod));
             if (chmod($target, $chmod) === false) {
                 throw new UnexpectedValueException('Unable to chmod target file "' . $target .'"');
             }

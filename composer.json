@@ -7,7 +7,8 @@
     "require": {
         "herrera-io/box": "~1.2",
         "symfony/console": "~2.1",
-        "symfony/finder": "~2.1"
+        "symfony/finder": "~2.1",
+        "symfony/process": "~2.1"
     },
     "autoload": {
         "psr-0": {"Clue": "src/"}
@@ -16,6 +17,6 @@
     "extra": {
         "phar": {
             "bundler": "composer"
-        }    
+        }
     }
 }
