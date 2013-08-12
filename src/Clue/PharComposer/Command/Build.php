@@ -11,6 +11,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Clue\PharComposer\PharComposer;
 use InvalidArgumentException;
+use UnexpectedValueException;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ExecutableFinder;
 
 class Build extends Command
 {
@@ -31,7 +35,7 @@ class Build extends Command
                 return;
             }
 
-            $output->writeln('<info>Your configuration disables writing phar files (phar.readonly = On), trying to re-spawn with correct config...');
+            $output->writeln('<info>Your configuration disables writing phar files (phar.readonly = On), trying to re-spawn with correct config');
             sleep(1);
 
             $args = array_merge(array('php', '-d phar.readonly=off'), $_SERVER['argv']);
@@ -42,6 +46,43 @@ class Build extends Command
         }
 
         $path = $input->getArgument('path');
+
+        if ($this->isPackageName($path)) {
+            if (is_dir($path)) {
+                $output->writeln('<info>There\'s also a directory with the given name</info>');
+            }
+            $package = $path;
+
+            $path = sys_get_temp_dir() . '/phar-composer' . mt_rand(0,9);
+            while (is_dir($path)) {
+                $path .= mt_rand(0, 9);
+            }
+
+            $finder = new ExecutableFinder();
+            if (is_file('composer.phar')) {
+                $command = $finder->find('php', '/usr/bin/php') . ' composer.phar';
+            } else {
+                $command = $finder->find('composer', '/usr/bin/composer');
+            }
+
+            $output->write('Installing <info>' . $package . '</info> to temporary directory <info>' . $path . '</info> (using <info>' . $command . '</info>)');
+
+
+            $command .= ' create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts';
+
+            $time = microtime(true);
+            try {
+                $this->exec($command, $output);
+            }
+            catch (UnexpectedValueException $e) {
+                throw new UnexpectedValueException('Installing package via composer failed', 0, $e);
+            }
+
+            $time = max(microtime(true) - $time, 0);
+            $output->writeln('');
+            $output->writeln('    <info>OK</info> - Downloading package completed after ' . round($time, 1) . 's');
+        }
+
         if (is_dir($path)) {
             $path = rtrim($path, '/') . '/composer.json';
         }
@@ -85,6 +126,54 @@ class Build extends Command
             $pharcomposer->setTarget($target);
         }
 
+        $time = microtime(true);
         $pharcomposer->build();
+
+        $time = max(microtime(true) - $time, 0);
+        $output->writeln('');
+        $output->writeln('    <info>OK</info> - Creating <info>' . $pharcomposer->getTarget() .'</info> completed after ' . round($time, 1) . 's');
+    }
+
+    private function isPackageName($path)
+    {
+        return !!preg_match('/^[^\s\/]+\/[^\s\/]+(\:[^\s]+)?$/i', $path);
+    }
+
+    private function exec($cmd, OutputInterface $output)
+    {
+        $ok = true;
+        $nl = true;
+
+        $process = new Process($cmd);
+        $process->start();
+        $code = $process->wait(function($type, $data) use ($output, &$ok, &$nl) {
+            if ($nl === true) {
+                $data = "\n" . $data;
+                $nl = false;
+            }
+            if (substr($data, -1) === "\n") {
+                $nl = true;
+                $data = substr($data, 0, -1);
+            }
+            $data = str_replace("\n", "\n    ", $data);
+
+            if ($type === Process::OUT) {
+                $output->write($data);
+            } else {
+                $output->write($data);
+                $ok = false;
+            }
+        });
+        if ($nl) {
+            $output->writeln('');
+        }
+
+        if ($code !== 0) {
+            throw new UnexpectedValueException('Error status code: ' . $process->getExitCodeText() . ' (code ' . $code . ')');
+        }
+
+        if (!$ok) {
+            throw new UnexpectedValueException('Error output present');
+        }
     }
 }
