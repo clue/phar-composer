@@ -3,20 +3,20 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "71fdf228cd68c87ac843c6462c69801d",
+    "hash": "d49f67208ee2524ba8dcb88d80887c2a",
     "packages": [
         {
             "name": "herrera-io/box",
-            "version": "1.4.0",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/herrera-io/php-box.git",
-                "reference": "1.4.0"
+                "reference": "1.5.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/herrera-io/php-box/zipball/1.4.0",
-                "reference": "1.4.0",
+                "url": "https://api.github.com/repos/herrera-io/php-box/zipball/1.5.0",
+                "reference": "1.5.0",
                 "shasum": ""
             },
             "require": {
@@ -25,12 +25,14 @@
                 "php": ">=5.3.3"
             },
             "require-dev": {
+                "herrera-io/annotations": "~1.0",
                 "herrera-io/phpunit-test-case": "1.*",
                 "mikey179/vfsstream": "1.1.0",
                 "phpseclib/phpseclib": "~0.3",
                 "phpunit/phpunit": "3.7.*"
             },
             "suggest": {
+                "herrera-io/annotations": "For compacting annotated docblocks.",
                 "phpseclib/phpseclib": "For verifying OpenSSL signed phars without the phar extension."
             },
             "type": "library",
@@ -60,7 +62,7 @@
             "keywords": [
                 "phar"
             ],
-            "time": "2013-07-23 17:27:25"
+            "time": "2013-08-09 22:42:01"
         },
         {
             "name": "herrera-io/file-system-functions",
