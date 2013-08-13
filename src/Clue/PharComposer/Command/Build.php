@@ -47,16 +47,69 @@ class Build extends Command
 
         $path = $input->getArgument('path');
 
-        if ($this->isPackageName($path)) {
+        if ($this->isPackageUrl($path)) {
+            $url = $path;
+            $version = null;
+
+            if (preg_match('/(.+)\:((?:dev\-|v\d)\S+)$/i', $url, $match)) {
+                $url = $match[1];
+                $version = $match[2];
+                if (substr($version, 0, 4) === 'dev-') {
+                    $version = substr($version, 4);
+                }
+            }
+
+
+            $path = $this->getDirTemporary();
+
+            $finder = new ExecutableFinder();
+
+            $output->write('Cloning <info>' . $url . '</info> into temporary directory <info>' . $path . '</info>');
+
+            $git = $finder->find('git', '/usr/bin/git');
+
+            $time = microtime(true);
+            $this->exec($git . ' clone ' . escapeshellarg($url) . ' ' . escapeshellarg($path), $output);
+
+            if ($version !== null) {
+                $this->exec($git . ' checkout ' . escapeshellarg($version) . ' 2>&1', $output, $path);
+            }
+
+            $time = max(microtime(true) - $time, 0);
+            $output->writeln('');
+            $output->writeln('    <info>OK</info> - Cloning base repository completed after ' . round($time, 1) . 's');
+
+            $pharcomposer = new PharComposer($path . '/composer.json');
+            $package = $pharcomposer->getPackageRoot()->getName();
+
+            if (is_file('composer.phar')) {
+                $command = $finder->find('php', '/usr/bin/php') . ' composer.phar';
+            } else {
+                $command = $finder->find('composer', '/usr/bin/composer');
+            }
+
+            $output->write('Installing dependencies for <info>' . $package . '</info> into <info>' . $path . '</info> (using <info>' . $command . '</info>)');
+
+            $command .= ' install --no-dev --no-progress --no-scripts';
+
+            $time = microtime(true);
+            try {
+                $this->exec($command, $output, $path);
+            }
+            catch (UnexpectedValueException $e) {
+                throw new UnexpectedValueException('Installing dependencies via composer failed', 0, $e);
+            }
+
+            $time = max(microtime(true) - $time, 0);
+            $output->writeln('');
+            $output->writeln('    <info>OK</info> - Downloading dependencies completed after ' . round($time, 1) . 's');
+        } elseif ($this->isPackageName($path)) {
             if (is_dir($path)) {
                 $output->writeln('<info>There\'s also a directory with the given name</info>');
             }
             $package = $path;
 
-            $path = sys_get_temp_dir() . '/phar-composer' . mt_rand(0,9);
-            while (is_dir($path)) {
-                $path .= mt_rand(0, 9);
-            }
+            $path = $this->getDirTemporary();
 
             $finder = new ExecutableFinder();
             if (is_file('composer.phar')) {
@@ -139,12 +192,27 @@ class Build extends Command
         return !!preg_match('/^[^\s\/]+\/[^\s\/]+(\:[^\s]+)?$/i', $path);
     }
 
-    private function exec($cmd, OutputInterface $output)
+    private function isPackageUrl($path)
+    {
+        return (strpos($path, '://') !== false && @parse_url($path) !== false);
+    }
+
+    private function getDirTemporary()
+    {
+        $path = sys_get_temp_dir() . '/phar-composer' . mt_rand(0,9);
+        while (is_dir($path)) {
+            $path .= mt_rand(0, 9);
+        }
+
+        return $path;
+    }
+
+    private function exec($cmd, OutputInterface $output, $chdir = null)
     {
         $ok = true;
         $nl = true;
 
-        $process = new Process($cmd);
+        $process = new Process($cmd, $chdir);
         $process->start();
         $code = $process->wait(function($type, $data) use ($output, &$ok, &$nl) {
             if ($nl === true) {
