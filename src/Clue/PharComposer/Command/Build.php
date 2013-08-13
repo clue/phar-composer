@@ -152,6 +152,9 @@ class Build extends Command
         $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
 
         $pharcomposer = new PharComposer($path);
+        $pharcomposer->setOutput(function ($line) use ($output) {
+            $output->write($line);
+        });
 
         $pathVendor = $pharcomposer->getPathVendor();
         if (!is_dir($pathVendor)) {
