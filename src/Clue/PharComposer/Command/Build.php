@@ -49,14 +49,31 @@ class Build extends Command
 
         if ($this->isPackageUrl($path)) {
             $url = $path;
+            $version = null;
+
+            if (preg_match('/(.+)\:((?:dev\-|v\d)\S+)$/i', $url, $match)) {
+                $url = $match[1];
+                $version = $match[2];
+                if (substr($version, 0, 4) === 'dev-') {
+                    $version = substr($version, 4);
+                }
+            }
+
+
             $path = $this->getDirTemporary();
 
             $finder = new ExecutableFinder();
 
             $output->write('Cloning <info>' . $url . '</info> into temporary directory <info>' . $path . '</info>');
 
+            $git = $finder->find('git', '/usr/bin/git');
+
             $time = microtime(true);
-            $this->exec($finder->find('git', '/usr/bin/git') . ' clone ' . escapeshellarg($url) . ' ' . escapeshellarg($path), $output);
+            $this->exec($git . ' clone ' . escapeshellarg($url) . ' ' . escapeshellarg($path), $output);
+
+            if ($version !== null) {
+                $this->exec($git . ' checkout ' . escapeshellarg($version) . ' 2>&1', $output, $path);
+            }
 
             $time = max(microtime(true) - $time, 0);
             $output->writeln('');
@@ -73,11 +90,11 @@ class Build extends Command
 
             $output->write('Installing dependencies for <info>' . $package . '</info> into <info>' . $path . '</info> (using <info>' . $command . '</info>)');
 
-            $command .= ' install --no-dev --no-progress --no-scripts --working-dir=' . escapeshellarg($path);
+            $command .= ' install --no-dev --no-progress --no-scripts';
 
             $time = microtime(true);
             try {
-                $this->exec($command, $output);
+                $this->exec($command, $output, $path);
             }
             catch (UnexpectedValueException $e) {
                 throw new UnexpectedValueException('Installing dependencies via composer failed', 0, $e);
@@ -190,12 +207,12 @@ class Build extends Command
         return $path;
     }
 
-    private function exec($cmd, OutputInterface $output)
+    private function exec($cmd, OutputInterface $output, $chdir = null)
     {
         $ok = true;
         $nl = true;
 
-        $process = new Process($cmd);
+        $process = new Process($cmd, $chdir);
         $process->start();
         $code = $process->wait(function($type, $data) use ($output, &$ok, &$nl) {
             if ($nl === true) {
