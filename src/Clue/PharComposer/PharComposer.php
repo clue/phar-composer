@@ -132,7 +132,6 @@ class PharComposer
         }
 
         $target = $this->getTarget();
-        $this->log('Start creating "'.$target.'"');
         if (file_exists($target)) {
             $this->log('  - Remove existing file');
             if(unlink($target) === false) {
