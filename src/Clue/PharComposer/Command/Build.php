@@ -45,11 +45,15 @@ class Build extends Command
             }
         }
 
+        $step = 1;
+        $steps = 1;
+
         $path = $input->getArgument('path');
 
         if ($this->isPackageUrl($path)) {
             $url = $path;
             $version = null;
+            $steps = 3;
 
             if (preg_match('/(.+)\:((?:dev\-|v\d)\S+)$/i', $url, $match)) {
                 $url = $match[1];
@@ -64,7 +68,7 @@ class Build extends Command
 
             $finder = new ExecutableFinder();
 
-            $output->write('Cloning <info>' . $url . '</info> into temporary directory <info>' . $path . '</info>');
+            $output->write('[' . $step++ . '/' . $steps.'] Cloning <info>' . $url . '</info> into temporary directory <info>' . $path . '</info>');
 
             $git = $finder->find('git', '/usr/bin/git');
 
@@ -88,7 +92,7 @@ class Build extends Command
                 $command = $finder->find('composer', '/usr/bin/composer');
             }
 
-            $output->write('Installing dependencies for <info>' . $package . '</info> into <info>' . $path . '</info> (using <info>' . $command . '</info>)');
+            $output->write('[' . $step++ . '/' . $steps.'] Installing dependencies for <info>' . $package . '</info> into <info>' . $path . '</info> (using <info>' . $command . '</info>)');
 
             $command .= ' install --no-dev --no-progress --no-scripts';
 
@@ -107,6 +111,7 @@ class Build extends Command
             if (is_dir($path)) {
                 $output->writeln('<info>There\'s also a directory with the given name</info>');
             }
+            $steps = 2;
             $package = $path;
 
             $path = $this->getDirTemporary();
@@ -118,7 +123,7 @@ class Build extends Command
                 $command = $finder->find('composer', '/usr/bin/composer');
             }
 
-            $output->write('Installing <info>' . $package . '</info> to temporary directory <info>' . $path . '</info> (using <info>' . $command . '</info>)');
+            $output->write('[' . $step++ . '/' . $steps.'] Installing <info>' . $package . '</info> to temporary directory <info>' . $path . '</info> (using <info>' . $command . '</info>)');
 
 
             $command .= ' create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts';
@@ -147,6 +152,9 @@ class Build extends Command
         $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('black', 'yellow'));
 
         $pharcomposer = new PharComposer($path);
+        $pharcomposer->setOutput(function ($line) use ($output) {
+            $output->write($line);
+        });
 
         $pathVendor = $pharcomposer->getPathVendor();
         if (!is_dir($pathVendor)) {
@@ -178,6 +186,8 @@ class Build extends Command
         if ($target !== null) {
             $pharcomposer->setTarget($target);
         }
+
+        $output->writeln('[' . $step++ . '/' . $steps.'] Creating phar <info>' . $pharcomposer->getTarget() . '</info>');
 
         $time = microtime(true);
         $pharcomposer->build();

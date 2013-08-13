@@ -17,6 +17,7 @@ class PharComposer
     private $package;
     private $main = null;
     private $target = null;
+    private $output = true;
 
     public function __construct($path)
     {
@@ -24,6 +25,16 @@ class PharComposer
 
         $this->package = $this->loadJson($path);
         $this->pathProject = dirname($path) . '/';
+    }
+
+    /**
+     * set output function to use to output log messages
+     *
+     * @param callable|boolean $output callable that receives a single $line argument or boolean echo
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
     }
 
     public function getTarget()
@@ -132,7 +143,6 @@ class PharComposer
         }
 
         $target = $this->getTarget();
-        $this->log('Start creating "'.$target.'"');
         if (file_exists($target)) {
             $this->log('  - Remove existing file');
             if(unlink($target) === false) {
@@ -207,7 +217,16 @@ class PharComposer
 
     public function log($message)
     {
-        echo $message . PHP_EOL;
+        $this->output($message . PHP_EOL);
+    }
+
+    private function output($message)
+    {
+        if ($this->output === true) {
+            echo $message;
+        } elseif ($this->output !== false) {
+            call_user_func($this->output, $message);
+        }
     }
 
     private function loadJson($path)
