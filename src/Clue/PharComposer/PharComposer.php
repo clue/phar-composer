@@ -179,6 +179,7 @@ class PharComposer
         } else {
             $generator = StubGenerator::create()
                 ->index($this->getPathLocalToBase($main))
+                ->extract(true)
                 ->banner("Bundled by phar-composer with the help of php-box.\n\n@link https://github.com/clue/phar-composer");
 
             $lines = file($main, FILE_IGNORE_NEW_LINES);
