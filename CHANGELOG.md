@@ -4,7 +4,7 @@ This file is a manually maintained list of changes for each release. Feel free
 to add your changes here when sending pull requests. Also send corrections if
 you spot any mistakes.
 
-## 0.2.0 (2013-xx-xx)
+## 0.2.0 (2013-08-15)
 
 * Feature: Packages can now also be cloned from any git URLs (#9), like this:
 
