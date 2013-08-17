@@ -4,6 +4,17 @@ This file is a manually maintained list of changes for each release. Feel free
 to add your changes here when sending pull requests. Also send corrections if
 you spot any mistakes.
 
+## 0.3.0 (2013-xx-xx)
+
+* Feature: Resulting phar files can now be executed on systems without
+ext-phar (#8). This vastly improves portability for legacy setups by including
+a small startup script which self-extracts the current archive into a temporary
+directory.
+* Feature: Resulting phar files can now be executed without the phar file name
+extension. E.g. this convenient feature now allows you to move your `~demo.phar`
+to `/usr/bin/demo` for easy system wide installations.
+* Fix: Resolving absolute paths to `vendor/autoload.php`
+
 ## 0.2.0 (2013-08-15)
 
 * Feature: Packages can now also be cloned from any git URLs (#9), like this:
