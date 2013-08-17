@@ -158,7 +158,7 @@ class PharComposer
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
-        $box->addFile($pathVendor . 'autoload.php');
+        $box->addFile($pathVendor . 'autoload.php', $this->getPathLocalToBase($pathVendor . 'autoload.php'));
 
         // TODO: check for vendor/bin !
 
