@@ -1,17 +1,17 @@
 # clue/phar-composer [![Build Status](https://travis-ci.org/clue/phar-composer.png?branch=master)](https://travis-ci.org/clue/phar-composer)
 
-Simple phar creation for your projects managed via composer.
+Simple phar creation for any project managed via composer.
 
 It takes your existing project's `composer.json` and builds an executable phar
 for your project among with its bundled dependencies.
 
-* Create a single executable phar archive, including its dependencies
+* Create a single executable phar archive, including its dependencies (i.e. vendor directory included)
 * Automated build process
 * Zero additional configuration 
 
-> Note: This project is in early alpha stage! It's been tested against a wide range
-of packages and we have yet to find any major issues. Given the current lack of unit
-tests, it's likely we're missing some edge cases though. Feel free to report any issues you encounter.
+> Note: This project is in beta stage! It's been tested against a wide range
+of packages and we have yet to find any major issues.
+Feel free to report any issues you encounter.
 
 ## Usage
 
@@ -21,12 +21,14 @@ Once clue/phar-composer is [installed](#install), you can simply invoke it via c
 $ php phar-composer.phar build ~/path/to/your/project
 ```
 
+The second argument can be pretty much everything that can be resolved to a valid project managed by composer.
+
 > As an example, this projet itself is bundled via phar-composer
 ([google recursion](https://www.google.com/search?q=recursion)). So instead of downloading the
 below mentioned `phar-composer.phar`, you can build one yourself by issuing:
 >
 > ```bash
-> $ php bin/phar-composer build ~/workspace/phar-composer
+> $ php phar-composer.phar build ~/workspace/phar-composer
 > ```
 
 ## Install
