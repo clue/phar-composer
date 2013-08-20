@@ -18,10 +18,43 @@ Feel free to report any issues you encounter.
 Once clue/phar-composer is [installed](#install), you can simply invoke it via command line like this:
 
 ```bash
-$ php phar-composer.phar build ~/path/to/your/project
+$ phar-composer build ~/path/to/your/project
 ```
 
 The second argument can be pretty much everything that can be resolved to a valid project managed by composer.
+Besides creating phar archives for locally installed packages like above, you can also easily download and
+bundle packages from packagist.org like this:
+
+```bash
+$ phar-composer build d11wtq/boris
+```
+
+The above will download and install the latest stable tagged release (if any).
+You can also specify a tagged version like this:
+
+```bash
+$ phar-composer build clue/phar-composer:0.1.*
+```
+
+Or you can specify to install the head of a given branch like this:
+
+```bash
+$ phar-composer build clue/phar-composer:dev-master
+```
+
+A similar syntax can be used to clone a package from any git URL. This is particularly
+useful for private packages or temporary git clones not otherwise listed on packagist:
+
+```bash
+$ phar-composer build https://github.com/composer/composer.git
+```
+
+The above will clone the repository and check out the default branch.
+Again, you can specify either a tag or branch name very similar to how composer works:
+
+```bash
+$ phar-composer build https://github.com/composer/composer.git:dev-master
+```
 
 > As an example, this projet itself is bundled via phar-composer
 ([google recursion](https://www.google.com/search?q=recursion)). So instead of downloading the
