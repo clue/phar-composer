@@ -33,7 +33,7 @@ The above will download and install the latest stable tagged release (if any).
 You can also specify a tagged version like this:
 
 ```bash
-$ phar-composer build clue/phar-composer:0.1.*
+$ phar-composer build clue/phar-composer:0.3.*
 ```
 
 Or you can specify to install the head of a given branch like this:

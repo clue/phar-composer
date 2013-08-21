@@ -4,7 +4,7 @@ This file is a manually maintained list of changes for each release. Feel free
 to add your changes here when sending pull requests. Also send corrections if
 you spot any mistakes.
 
-## 0.3.0 (2013-xx-xx)
+## 0.3.0 (2013-08-21)
 
 * Feature: Resulting phar files can now be executed on systems without
 ext-phar (#8). This vastly improves portability for legacy setups by including
