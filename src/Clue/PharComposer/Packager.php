@@ -98,20 +98,20 @@ class Packager
 
             $finder = new ExecutableFinder();
 
-            $this->log('[' . $step++ . '/' . $steps.'] Cloning <info>' . $url . '</info> into temporary directory <info>' . $path . '</info>');
-
             $git = $finder->find('git', '/usr/bin/git');
 
-            $time = microtime(true);
-            $this->exec($git . ' clone ' . escapeshellarg($url) . ' ' . escapeshellarg($path));
+            $that = $this;
+            $this->displayMeasure(
+                '[' . $step++ . '/' . $steps.'] Cloning <info>' . $url . '</info> into temporary directory <info>' . $path . '</info>',
+                function() use ($that, $url, $path, $version, $git) {
+                    $that->exec($git . ' clone ' . escapeshellarg($url) . ' ' . escapeshellarg($path));
 
-            if ($version !== null) {
-                $this->exec($git . ' checkout ' . escapeshellarg($version) . ' 2>&1', $path);
-            }
-
-            $time = max(microtime(true) - $time, 0);
-            //$this->log('');
-            $this->log('    <info>OK</info> - Cloning base repository completed after ' . round($time, 1) . 's');
+                    if ($version !== null) {
+                        $this->exec($git . ' checkout ' . escapeshellarg($version) . ' 2>&1', $path);
+                    }
+                },
+                'Cloning base repository completed'
+            );
 
             $pharcomposer = new PharComposer($path . '/composer.json');
             $package = $pharcomposer->getPackageRoot()->getName();
@@ -121,22 +121,20 @@ class Packager
             } else {
                 $command = $finder->find('composer', '/usr/bin/composer');
             }
-
-            $this->log('[' . $step++ . '/' . $steps.'] Installing dependencies for <info>' . $package . '</info> into <info>' . $path . '</info> (using <info>' . $command . '</info>)');
-
             $command .= ' install --no-dev --no-progress --no-scripts';
 
-            $time = microtime(true);
-            try {
-                $this->exec($command, $path);
-            }
-            catch (UnexpectedValueException $e) {
-                throw new UnexpectedValueException('Installing dependencies via composer failed', 0, $e);
-            }
-
-            $time = max(microtime(true) - $time, 0);
-            $this->log('');
-            $this->log('    <info>OK</info> - Downloading dependencies completed after ' . round($time, 1) . 's');
+            $this->displayMeasure(
+                '[' . $step++ . '/' . $steps.'] Installing dependencies for <info>' . $package . '</info> into <info>' . $path . '</info> (using <info>' . $command . '</info>)',
+                function () use ($that, $command, $path) {
+                    try {
+                        $that->exec($command, $path);
+                    }
+                    catch (UnexpectedValueException $e) {
+                        throw new UnexpectedValueException('Installing dependencies via composer failed', 0, $e);
+                    }
+                },
+                'Downloading dependencies completed'
+            );
         } elseif ($this->isPackageName($path)) {
             if (is_dir($path)) {
                 $this->log('<info>There\'s also a directory with the given name</info>');
@@ -152,23 +150,21 @@ class Packager
             } else {
                 $command = $finder->find('composer', '/usr/bin/composer');
             }
-
-            $this->log('[' . $step++ . '/' . $steps.'] Installing <info>' . $package . '</info> to temporary directory <info>' . $path . '</info> (using <info>' . $command . '</info>)');
-
-
             $command .= ' create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts';
 
-            $time = microtime(true);
-            try {
-                $this->exec($command);
-            }
-            catch (UnexpectedValueException $e) {
-                throw new UnexpectedValueException('Installing package via composer failed', 0, $e);
-            }
-
-            $time = max(microtime(true) - $time, 0);
-            $this->log('');
-            $this->log('    <info>OK</info> - Downloading package completed after ' . round($time, 1) . 's');
+            $that = $this;
+            $this->displayMeasure(
+                '[' . $step++ . '/' . $steps.'] Installing <info>' . $package . '</info> to temporary directory <info>' . $path . '</info> (using <info>' . $command . '</info>)',
+                function () use ($that, $command) {
+                    try {
+                        $that->exec($command);
+                    }
+                    catch (UnexpectedValueException $e) {
+                        throw new UnexpectedValueException('Installing package via composer failed', 0, $e);
+                    }
+                },
+                'Downloading package completed'
+            );
         }
 
         if (is_dir($path)) {
@@ -200,7 +196,17 @@ class Packager
         return max(microtime(true) - $time, 0);
     }
 
-    private function exec($cmd, $chdir = null)
+    public function displayMeasure($title, $fn, $success)
+    {
+        $this->log($title);
+
+        $time = $this->measure($fn);
+
+        $this->log('');
+        $this->log('    <info>OK</info> - ' . $success .' (after ' . round($time, 1) . 's)');
+    }
+
+    public function exec($cmd, $chdir = null)
     {
         $ok = true;
         $nl = true;
