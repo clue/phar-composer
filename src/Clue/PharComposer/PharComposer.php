@@ -18,6 +18,7 @@ class PharComposer
     private $main = null;
     private $target = null;
     private $output = true;
+    private $step = '?';
 
     public function __construct($path)
     {
@@ -137,6 +138,9 @@ class PharComposer
 
     public function build()
     {
+        $this->log('[' . $this->step . '/' . $this->step.'] Creating phar <info>' . $this->getTarget() . '</info>');
+        $time = microtime(true);
+
         $pathVendor = $this->getPathVendor();
         if (!is_dir($pathVendor)) {
             throw new RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
@@ -206,6 +210,10 @@ class PharComposer
                 throw new UnexpectedValueException('Unable to chmod target file "' . $target .'"');
             }
         }
+
+        $time = max(microtime(true) - $time, 0);
+        $this->log('');
+        $this->log('    <info>OK</info> - Creating <info>' . $this->getTarget() .'</info> completed after ' . round($time, 1) . 's');
     }
 
     public function getPathLocalToBase($path)
@@ -219,6 +227,11 @@ class PharComposer
     public function log($message)
     {
         $this->output($message . PHP_EOL);
+    }
+
+    public function setStep($step)
+    {
+        $this->step = $step;
     }
 
     private function output($message)
