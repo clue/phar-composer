@@ -11,5 +11,6 @@ class App extends BaseApplication
         parent::__construct('phar-composer', '@git_tag@');
 
         $this->add(new Command\Build());
+        $this->add(new Command\Search());
     }
 }
