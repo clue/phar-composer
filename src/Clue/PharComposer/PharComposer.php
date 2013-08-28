@@ -148,7 +148,7 @@ class PharComposer
 
         $target = $this->getTarget();
         if (file_exists($target)) {
-            $this->log('  - Remove existing file');
+            $this->log('  - Remove existing file <info>' . $target . '</info> (' . $this->getSize($target) . ')');
             if(unlink($target) === false) {
                 throw new UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
             }
@@ -212,8 +212,16 @@ class PharComposer
         }
 
         $time = max(microtime(true) - $time, 0);
+
+
+
         $this->log('');
-        $this->log('    <info>OK</info> - Creating <info>' . $this->getTarget() .'</info> completed after ' . round($time, 1) . 's');
+        $this->log('    <info>OK</info> - Creating <info>' . $this->getTarget() .'</info> (' . $this->getSize($this->getTarget()) . ') completed after ' . round($time, 1) . 's');
+    }
+
+    private function getSize($path)
+    {
+        return round(filesize($path) / 1024, 1) . ' KiB';
     }
 
     public function getPathLocalToBase($path)
