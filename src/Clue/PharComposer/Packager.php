@@ -247,6 +247,31 @@ class Packager
         }
     }
 
+    public function install(PharComposer $pharer, $path)
+    {
+        $pharer->build();
+
+        $this->log('Move resulting phar to <info>' . $path . '</info>');
+        $this->exec('sudo mv -f ' . escapeshellarg($pharer->getTarget()) . ' ' . escapeshellarg($path));
+
+        $this->log('');
+        $this->log('    <info>OK</info> - Moved to <info>' . $path . '</info>');
+    }
+
+    public function getSystemBin(PharComposer $pharer, $path = null)
+    {
+        if ($path === null) {
+            $path = '/usr/local/bin';
+        }
+
+        // check path is in $PATH environment
+        if (is_dir($path)) {
+            $path = rtrim($path, '/') . '/' . basename($pharer->getTarget(), '.phar');
+        }
+
+        return $path;
+    }
+
     private function isPackageName($path)
     {
         return !!preg_match('/^[^\s\/]+\/[^\s\/]+(\:[^\s]+)?$/i', $path);
