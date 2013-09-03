@@ -13,5 +13,6 @@ class App extends BaseApplication
         $this->add(new Command\Build());
         $this->add(new Command\Search());
         $this->add(new Command\Install());
+        $this->add(new Command\Gui());
     }
 }
