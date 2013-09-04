@@ -76,10 +76,38 @@ class Gui extends Command
         $menu->setCancelLabel('Quit');
         $selection = $menu->waitReturn();
 
-        if ($selection === false) {
+        if ($selection === '0') {
+            $pharer = $this->doSearch($builder, $packager);
+        } else {
             return;
         }
 
+        if ($pharer === null) {
+            return;
+        }
+
+        $action = $builder->listMenu(
+            array(
+                'build'   => 'Build project',
+                'install' => 'Install project system-wide'
+            ),
+            'Action for "' . $pharer->getPackageRoot()->getName() .'"' /*,
+            'Quit' */
+        )->waitReturn();
+
+        if ($action === 'build') {
+            $this->doBuild($builder, $packager, $pharer);
+        } elseif ($action ==='install') {
+            $this->doInstall($builder, $packager, $pharer);
+        } else {
+            return;
+        }
+
+        $builder->info('Successfully built ' . $pharer->getTarget() . '!')->waitReturn();
+    }
+
+    protected function doSearch(Builder $builder, Packager $packager)
+    {
         $oldname = null;
 
         do {
@@ -147,48 +175,41 @@ class Gui extends Command
             return;
         }
 
-        $action = $builder->listMenu(
-            array(
-                'build'   => 'Build project',
-                'install' => 'Install project system-wide'
-            ),
-            'Action (' . $name . ':' . $version .')' /*,
-            'Quit' */
-        )->waitReturn();
-
-        if ($action === false) {
-            return;
-        }
-
         $pulsate = $builder->pulsate('Installing to temporary directory...')->run();
         $pharer = $packager->getPharer($name, $version);
         $pulsate->close();
 
-        if ($action === 'install') {
-            $pulsate = $builder->pulsate('Installing...')->run();
+        return $pharer;
+    }
 
-            $path = $packager->getSystemBin($pharer);
-            $packager->install($pharer, $path);
-        } else {
-            $pulsate = $builder->pulsate('Waiting for target file name...')->run();
+    protected function doInstall(Builder $builder, Packager $packager, PharComposer $pharer)
+    {
+        $pulsate = $builder->pulsate('Installing...')->run();
 
-            $save = $builder->fileSave('Location to write file to', $pharer->getTarget());
+        $path = $packager->getSystemBin($pharer);
+        $packager->install($pharer, $path);
 
-            $target = $save->waitReturn();
+        $pulsate->close();
+    }
 
-            if ($target === false) {
-                return;
-            }
+    protected function doBuild(Builder $builder, Packager $packager, PharComposer $pharer)
+    {
+        $pulsate = $builder->pulsate('Waiting for target file name...')->run();
 
-            $pulsate->close();
-            $pulsate = $builder->pulsate('Building target file...')->run();
+        $save = $builder->fileSave('Location to write file to', $pharer->getTarget());
 
-            $pharer->setTarget($target);
-            $pharer->build();
+        $target = $save->waitReturn();
+
+        if ($target === false) {
+            return;
         }
 
         $pulsate->close();
+        $pulsate = $builder->pulsate('Building target file...')->run();
 
-        $builder->info('Successfully built ' . $pharer->getTarget() . '!')->waitReturn();
+        $pharer->setTarget($target);
+        $pharer->build();
+
+        $pulsate->close();
     }
 }
