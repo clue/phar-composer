@@ -34,8 +34,13 @@ class Gui extends Command
 
     public function hasZenity()
     {
+        return $this->hasBin('zenity');
+    }
+
+    private function hasBin($bin)
+    {
         foreach (explode(PATH_SEPARATOR, getenv('PATH')) as $path) {
-            $path = rtrim($path, '/') . '/zenity';
+            $path = rtrim($path, '/') . '/' . $bin;
             if (file_exists($path)) {
                 return true;
             }
@@ -81,6 +86,13 @@ class Gui extends Command
         $packager = new Packager();
         $packager->setOutput($output);
         $packager->coerceWritable();
+
+        foreach (array('gksudo', 'kdesudo', 'cocoasudo', 'sudo') as $bin) {
+            if ($this->hasBin($bin)) {
+                $packager->setBinSudo($bin);
+                break;
+            }
+        }
 
         $loop = Factory::create();
         $launcher = new Launcher($loop);
