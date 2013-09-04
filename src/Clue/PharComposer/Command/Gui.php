@@ -32,6 +32,17 @@ class Gui extends Command
              ->setDescription('Interactive GUI (requires Zenity, likely only on Linux/etc.)');
     }
 
+    public function hasZenity()
+    {
+        foreach (explode(PATH_SEPARATOR, getenv('PATH')) as $path) {
+            $path = rtrim($path, '/') . '/zenity';
+            if (file_exists($path)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected function select(OutputInterface $output, $label, array $choices, $abortable = null)
     {
         $dialog = $this->getHelperSet()->get('dialog');

@@ -37,6 +37,10 @@ class App extends BaseApplication
 
     private function getDefaultCommandName()
     {
+        $gui = $this->get('gui');
+        if ($gui instanceof Command\Gui && $gui->hasZenity()) {
+            return 'gui';
+        }
         return 'search';
     }
 
