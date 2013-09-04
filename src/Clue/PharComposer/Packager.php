@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Packager
 {
     private $output;
+    private $binSudo = 'sudo';
 
     public function __construct()
     {
@@ -21,6 +22,11 @@ class Packager
     {
         $fn = $this->output;
         $fn($message . PHP_EOL);
+    }
+
+    public function setBinSudo($bin)
+    {
+        $this->binSudo = $bin;
     }
 
     public function setOutput($fn)
@@ -252,7 +258,7 @@ class Packager
         $pharer->build();
 
         $this->log('Move resulting phar to <info>' . $path . '</info>');
-        $this->exec('sudo mv -f ' . escapeshellarg($pharer->getTarget()) . ' ' . escapeshellarg($path));
+        $this->exec($this->binSudo . ' -- mv -f ' . escapeshellarg($pharer->getTarget()) . ' ' . escapeshellarg($path));
 
         $this->log('');
         $this->log('    <info>OK</info> - Moved to <info>' . $path . '</info>');
