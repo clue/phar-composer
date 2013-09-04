@@ -148,7 +148,7 @@ class Gui extends Command
             $table->setHeight(600);
 
             $name = $table->waitReturn();
-        } while ($name === false);
+        } while (is_bool($name));
 
         $pulsate = $builder->pulsate('Selected <info>' . $name . '</info>, listing versions...');
         $pulsate->setNoCancel(true);
@@ -174,7 +174,7 @@ class Gui extends Command
         $dialog->setHeight(300);
         $version = $dialog->waitReturn();
 
-        if ($version === false) {
+        if (is_bool($version)) {
             return;
         }
 
