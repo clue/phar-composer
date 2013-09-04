@@ -81,13 +81,16 @@ class Gui extends Command
         $menu->setCancelLabel('Quit');
         $selection = $menu->waitReturn();
 
+        if ($selection === false) {
+            return;
+        }
+
         $oldname = null;
 
         do {
             $dialog = $builder->entry('Search (partial) project name', $oldname);
             $dialog->setTitle('Search project name');
             $name = $dialog->waitReturn();
-            var_dump($name);
             if ($name === false) {
                 return;
             }
@@ -105,7 +108,7 @@ class Gui extends Command
 
                 $choices[$package->getName()] = array(
                     $package->getName(),
-                    mb_strimwidth($package->getDescription(), 0, 100, '…', 'utf-8'),
+                    mb_strimwidth($package->getDescription(), 0, 80, '…', 'utf-8'),
                     $package->getDownloads()
                 );
             }
@@ -145,6 +148,10 @@ class Gui extends Command
         $dialog->setHeight(300);
         $version = $dialog->waitReturn();
 
+        if ($version === false) {
+            return;
+        }
+
         $action = $builder->listMenu(
             array(
                 'build'   => 'Build project',
@@ -154,7 +161,7 @@ class Gui extends Command
             'Quit' */
         )->waitReturn();
 
-        if ($action === null) {
+        if ($action === false) {
             return;
         }
 
