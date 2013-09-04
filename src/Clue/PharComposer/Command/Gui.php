@@ -141,6 +141,12 @@ class Gui extends Command
 
             $pulsate->close();
 
+            if (!$choices) {
+                $builder->warning('No package matching "' . $name .'" found!')->waitReturn();
+                $name = false;
+                continue;
+            }
+
             $table = $builder->table($choices, array('Name', 'Description', 'Downloads'), 'Select matching package');
             $table->setTitle('Select matching package');
             $table->setCancelLabel('Back to Search');
@@ -168,6 +174,11 @@ class Gui extends Command
         }
 
         $pulsate->close();
+
+        if (!$choices) {
+            $builder->warning('No versions for package "' . $name .'" found!')->waitReturn();
+            return;
+        }
 
         $dialog = $builder->table($choices, array('Version', 'Binary'), 'Select available version');
         $dialog->setWidth(800);
