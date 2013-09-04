@@ -45,7 +45,7 @@ class Packager
         $this->output = $fn;
     }
 
-    public function coerceWritable()
+    public function coerceWritable($wait = 1)
     {
         try {
             $this->assertWritable();
@@ -57,7 +57,9 @@ class Packager
             }
 
             $this->log('<info>' . $e->getMessage() . ', trying to re-spawn with correct config</info>');
-            sleep(1);
+            if ($wait) {
+                sleep($wait);
+            }
 
             $args = array_merge(array('php', '-d phar.readonly=off'), $_SERVER['argv']);
             if (pcntl_exec('/usr/bin/env', $args) === false) {

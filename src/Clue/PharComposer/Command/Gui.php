@@ -50,9 +50,15 @@ class Gui extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $loop = Factory::create();
+        $launcher = new Launcher($loop);
+        $builder = new Builder($launcher);
+
         $packager = new Packager();
-        $packager->setOutput($output);
-        $packager->coerceWritable();
+        $packager->setOutput(function ($line) use ($builder) {
+            $builder->info(strip_tags($line))->waitReturn();
+        });
+        $packager->coerceWritable(0);
 
         foreach (array('gksudo', 'kdesudo', 'cocoasudo', 'sudo') as $bin) {
             if ($this->hasBin($bin)) {
@@ -61,9 +67,8 @@ class Gui extends Command
             }
         }
 
-        $loop = Factory::create();
-        $launcher = new Launcher($loop);
-        $builder = new Builder($launcher);
+        $packager->setOutput($output);
+
 
         $menu = $builder->listMenu(array('Search package online', 'Select local package', 'About clue/phar-composer'), 'Action');
         $menu->setTitle('clue/phar-composer');
