@@ -70,15 +70,23 @@ class Gui extends Command
         $packager->setOutput($output);
 
 
-        $menu = $builder->listMenu(array('Search package online', 'Select local package', 'About clue/phar-composer'), 'Action');
+        $menu = $builder->listMenu(
+            array(
+                'search' => 'Search package online',
+                'local'  => 'Select local package',
+                'url'    => 'Build from git-Repository',
+                'about'  => 'About clue/phar-composer'
+            ),
+            'Action'
+        );
         $menu->setTitle('clue/phar-composer');
         $menu->setWindowIcon('info');
         $menu->setCancelLabel('Quit');
         $selection = $menu->waitReturn();
 
-        if ($selection === '0') {
+        if ($selection === 'search') {
             $pharer = $this->doSearch($builder, $packager);
-        } elseif ($selection === '1') {
+        } elseif ($selection === 'local') {
             do {
                 $dir = $builder->directorySelection()->waitReturn();
                 if ($dir === false) {
@@ -92,6 +100,8 @@ class Gui extends Command
                     $builder->error('Could not initialize composer package:' . PHP_EOL . PHP_EOL . $e->getMessage())->waitReturn();
                 }
             } while(true);
+        } elseif ($selection === 'url') {
+            $pharer = $this->doUrl($builder, $packager);
         } else {
             return;
         }
@@ -205,6 +215,28 @@ class Gui extends Command
         $pulsate->close();
 
         return $pharer;
+    }
+
+    protected function doUrl(Builder $builder, Packager $packager)
+    {
+        do {
+            $url = $builder->entry('Git URL to clone')->waitReturn();
+            if ($url === false) {
+                return;
+            }
+            $pulsate = $builder->pulsate('Cloning and installing from git...')->run();
+            try {
+                $pharer = $packager->getPharer($url);
+                $pulsate->close();
+
+                return $pharer;
+            }
+            catch (\Exception $e) {
+                $pulsate->close();
+
+                $builder->error('Unable to clone repository:' . PHP_EOL . PHP_EOL . $e->getMessage())->waitReturn();
+            }
+        } while(true);
     }
 
     protected function doInstall(Builder $builder, Packager $packager, PharComposer $pharer)
