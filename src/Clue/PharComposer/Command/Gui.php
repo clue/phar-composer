@@ -78,6 +78,9 @@ class Gui extends Command
 
         if ($selection === '0') {
             $pharer = $this->doSearch($builder, $packager);
+        } elseif ($selection === '1') {
+            $dir = $builder->directorySelection()->waitReturn();
+            $pharer = $packager->getPharer($dir);
         } else {
             return;
         }
