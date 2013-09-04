@@ -165,9 +165,13 @@ class Gui extends Command
         $pulsate->close();
 
         if ($action === 'install') {
+            $pulsate = $builder->pulsate('Installing...')->run();
+
             $path = $packager->getSystemBin($pharer);
             $packager->install($pharer, $path);
         } else {
+            $pulsate = $builder->pulsate('Waiting for target file name...')->run();
+
             $save = $builder->fileSave('Location to write file to', $pharer->getTarget());
 
             $target = $save->waitReturn();
@@ -176,9 +180,14 @@ class Gui extends Command
                 return;
             }
 
+            $pulsate->close();
+            $pulsate = $builder->pulsate('Building target file...')->run();
+
             $pharer->setTarget($target);
             $pharer->build();
         }
+
+        $pulsate->close();
 
         $builder->info('Successfully built ' . $pharer->getTarget() . '!')->waitReturn();
     }
