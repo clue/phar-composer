@@ -48,39 +48,6 @@ class Gui extends Command
         return false;
     }
 
-    protected function select(OutputInterface $output, $label, array $choices, $abortable = null)
-    {
-        $dialog = $this->getHelperSet()->get('dialog');
-        /* @var $dialog DialogHelper */
-
-        if (!$choices) {
-            $output->writeln('<error>No matching packages found</error>');
-            return;
-        }
-
-        // TODO: skip dialog, if exact match
-
-        if ($abortable === true) {
-            $abortable = '<hl>Abort</hl>';
-        } elseif ($abortable === false) {
-            $abortable = null;
-        }
-
-        $select = array_merge(array(0 => $abortable), array_values($choices));
-        if ($abortable === null) {
-            unset($select[0]);
-        }
-
-        $index = $dialog->select($output, $label, $select);
-
-        if ($index == 0) {
-            return null;
-        }
-
-        $indices = array_keys($choices);
-        return $indices[$index - 1];
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $packager = new Packager();
