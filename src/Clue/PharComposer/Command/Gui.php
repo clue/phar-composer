@@ -165,16 +165,26 @@ class Gui extends Command
             return;
         }
 
-
-
+        $pulsate = $builder->pulsate('Installing to temporary directory...')->run();
         $pharer = $packager->getPharer($name, $version);
-
+        $pulsate->close();
 
         if ($action === 'install') {
             $path = $packager->getSystemBin($pharer);
             $packager->install($pharer, $path);
         } else {
+            $save = $builder->fileSave('Location to write file to', $pharer->getTarget());
+
+            $target = $save->waitReturn();
+
+            if ($target === false) {
+                return;
+            }
+
+            $pharer->setTarget($target);
             $pharer->build();
         }
+
+        $builder->info('Successfully built ' . $pharer->getTarget() . '!')->waitReturn();
     }
 }
