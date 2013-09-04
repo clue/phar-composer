@@ -188,9 +188,20 @@ class Gui extends Command
         foreach ($package->getVersions() as $version) {
             /* @var $version Version */
 
+            $time = new \DateTime($version->getTime());
+            $time = $time->format('Y-m-d H:i:s');
+
+            $bin = $version->getBin();
+            if ($bin) {
+                $bin = '☑ ' . array_shift($bin);
+            } else {
+                $bin = '☐ no executable bin';
+            }
+
             $choices[$version->getVersion()] = array(
                 $version->getVersion(),
-                ($version->getBin() === null) ? 'no executable bin' : '☑'
+                $time,
+                $bin
             );
         }
 
@@ -201,7 +212,7 @@ class Gui extends Command
             return;
         }
 
-        $dialog = $builder->table($choices, array('Version', 'Binary'), 'Select available version');
+        $dialog = $builder->table($choices, array('Version', 'Date', 'Binary'), 'Select available version');
         $dialog->setWidth(800);
         $dialog->setHeight(300);
         $version = $dialog->waitReturn();
