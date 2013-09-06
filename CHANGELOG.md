@@ -4,6 +4,32 @@ This file is a manually maintained list of changes for each release. Feel free
 to add your changes here when sending pull requests. Also send corrections if
 you spot any mistakes.
 
+## 0.4.0 (2013-xx-xx)
+
+* Feature: New `install` command will now both build the given package and then
+install it into the system-wide bin directory `/usr/local/bin` (usually already
+in your `$PATH`). This works for any package name or URL just like with the
+`build` command, e.g.:
+
+```bash
+$ phar-composer install phpunit/phpunit
+```
+
+After some (lengthy) build output, you should now be able to run it by just issuing:
+
+```bash
+$ phpunit
+```
+
+* Feature: New `search` command provides an interactive command line search.
+It will ask for the package name and issue an search via packagist.org's API and
+present a list of matching packages. So if you don't know the exact package name,
+you can now use the following command:
+
+```bash
+$ phar-composer search boris
+```
+
 ## 0.3.0 (2013-08-21)
 
 * Feature: Resulting phar files can now be executed on systems without
