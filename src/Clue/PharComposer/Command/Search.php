@@ -128,7 +128,8 @@ class Search extends Command
             $output,
             'Action',
             array(
-                'build' => 'Build project'
+                'build'   => 'Build project',
+                'install' => 'Install project system-wide'
             ),
             'Quit'
         );
@@ -137,7 +138,16 @@ class Search extends Command
             return;
         }
 
+
+
         $pharer = $packager->getPharer($name, $version);
-        $pharer->build();
+
+
+        if ($action === 'install') {
+            $path = $packager->getSystemBin($pharer);
+            $packager->install($pharer, $path);
+        } else {
+            $pharer->build();
+        }
     }
 }
