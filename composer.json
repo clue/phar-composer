@@ -10,9 +10,7 @@
         "symfony/finder": "~2.1",
         "symfony/process": "~2.1",
         "knplabs/packagist-api": "dev-master",
-        
-        "clue/zenity-react": "dev-master",
-        "icecave/mephisto": "dev-develop"
+        "clue/zenity-react": "0.1.*"
     },
     "autoload": {
         "psr-0": {"Clue": "src/"}
