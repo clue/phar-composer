@@ -10,6 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Packager
 {
+    const PATH_BIN = '/usr/local/bin';
+
     private $output;
 
     public function __construct()
@@ -260,11 +262,19 @@ class Packager
 
     public function getSystemBin(PharComposer $pharer, $path = null)
     {
+        // no path given => place in system bin path
         if ($path === null) {
-            $path = '/usr/local/bin';
+            $path = self::PATH_BIN;
         }
 
-        // check path is in $PATH environment
+        // no slash => path is relative to system bin path
+        if (strpos($path, '/') === false) {
+            $path = self::PATH_BIN . '/' . $path;
+        }
+
+        // TODO: check path is in $PATH environment
+
+        // path is actually a directory => append package name
         if (is_dir($path)) {
             $path = rtrim($path, '/') . '/' . basename($pharer->getTarget(), '.phar');
         }
