@@ -15,7 +15,12 @@ Feel free to report any issues you encounter.
 
 ## Usage
 
-Once clue/phar-composer is [installed](#install), you can simply invoke it via command line like this:
+Once clue/phar-composer is [installed](#install), you can use it via command line like this.
+
+### phar-composer build
+
+The `build` command can be used to build an executable single-file phar (php archive) for any project
+managed by composer:
 
 ```bash
 $ phar-composer build ~/path/to/your/project
@@ -56,13 +61,41 @@ Again, you can specify either a tag or branch name very similar to how composer 
 $ phar-composer build https://github.com/composer/composer.git:dev-master
 ```
 
-> As an example, this projet itself is bundled via phar-composer
-([google recursion](https://www.google.com/search?q=recursion)). So instead of downloading the
-below mentioned `phar-composer.phar`, you can build one yourself by issuing:
->
-> ```bash
-> $ php phar-composer.phar build ~/workspace/phar-composer
-> ```
+### phar-composer install
+
+The `install` command will both build the given package and then
+install it into the system-wide bin directory `/usr/local/bin` (usually already
+in your `$PATH`). This works for any package name or URL just like with the
+`build` command, e.g.:
+
+```bash
+$ phar-composer install phpunit/phpunit
+```
+
+After some (lengthy) build output, you should now be able to run it by just issuing:
+
+```bash
+$ phpunit
+```
+
+> In essence, the `install` command will basically just issue a `build` and then
+`sudo mv $target.phar /usr/local/bin/$target`. It will ask you for your sudo password
+when necessary, so it's not needed (and in fact not *recommended*) to run the whole
+comamnd via `sudo`.
+
+### phar-composer search
+
+The `search` command provides an interactive command line search.
+It will ask for the package name and issue an search via packagist.org's API and
+present a list of matching packages. So if you don't know the exact package name,
+you can use the following command:
+
+```bash
+$ phar-composer search boris
+```
+
+It uses an interactive command line menu to ask you for the matching package name,
+its version and will then offer you to either `build` or `install` it.
 
 ## Install
 
@@ -77,20 +110,36 @@ to any directory:
 $ wget http://www.lueck.tv/phar-composer/phar-composer.phar
 ```
 
+That's it. You can now verify everything works by running:
 
-> If you prefer a global (system-wide) installation without having to type the `.phar` extension
-each time, you may simply invoke:
-> 
-> ```bash
-> $ chmod 0755 phar-composer.phar
-> $ sudo mv phar-composer.phar /usr/local/bin/phar-composer`
-> ```
->
-> You can verify everything works by running:
-> 
-> ```bash
-> $ phar-composer --version
-> ```
+```bash
+$ php phar-composer.phar --version
+```
+
+The above usage examples assume you've installed phar-composer system-wide to your $PATH (recommended),
+so you have the following options:
+
+1.  Only use phar-composer locally and adjust the usage examples: So instead of
+    running `$ phar-composer --version`, you have to type `$ php phar-composer.phar --version`.
+
+2.  Use phar-composer's `install` command to install itself to your $PATH by running:
+
+    ```bash
+    $ php phar-composer.phar install clue/phar-composer
+    ```
+
+3.  Or you can manually make the `phar-composer.phar` executable and move it to your $PATH by running:
+
+   ```bash
+   $ chmod 755 phar-composer.phar
+   $ sudo mv phar-composer.phar /usr/local/bin/phar-composer
+   ```
+
+If you have installed phar-composer system-wide, you can now verify everything works by running:
+
+```bash
+$ phar-composer --version
+```
 
 #### Updating phar
 
@@ -107,16 +156,26 @@ $ curl -s https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
 
-> As an example, you can now build the above mentioned `phar-composer.phar` yourself by issuing:
->
-> ```bash
-> $ php bin/phar-composer build
-> ```
+You can now verify everything works by running phar-composer like this:
+
+```bash
+$ php bin/phar-composer --version
+```
+
+Optionally, you can now build the above mentioned `phar-composer.phar` yourself by issuing:
+
+```bash
+$ php bin/phar-composer build
+```
+
+Optionally, you can now follow the above instructions for a [system-wide installation](#as-a-phar-recommended).
+
 
 #### Updating manually
+
 ```bash
 $ git pull
-$ php composer.phar update
+$ php composer.phar install
 ```
 
 ## License
