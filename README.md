@@ -15,7 +15,12 @@ Feel free to report any issues you encounter.
 
 ## Usage
 
-Once clue/phar-composer is [installed](#install), you can simply invoke it via command line like this:
+Once clue/phar-composer is [installed](#install), you can use it via command line like this.
+
+### phar-composer build
+
+The `build` command can be used to build an executable single-file phar (php archive) for any project
+managed by composer:
 
 ```bash
 $ phar-composer build ~/path/to/your/project
@@ -63,6 +68,42 @@ below mentioned `phar-composer.phar`, you can build one yourself by issuing:
 > ```bash
 > $ php phar-composer.phar build ~/workspace/phar-composer
 > ```
+
+### phar-composer install
+
+The `install` command will both build the given package and then
+install it into the system-wide bin directory `/usr/local/bin` (usually already
+in your `$PATH`). This works for any package name or URL just like with the
+`build` command, e.g.:
+
+```bash
+$ phar-composer install phpunit/phpunit
+```
+
+After some (lengthy) build output, you should now be able to run it by just issuing:
+
+```bash
+$ phpunit
+```
+
+> In essence, the `install` command will basically just issue a `build` and then
+`sudo mv $target.phar /usr/local/bin/$target`. It will ask you for your sudo password
+when necessary, so it's not needed (and in fact not *recommended*) to run the whole
+comamnd via `sudo`.
+
+### phar-composer search
+
+The `search` command provides an interactive command line search.
+It will ask for the package name and issue an search via packagist.org's API and
+present a list of matching packages. So if you don't know the exact package name,
+you can use the following command:
+
+```bash
+$ phar-composer search boris
+```
+
+It uses an interactive command line menu to ask you for the matching package name,
+its version and will then offer you to either `build` or `install` it.
 
 ## Install
 
