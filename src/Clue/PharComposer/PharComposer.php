@@ -54,6 +54,11 @@ class PharComposer
 
     public function setTarget($target)
     {
+        // path is actually a directory => append package name
+        if (is_dir($target)) {
+            $this->target = null;
+            $target = rtrim($target, '/') . '/' . $this->getTarget();
+        }
         $this->target = $target;
         return $this;
     }
