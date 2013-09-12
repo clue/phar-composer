@@ -30,6 +30,9 @@ you spot any mistakes.
     $ phar-composer search boris
     ```
 
+*   Feature: Both `build` and `install` commands now also optionally accept an
+    additional target directory to place the resulting phar into.
+
 ## 0.3.0 (2013-08-21)
 
 *   Feature: Resulting phar files can now be executed on systems without
