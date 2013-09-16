@@ -9,7 +9,8 @@
         "symfony/console": "~2.1",
         "symfony/finder": "~2.1",
         "symfony/process": "~2.1",
-        "knplabs/packagist-api": "dev-master"
+        "knplabs/packagist-api": "dev-master",
+        "clue/zenity-react": "0.1.*"
     },
     "autoload": {
         "psr-0": {"Clue": "src/"}
