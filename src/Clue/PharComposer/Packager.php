@@ -13,6 +13,7 @@ class Packager
     const PATH_BIN = '/usr/local/bin';
 
     private $output;
+    private $binSudo = 'sudo';
 
     public function __construct()
     {
@@ -23,6 +24,11 @@ class Packager
     {
         $fn = $this->output;
         $fn($message . PHP_EOL);
+    }
+
+    public function setBinSudo($bin)
+    {
+        $this->binSudo = $bin;
     }
 
     public function setOutput($fn)
@@ -41,7 +47,7 @@ class Packager
         $this->output = $fn;
     }
 
-    public function coerceWritable()
+    public function coerceWritable($wait = 1)
     {
         try {
             $this->assertWritable();
@@ -53,7 +59,9 @@ class Packager
             }
 
             $this->log('<info>' . $e->getMessage() . ', trying to re-spawn with correct config</info>');
-            sleep(1);
+            if ($wait) {
+                sleep($wait);
+            }
 
             $args = array_merge(array('php', '-d phar.readonly=off'), $_SERVER['argv']);
             if (pcntl_exec('/usr/bin/env', $args) === false) {
@@ -254,7 +262,7 @@ class Packager
         $pharer->build();
 
         $this->log('Move resulting phar to <info>' . $path . '</info>');
-        $this->exec('sudo mv -f ' . escapeshellarg($pharer->getTarget()) . ' ' . escapeshellarg($path));
+        $this->exec($this->binSudo . ' -- mv -f ' . escapeshellarg($pharer->getTarget()) . ' ' . escapeshellarg($path));
 
         $this->log('');
         $this->log('    <info>OK</info> - Moved to <info>' . $path . '</info>');
