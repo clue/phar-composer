@@ -55,7 +55,7 @@ class Explicit extends Base
             }
 
             if (isset($autoload['files'])) {
-                foreach($autoload['classmap'] as $path) {
+                foreach($autoload['files'] as $path) {
                     $this->addFile($this->package->getAbsolutePath($path));
                 }
             }
