@@ -31,12 +31,40 @@ class PackageTest extends TestCase
         $this->assertEquals('dir/src/vendors/', $package->getPathVendor());
     }
 
-    public function testConstructorBundlerComposer()
+    public function testConstructorBundlerComposerWithoutAdditionalIncludes()
     {
         $package = new Package(array(
             'extra' => array(
                 'phar' => array(
                     'bundler' => 'composer'
+                 )
+            )
+        ), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit', $package->getBundler());
+    }
+
+    public function testConstructorBundlerComposerWithAdditionalInclude()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'bundler'  => 'composer',
+                    'includes' => 'another.php'
+                 )
+            )
+        ), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit', $package->getBundler());
+    }
+
+    public function testConstructorBundlerComposerWithAdditionalIncludes()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'bundler'  => 'composer',
+                    'includes' => array('another.php', __DIR__)
                  )
             )
         ), 'dir/');

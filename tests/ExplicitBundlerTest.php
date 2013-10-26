@@ -25,7 +25,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox          = $this->createMock('Herrera\Box\Box');
         $this->mockPharComposer = $this->createMock('Clue\PharComposer\PharComposer');
         $this->mockPackage      = $this->createMock('Clue\PharComposer\Package');
-        $this->explicitBundler  = new ExplicitBundler();
+        $this->explicitBundler  = new ExplicitBundler(array());
     }
 
     private function createMock($class)
@@ -163,5 +163,47 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->exactly(2))
                       ->method('buildFromIterator');
         $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+    }
+
+    /**
+     * @test
+     */
+    public function addsFilesFromAdditionalIncludes()
+    {
+        $this->mockPackage->expects($this->once())
+                          ->method('getBins')
+                          ->will($this->returnValue(array()));
+
+        $this->mockPackage->expects($this->once())
+                          ->method('getAbsolutePath')
+                          ->with($this->equalTo('another.php'))
+                          ->will($this->returnValue('another.php'));
+        $this->mockPharComposer->expects($this->once())
+                               ->method('getPathLocalToBase')
+                               ->with($this->equalTo('another.php'))
+                               ->will($this->returnValue('/local/path/to/another.php'));
+        $this->mockBox->expects($this->once())
+                      ->method('addFile')
+                      ->with($this->equalTo('another.php'), $this->equalTo('/local/path/to/another.php'));
+        $explicitBundler = new ExplicitBundler(array('another.php'));
+        $explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+    }
+
+    /**
+     * @test
+     */
+    public function addsDirectoriesFromAdditionalIncludes()
+    {
+        $this->mockPackage->expects($this->once())
+                          ->method('getBins')
+                          ->will($this->returnValue(array()));
+        $this->mockPackage->expects($this->once())
+                          ->method('getAbsolutePath')
+                          ->with($this->equalTo(__DIR__))
+                          ->will($this->returnValue(__DIR__));
+        $this->mockBox->expects($this->once())
+                      ->method('buildFromIterator');
+        $explicitBundler = new ExplicitBundler(array(__DIR__));
+        $explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
     }
 }

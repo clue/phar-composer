@@ -6,18 +6,31 @@ use Herrera\Box\Box;
 
 class Explicit extends Base
 {
+    private $additionalIncludes;
+
+    public function __construct(array $additionalIncludes)
+    {
+        $this->additionalIncludes = $additionalIncludes;
+    }
+
     protected function bundle()
     {
-        foreach ($this->package->getBins() as $bin) {
-            $this->addFile($bin);
-        }
-
+        $this->bundleBins();
         $autoload = $this->package->getAutoload();
 
         if ($autoload !== null) {
             $this->bundlePsr0($autoload);
             $this->bundleClassmap($autoload);
             $this->bundleFiles($autoload);
+        }
+
+        $this->bundleAdditionalIncludes();
+    }
+
+    private function bundleBins()
+    {
+        foreach ($this->package->getBins() as $bin) {
+            $this->addFile($bin);
         }
     }
 
@@ -64,12 +77,7 @@ class Explicit extends Base
         }
 
         foreach($autoload['classmap'] as $path) {
-            $path = $this->package->getAbsolutePath($path);
-            if (is_dir($path)) {
-                $this->addDirectory($path);
-            } else {
-                $this->addFile($path);
-            }
+            $this->addPath($this->package->getAbsolutePath($path));
         }
     }
 
@@ -79,6 +87,22 @@ class Explicit extends Base
             foreach($autoload['files'] as $path) {
                 $this->addFile($this->package->getAbsolutePath($path));
             }
+        }
+    }
+
+    private function bundleAdditionalIncludes()
+    {
+        foreach ($this->additionalIncludes as $additionalInclude) {
+            $this->addPath($this->package->getAbsolutePath($additionalInclude));
+        }
+    }
+
+    private function addPath($path)
+    {
+        if (is_dir($path)) {
+            $this->addDirectory($path);
+        } else {
+            $this->addFile($path);
         }
     }
 }

@@ -39,19 +39,37 @@ class Package
 
     public function getBundler()
     {
-        $bundlerName = 'complete';
-        if (isset($this->package['extra']['phar']['bundler'])) {
-            $bundlerName = $this->package['extra']['phar']['bundler'];
-        }
-
+        $bundlerName = $this->getBundlerName();
         if ($bundlerName === 'composer') {
-            return new ExplicitBundler();
+            return new ExplicitBundler($this->getAdditionalIncludes());
         } elseif ($bundlerName === 'complete') {
             return new CompleteBundler();
         } else {
             // TODO: instead of failing, just return a default bundler
             throw new UnexpectedValueException('Invalid bundler "' . $bundlerName . '" specified');
         }
+    }
+
+    private function getBundlerName()
+    {
+        if (isset($this->package['extra']['phar']['bundler'])) {
+            return $this->package['extra']['phar']['bundler'];
+        }
+
+        return 'complete';
+    }
+
+    private function getAdditionalIncludes()
+    {
+        if (isset($this->package['extra']['phar']['includes'])) {
+            if (!is_array($this->package['extra']['phar']['includes'])) {
+                return array($this->package['extra']['phar']['includes']);
+            }
+
+            return $this->package['extra']['phar']['includes'];
+        }
+
+        return array();
     }
 
     public function getAutoload()
