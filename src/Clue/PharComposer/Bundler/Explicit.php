@@ -2,39 +2,56 @@
 
 namespace Clue\PharComposer\Bundler;
 
+use Clue\PharComposer\Package;
+use Symfony\Component\Finder\Finder;
+use Clue\PharComposer\PharComposer;
 use Herrera\Box\Box;
 
-class Explicit extends Base
+class Explicit implements BundlerInterface
 {
     private $additionalIncludes;
+
+    /**
+     *
+     * @var Box
+     */
+    protected $box;
+
+    /**
+     *
+     * @var PharComposer
+     */
+    protected $pharcomposer;
 
     public function __construct(array $additionalIncludes)
     {
         $this->additionalIncludes = $additionalIncludes;
     }
 
-    protected function bundle()
+    public function build(PharComposer $pharcomposer, Box $box, Package $package)
     {
-        $this->bundleBins();
-        $autoload = $this->package->getAutoload();
+        $this->pharcomposer = $pharcomposer;
+        $this->box          = $box;
+        $this->bundleBins($package);
+        $autoload = $package->getAutoload();
 
         if ($autoload !== null) {
-            $this->bundlePsr0($autoload);
-            $this->bundleClassmap($autoload);
-            $this->bundleFiles($autoload);
+            $this->bundlePsr0($package, $autoload);
+            $this->bundleClassmap($package, $autoload);
+            $this->bundleFiles($package, $autoload);
         }
 
-        $this->bundleAdditionalIncludes();
+        $this->bundleAdditionalIncludes($package);
     }
 
-    private function bundleBins()
+    private function bundleBins(Package $package)
     {
-        foreach ($this->package->getBins() as $bin) {
+        foreach ($package->getBins() as $bin) {
             $this->addFile($bin);
         }
     }
 
-    private function bundlePsr0(array $autoload)
+    private function bundlePsr0(Package $package, array $autoload)
     {
         if (!isset($autoload['psr-0'])) {
             return;
@@ -49,7 +66,7 @@ class Explicit extends Base
                 // TODO: this is not correct actually... should work for most repos nevertheless
                 // TODO: we have to take target-dir into account
 
-                $this->addDirectory($this->package->getAbsolutePath($this->buildNamespacePath($namespace, $path)));
+                $this->addDirectory($package->getAbsolutePath($this->buildNamespacePath($namespace, $path)));
             }
         }
     }
@@ -70,30 +87,30 @@ class Explicit extends Base
         return rtrim($path, '/') . '/' . $namespace;
     }
 
-    private function bundleClassmap(array $autoload)
+    private function bundleClassmap(Package $package, array $autoload)
     {
         if (!isset($autoload['classmap'])) {
             return;
         }
 
         foreach($autoload['classmap'] as $path) {
-            $this->addPath($this->package->getAbsolutePath($path));
+            $this->addPath($package->getAbsolutePath($path));
         }
     }
 
-    private function bundleFiles(array $autoload)
+    private function bundleFiles(Package $package, array $autoload)
     {
         if (isset($autoload['files'])) {
             foreach($autoload['files'] as $path) {
-                $this->addFile($this->package->getAbsolutePath($path));
+                $this->addFile($package->getAbsolutePath($path));
             }
         }
     }
 
-    private function bundleAdditionalIncludes()
+    private function bundleAdditionalIncludes(Package $package)
     {
         foreach ($this->additionalIncludes as $additionalInclude) {
-            $this->addPath($this->package->getAbsolutePath($additionalInclude));
+            $this->addPath($package->getAbsolutePath($additionalInclude));
         }
     }
 
@@ -104,5 +121,26 @@ class Explicit extends Base
         } else {
             $this->addFile($path);
         }
+    }
+
+    private function addDirectory($dir)
+    {
+        $dir = rtrim($dir, '/') . '/';
+
+        $iterator = Finder::create()
+            ->files()
+            //->filter($this->getBlacklistFilter())
+            ->ignoreVCS(true)
+            ->in($dir);
+
+        $this->pharcomposer->log('    adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir) . '"');
+        $this->box->buildFromIterator($iterator, $this->pharcomposer->getBase());
+    }
+
+    private function addFile($file)
+    {
+        $local = $this->pharcomposer->getPathLocalToBase($file);
+        $this->pharcomposer->log('    adding "' . $file .'" as "' . $local . '"');
+        $this->box->addFile($file, $local);
     }
 }
