@@ -41,9 +41,9 @@ class Package
     {
         $bundlerName = $this->getBundlerName();
         if ($bundlerName === 'composer') {
-            return new ExplicitBundler($this->getAdditionalIncludes());
+            return new ExplicitBundler($this);
         } elseif ($bundlerName === 'complete') {
-            return new CompleteBundler();
+            return new CompleteBundler($this);
         } else {
             // TODO: instead of failing, just return a default bundler
             throw new UnexpectedValueException('Invalid bundler "' . $bundlerName . '" specified');
@@ -59,7 +59,7 @@ class Package
         return 'complete';
     }
 
-    private function getAdditionalIncludes()
+    public function getAdditionalIncludes()
     {
         if (isset($this->package['extra']['phar']['include'])) {
             if (!is_array($this->package['extra']['phar']['include'])) {

@@ -9,7 +9,12 @@ use Herrera\Box\Box;
 
 class Explicit implements BundlerInterface
 {
-    private $additionalIncludes;
+    /**
+     * package the bundler is for
+     *
+     * @type  Package
+     */
+    private $package;
 
     /**
      *
@@ -23,35 +28,35 @@ class Explicit implements BundlerInterface
      */
     protected $pharcomposer;
 
-    public function __construct(array $additionalIncludes)
+    public function __construct(Package $package)
     {
-        $this->additionalIncludes = $additionalIncludes;
+        $this->package = $package;
     }
 
-    public function build(PharComposer $pharcomposer, Box $box, Package $package)
+    public function build(PharComposer $pharcomposer, Box $box)
     {
         $this->pharcomposer = $pharcomposer;
         $this->box          = $box;
-        $this->bundleBins($package);
-        $autoload = $package->getAutoload();
+        $this->bundleBins();
+        $autoload = $this->package->getAutoload();
 
         if ($autoload !== null) {
-            $this->bundlePsr0($package, $autoload);
-            $this->bundleClassmap($package, $autoload);
-            $this->bundleFiles($package, $autoload);
+            $this->bundlePsr0($autoload);
+            $this->bundleClassmap($autoload);
+            $this->bundleFiles($autoload);
         }
 
-        $this->bundleAdditionalIncludes($package);
+        $this->bundleAdditionalIncludes();
     }
 
-    private function bundleBins(Package $package)
+    private function bundleBins()
     {
-        foreach ($package->getBins() as $bin) {
+        foreach ($this->package->getBins() as $bin) {
             $this->addFile($bin);
         }
     }
 
-    private function bundlePsr0(Package $package, array $autoload)
+    private function bundlePsr0(array $autoload)
     {
         if (!isset($autoload['psr-0'])) {
             return;
@@ -66,7 +71,7 @@ class Explicit implements BundlerInterface
                 // TODO: this is not correct actually... should work for most repos nevertheless
                 // TODO: we have to take target-dir into account
 
-                $this->addDirectory($package->getAbsolutePath($this->buildNamespacePath($namespace, $path)));
+                $this->addDirectory($this->package->getAbsolutePath($this->buildNamespacePath($namespace, $path)));
             }
         }
     }
@@ -87,30 +92,30 @@ class Explicit implements BundlerInterface
         return rtrim($path, '/') . '/' . $namespace;
     }
 
-    private function bundleClassmap(Package $package, array $autoload)
+    private function bundleClassmap(array $autoload)
     {
         if (!isset($autoload['classmap'])) {
             return;
         }
 
         foreach($autoload['classmap'] as $path) {
-            $this->addPath($package->getAbsolutePath($path));
+            $this->addPath($this->package->getAbsolutePath($path));
         }
     }
 
-    private function bundleFiles(Package $package, array $autoload)
+    private function bundleFiles(array $autoload)
     {
         if (isset($autoload['files'])) {
             foreach($autoload['files'] as $path) {
-                $this->addFile($package->getAbsolutePath($path));
+                $this->addFile($this->package->getAbsolutePath($path));
             }
         }
     }
 
-    private function bundleAdditionalIncludes(Package $package)
+    private function bundleAdditionalIncludes()
     {
-        foreach ($this->additionalIncludes as $additionalInclude) {
-            $this->addPath($package->getAbsolutePath($additionalInclude));
+        foreach ($this->package->getAdditionalIncludes() as $additionalInclude) {
+            $this->addPath($this->package->getAbsolutePath($additionalInclude));
         }
     }
 

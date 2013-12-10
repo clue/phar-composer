@@ -25,7 +25,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox          = $this->createMock('Herrera\Box\Box');
         $this->mockPharComposer = $this->createMock('Clue\PharComposer\PharComposer');
         $this->mockPackage      = $this->createMock('Clue\PharComposer\Package');
-        $this->explicitBundler  = new ExplicitBundler(array());
+        $this->explicitBundler  = new ExplicitBundler($this->mockPackage);
     }
 
     private function createMock($class)
@@ -35,11 +35,19 @@ class ExplicitBundlerTest extends TestCase
                     ->getMock();
     }
 
+    private function mockIncludes(array $includes = array())
+    {
+        $this->mockPackage->expects($this->once())
+                          ->method('getAdditionalIncludes')
+                          ->will($this->returnValue($includes));
+    }
+
     /**
      * @test
      */
     public function addsBinariesDefinedByPackageToBox()
     {
+        $this->mockIncludes();
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array('bin/example')));
@@ -50,7 +58,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('bin/example'), $this->equalTo('/local/path/to/bin/example'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -58,6 +66,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsFilesDefinedByAutoload()
     {
+        $this->mockIncludes();
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array()));
@@ -75,7 +84,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('foo.php'), $this->equalTo('/local/path/to/foo.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -83,6 +92,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsFilesDefinedByClassmap()
     {
+        $this->mockIncludes();
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array()));
@@ -100,7 +110,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('src/Example/SomeClass.php'), $this->equalTo('/local/path/to/src/Example/SomeClass.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -108,6 +118,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsDirectoriesDefinedByClassmap()
     {
+        $this->mockIncludes();
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array()));
@@ -120,7 +131,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(__DIR__));
         $this->mockBox->expects($this->once())
                       ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -128,6 +139,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsAllPathesDefinedByPsr0WithSinglePath()
     {
+        $this->mockIncludes();
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array()));
@@ -141,7 +153,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue($path . '/Clue'));
         $this->mockBox->expects($this->once())
                       ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -149,6 +161,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsAllPathesDefinedByPsr0WithSeveralPathes()
     {
+        $this->mockIncludes();
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array()));
@@ -162,7 +175,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue($path . '/Clue'));
         $this->mockBox->expects($this->exactly(2))
                       ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -170,6 +183,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsFilesFromAdditionalIncludes()
     {
+        $this->mockIncludes(array('another.php'));
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array()));
@@ -185,8 +199,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('another.php'), $this->equalTo('/local/path/to/another.php'));
-        $explicitBundler = new ExplicitBundler(array('another.php'));
-        $explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -194,6 +207,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsDirectoriesFromAdditionalIncludes()
     {
+        $this->mockIncludes(array(__DIR__));
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array()));
@@ -203,7 +217,6 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(__DIR__));
         $this->mockBox->expects($this->once())
                       ->method('buildFromIterator');
-        $explicitBundler = new ExplicitBundler(array(__DIR__));
-        $explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 }

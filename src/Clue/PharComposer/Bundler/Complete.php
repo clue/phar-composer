@@ -10,16 +10,28 @@ use Herrera\Box\Box;
 
 class Complete implements BundlerInterface
 {
-    public function build(PharComposer $pharcomposer, Box $box, Package $package)
+     /**
+     * package the bundler is for
+     *
+     * @type  Package
+     */
+    private $package;
+
+    public function __construct(Package $package)
+    {
+        $this->package = $package;
+    }
+
+    public function build(PharComposer $pharcomposer, Box $box)
     {
         $iterator = Finder::create()
             ->files()
             ->ignoreVCS(true)
-            ->filter($package->getBlacklistFilter())
-            ->exclude($package->getPathVendor())
-            ->in($package->getDirectory());
+            ->filter($this->package->getBlacklistFilter())
+            ->exclude($this->package->getPathVendor())
+            ->in($this->package->getDirectory());
 
-        $pharcomposer->log('    Adding whole project directory "' . $package->getDirectory() . '"');
+        $pharcomposer->log('    Adding whole project directory "' . $this->package->getDirectory() . '"');
         $box->buildFromIterator($iterator, $pharcomposer->getBase());
     }
 }
