@@ -5,7 +5,7 @@ namespace Clue\PharComposer\Bundler;
 use Clue\PharComposer\Package;
 use Symfony\Component\Finder\Finder;
 use Clue\PharComposer\PharComposer;
-use Herrera\Box\Box;
+use Clue\PharComposer\TargetPhar;
 
 class Explicit implements BundlerInterface
 {
@@ -18,9 +18,9 @@ class Explicit implements BundlerInterface
 
     /**
      *
-     * @var Box
+     * @var TargetPhar
      */
-    protected $box;
+    protected $targetPhar;
 
     /**
      *
@@ -33,10 +33,10 @@ class Explicit implements BundlerInterface
         $this->package = $package;
     }
 
-    public function build(PharComposer $pharcomposer, Box $box)
+    public function build(PharComposer $pharcomposer, TargetPhar $targetPhar)
     {
         $this->pharcomposer = $pharcomposer;
-        $this->box          = $box;
+        $this->targetPhar          = $targetPhar;
         $this->bundleBins();
         $autoload = $this->package->getAutoload();
 
@@ -139,13 +139,12 @@ class Explicit implements BundlerInterface
             ->in($dir);
 
         $this->pharcomposer->log('    adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir) . '"');
-        $this->box->buildFromIterator($iterator, $this->pharcomposer->getBase());
+        $this->targetPhar->buildFromIterator($iterator);
     }
 
     private function addFile($file)
     {
-        $local = $this->pharcomposer->getPathLocalToBase($file);
-        $this->pharcomposer->log('    adding "' . $file .'" as "' . $local . '"');
-        $this->box->addFile($file, $local);
+        $this->pharcomposer->log('    adding "' . $file .'" as "' . $this->pharcomposer->getPathLocalToBase($file) . '"');
+        $this->targetPhar->addFile($file);
     }
 }
