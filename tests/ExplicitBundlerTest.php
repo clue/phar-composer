@@ -11,20 +11,20 @@ class ExplicitBundlerTest extends TestCase
      */
     private $explicitBundler;
 
+    private $mockPackage;
+
     private $mockTargetPhar;
 
-    private $mockPharComposer;
-
-    private $mockPackage;
+    private $mockLogger;
 
     /**
      * set up test environment
      */
     public function setUp()
     {
-        $this->mockTargetPhar   = $this->createMock('Clue\PharComposer\TargetPhar');
-        $this->mockPharComposer = $this->createMock('Clue\PharComposer\PharComposer');
         $this->mockPackage      = $this->createMock('Clue\PharComposer\Package');
+        $this->mockTargetPhar   = $this->createMock('Clue\PharComposer\TargetPhar');
+        $this->mockLogger       = $this->createMock('Clue\PharComposer\Logger');
         $this->explicitBundler  = new ExplicitBundler($this->mockPackage);
     }
 
@@ -54,7 +54,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockTargetPhar->expects($this->once())
                              ->method('addFile')
                              ->with($this->equalTo('bin/example'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 
     /**
@@ -76,7 +76,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockTargetPhar->expects($this->once())
                              ->method('addFile')
                              ->with($this->equalTo('foo.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 
     /**
@@ -98,7 +98,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockTargetPhar->expects($this->once())
                              ->method('addFile')
                              ->with($this->equalTo('src/Example/SomeClass.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 
     /**
@@ -119,7 +119,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(__DIR__));
         $this->mockTargetPhar->expects($this->once())
                              ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 
     /**
@@ -141,7 +141,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue($path . '/Clue'));
         $this->mockTargetPhar->expects($this->once())
                              ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 
     /**
@@ -163,7 +163,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue($path . '/Clue'));
         $this->mockTargetPhar->expects($this->exactly(2))
                              ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 
     /**
@@ -183,7 +183,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockTargetPhar->expects($this->once())
                              ->method('addFile')
                              ->with($this->equalTo('another.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 
     /**
@@ -201,6 +201,6 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(__DIR__));
         $this->mockTargetPhar->expects($this->once())
                              ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->explicitBundler->build($this->mockTargetPhar, $this->mockLogger);
     }
 }

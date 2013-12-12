@@ -4,7 +4,7 @@ namespace Clue\PharComposer\Bundler;
 
 use Clue\PharComposer\Package;
 use Symfony\Component\Finder\Finder;
-use Clue\PharComposer\PharComposer;
+use Clue\PharComposer\Logger;
 use Clue\PharComposer\TargetPhar;
 
 class Explicit implements BundlerInterface
@@ -24,19 +24,19 @@ class Explicit implements BundlerInterface
 
     /**
      *
-     * @var PharComposer
+     * @var Logger
      */
-    protected $pharcomposer;
+    protected $logger;
 
     public function __construct(Package $package)
     {
         $this->package = $package;
     }
 
-    public function build(PharComposer $pharcomposer, TargetPhar $targetPhar)
+    public function build(TargetPhar $targetPhar, Logger $logger)
     {
-        $this->pharcomposer = $pharcomposer;
-        $this->targetPhar          = $targetPhar;
+        $this->logger     = $logger;
+        $this->targetPhar = $targetPhar;
         $this->bundleBins();
         $autoload = $this->package->getAutoload();
 
@@ -138,13 +138,13 @@ class Explicit implements BundlerInterface
             ->ignoreVCS(true)
             ->in($dir);
 
-        $this->pharcomposer->log('    adding "' . $dir .'" as "' . $this->pharcomposer->getPathLocalToBase($dir) . '"');
+        $this->logger->log('    adding "' . $dir);
         $this->targetPhar->buildFromIterator($iterator);
     }
 
     private function addFile($file)
     {
-        $this->pharcomposer->log('    adding "' . $file .'" as "' . $this->pharcomposer->getPathLocalToBase($file) . '"');
+        $this->logger->log('    adding "' . $file);
         $this->targetPhar->addFile($file);
     }
 }

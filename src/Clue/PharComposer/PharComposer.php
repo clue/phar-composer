@@ -257,6 +257,6 @@ class PharComposer
 
     private function addPackage(Package $package, TargetPhar $targetPhar)
     {
-        $package->getBundler()->build($this, $targetPhar);
+        $package->getBundler()->build($targetPhar, $this->logger);
     }
 }
