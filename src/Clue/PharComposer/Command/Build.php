@@ -24,7 +24,8 @@ class Build extends Command
         $this->setName('build')
              ->setDescription('Build phar for the given composer project')
              ->addArgument('path', InputArgument::OPTIONAL, 'Path to project directory or composer.json', '.')
-             ->addArgument('target', InputArgument::OPTIONAL, 'Path to write phar output to (defaults to project name)');
+             ->addArgument('target', InputArgument::OPTIONAL, 'Path to write phar output to (defaults to project name)')
+             ->addOption('force-extract', 'x', InputOption::VALUE_NONE, 'Enforce extracting the phar to a temporary directory.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -41,6 +42,11 @@ class Build extends Command
         $target = $input->getArgument('target');
         if ($target !== null) {
             $pharer->setTarget($target);
+        }
+
+        $forceExtract = $input->getOption('force-extract');
+        if ($forceExtract !== null) {
+            $pharer->setForceExtract(true);
         }
 
         $pharer->build();
