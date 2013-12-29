@@ -99,4 +99,13 @@ class Package
     {
         return $this->directory . ltrim($path, '/');
     }
+
+    public function getForceExtract()
+    {
+        $forceExtract = false;
+        if (!empty($this->package['extra']['phar']['force-extract'])) {
+            $forceExtract = true;
+        }
+        return $forceExtract;
+    }
 }
