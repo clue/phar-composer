@@ -17,6 +17,8 @@ class PharComposerTest extends TestCase
         $this->assertEquals($this->getPathProjectAbsolute('vendor') . '/', $pharcomposer->getPathVendor());
         $this->assertEquals('phar-composer.phar', $pharcomposer->getTarget());
 
+        $this->assertFalse($pharcomposer->getForceExtract());
+
         return $pharcomposer;
     }
 
@@ -31,6 +33,9 @@ class PharComposerTest extends TestCase
 
         $pharcomposer->setTarget('test.phar');
         $this->assertEquals('test.phar', $pharcomposer->getTarget());
+
+        $pharcomposer->setForceExtract(true);
+        $this->assertTrue($pharcomposer->getForceExtract());
 
         return $pharcomposer;
     }
