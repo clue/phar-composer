@@ -84,6 +84,16 @@ Again, you can specify either a tag or branch name very similar to how composer 
 $ phar-composer build https://github.com/composer/composer.git:dev-master
 ```
 
+Some packages are very difficult to bundle as a phar, most often because they
+work with their paths in a way that does not work within phars (most notably
+using realpath() etc.). In this case it is possible to enforce extracting the
+executable phar archive to a temporary directory. This option is disabled by
+default for performance reasons, to enable use `--force-extract` option e.g.:
+
+```bash
+$ phar-composer build --force-extract https://github.com/clue/phar-composer.git
+```
+
 ### phar-composer install
 
 The `install` command will both build the given package and then

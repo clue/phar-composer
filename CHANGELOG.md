@@ -44,6 +44,28 @@
 *   Fix: Fixed an undocumented config key
     ([#14](https://github.com/clue/phar-composer/pull/14), thanks @mikey179)
 
+## 0.5.0 (xxxx-xx-xx)
+
+*   Feature: Added support to force extracting phar archives. This options is
+    disabled by default for performance reasons, to enable use the config key
+    `extra.phar.force-extract` in the `composer.json` file:
+
+    ```json
+    "extra": {
+        "phar": {
+            "force-extract": true
+        }
+    }
+    ```
+
+    Or use `--force-extract` option in the command line:
+
+    ```bash
+    $ phar-composer build --force-extract https://github.com/clue/phar-composer.git
+    ```
+    
+    CLI option will override the value in the config key.
+
 ## 0.4.0 (2013-09-12)
 
 *   Feature: New `install` command will now both build the given package and then
