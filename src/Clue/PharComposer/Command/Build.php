@@ -44,8 +44,7 @@ class Build extends Command
             $pharer->setTarget($target);
         }
 
-        $forceExtract = $input->getOption('force-extract');
-        if ($forceExtract !== null) {
+        if ($input->getOption('force-extract')) {
             $pharer->setForceExtract(true);
         }
 
