@@ -7,16 +7,16 @@
     "packages": [
         {
             "name": "clue/zenity-react",
-            "version": "v0.1.0",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/zenity-react.git",
-                "reference": "99b1d7226b90e1051b6f422295a4e39c2788cb95"
+                "reference": "6ca20be6f6c4701aa6b0dbc1559361839efecf44"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/zenity-react/zipball/99b1d7226b90e1051b6f422295a4e39c2788cb95",
-                "reference": "99b1d7226b90e1051b6f422295a4e39c2788cb95",
+                "url": "https://api.github.com/repos/clue/zenity-react/zipball/6ca20be6f6c4701aa6b0dbc1559361839efecf44",
+                "reference": "6ca20be6f6c4701aa6b0dbc1559361839efecf44",
                 "shasum": ""
             },
             "require": {
@@ -40,7 +40,7 @@
                 }
             ],
             "description": "Async Zenity",
-            "time": "2013-09-06 10:32:59"
+            "time": "2014-01-24 13:35:59"
         },
         {
             "name": "doctrine/inflector",
