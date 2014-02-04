@@ -4,10 +4,8 @@ namespace Clue\PharComposer;
 
 use Symfony\Component\Finder\SplFileInfo;
 
-use Clue\PharComposer\Bundler\BundlerInterface;
 use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
 use Clue\PharComposer\Bundler\Complete as CompleteBundler;
-use UnexpectedValueException;
 
 class Package
 {
@@ -37,21 +35,39 @@ class Package
         return $this->directory;
     }
 
-    public function getBundler()
+    public function getBundler(Logger $logger)
     {
-        $bundlerName = 'complete';
+        $bundlerName = $this->getBundlerName();
+        if ($bundlerName === 'composer') {
+            return new ExplicitBundler($this, $logger);
+        } elseif ($bundlerName === 'complete') {
+            return new CompleteBundler($this, $logger);
+        } else {
+            $logger->log('Invalid bundler "' . $bundlerName . '" specified in package "' . $this->getName() . '", will fall back to "complete" bundler');
+            return new CompleteBundler($this, $logger);
+        }
+    }
+
+    private function getBundlerName()
+    {
         if (isset($this->package['extra']['phar']['bundler'])) {
-            $bundlerName = $this->package['extra']['phar']['bundler'];
+            return $this->package['extra']['phar']['bundler'];
         }
 
-        if ($bundlerName === 'composer') {
-            return new ExplicitBundler();
-        } elseif ($bundlerName === 'complete') {
-            return new CompleteBundler();
-        } else {
-            // TODO: instead of failing, just return a default bundler
-            throw new UnexpectedValueException('Invalid bundler "' . $bundlerName . '" specified');
+        return 'complete';
+    }
+
+    public function getAdditionalIncludes()
+    {
+        if (isset($this->package['extra']['phar']['include'])) {
+            if (!is_array($this->package['extra']['phar']['include'])) {
+                return array($this->package['extra']['phar']['include']);
+            }
+
+            return $this->package['extra']['phar']['include'];
         }
+
+        return array();
     }
 
     public function getAutoload()
@@ -75,10 +91,23 @@ class Package
 
     public function getBlacklist()
     {
-        return array(
-            $this->getAbsolutePath('composer.phar'),
-            $this->getAbsolutePath('phar-composer.phar')
-        );
+        $blacklist   = $this->getAdditionalExcludes();
+        $blacklist[] = 'composer.phar';
+        $blacklist[] = 'phar-composer.phar';
+        return array_map(array($this, 'getAbsolutePath'), $blacklist);
+    }
+
+    private function getAdditionalExcludes()
+    {
+        if (isset($this->package['extra']['phar']['exclude'])) {
+            if (!is_array($this->package['extra']['phar']['exclude'])) {
+                return array($this->package['extra']['phar']['exclude']);
+            }
+
+            return $this->package['extra']['phar']['exclude'];
+        }
+
+        return array();
     }
 
     /**

@@ -4,7 +4,6 @@ namespace Clue\PharComposer;
 
 use Symfony\Component\Finder\Finder;
 
-use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
 use UnexpectedValueException;
 use InvalidArgumentException;
@@ -17,7 +16,7 @@ class PharComposer
     private $package;
     private $main = null;
     private $target = null;
-    private $output = true;
+    private $logger;
     private $step = '?';
 
     public function __construct($path)
@@ -26,6 +25,7 @@ class PharComposer
 
         $this->package = $this->loadJson($path);
         $this->pathProject = dirname($path) . '/';
+        $this->logger = new Logger();
     }
 
     /**
@@ -35,7 +35,7 @@ class PharComposer
      */
     public function setOutput($output)
     {
-        $this->output = $output;
+        $this->logger->setOutput($output);
     }
 
     public function getTarget()
@@ -159,24 +159,22 @@ class PharComposer
             }
         }
 
-        $box = Box::create($target);
-        $box->getPhar()->startBuffering();
-
+        $targetPhar = TargetPhar::create($target, $this);
         $this->log('  - Adding main package');
-        $this->addPackage($this->getPackageRoot(), $box);
+        $targetPhar->addBundle(Bundle::from($this->getPackageRoot(), $this->logger));
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
-        $box->addFile($pathVendor . 'autoload.php', $this->getPathLocalToBase($pathVendor . 'autoload.php'));
+        $targetPhar->addFile($pathVendor . 'autoload.php');
 
         // TODO: check for vendor/bin !
 
         // only add composer base directory (no sub-directories!)
-        $box->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME), $this->getBase());
+        $targetPhar->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME));
 
         foreach ($this->getPackagesDependencies() as $package) {
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
-            $this->addPackage($package, $box);
+            $targetPhar->addBundle(Bundle::from($package, $this->logger));
         }
 
 
@@ -198,16 +196,16 @@ class PharComposer
 
                 // remove shebang from main file and add (overwrite)
                 unset($lines[0]);
-                $box->addFromString($this->getPathLocalToBase($main), implode("\n", $lines));
+                $targetPhar->addFromString($this->getPathLocalToBase($main), implode("\n", $lines));
             }
 
-            $box->getPhar()->setStub($generator->generate());
+            $targetPhar->setStub($generator->generate());
 
             $chmod = octdec(substr(decoct(fileperms($main)),-4));
             $this->log('    Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
-        $box->getPhar()->stopBuffering();
+        $targetPhar->finalize();
 
         if ($chmod !== null) {
             $this->log('    Applying chmod ' . sprintf('%04o', $chmod));
@@ -239,21 +237,12 @@ class PharComposer
 
     public function log($message)
     {
-        $this->output($message . PHP_EOL);
+        $this->logger->log($message);
     }
 
     public function setStep($step)
     {
         $this->step = $step;
-    }
-
-    private function output($message)
-    {
-        if ($this->output === true) {
-            echo $message;
-        } elseif ($this->output !== false) {
-            call_user_func($this->output, $message);
-        }
     }
 
     private function loadJson($path)
@@ -264,10 +253,5 @@ class PharComposer
             throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
         }
         return $ret;
-    }
-
-    private function addPackage(Package $package, Box $box)
-    {
-        $package->getBundler()->build($this, $box, $package);
     }
 }

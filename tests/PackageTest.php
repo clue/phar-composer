@@ -10,7 +10,6 @@ class PackageTest extends TestCase
 
         $this->assertEquals(null, $package->getAutoload());
         $this->assertEquals(array(), $package->getBins());
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete', $package->getBundler());
         $this->assertEquals('dir/', $package->getDirectory());
         $this->assertEquals('unknown', $package->getName());
         $this->assertEquals('dir/vendor/', $package->getPathVendor());
@@ -31,7 +30,14 @@ class PackageTest extends TestCase
         $this->assertEquals('dir/src/vendors/', $package->getPathVendor());
     }
 
-    public function testConstructorBundlerComposer()
+    private function createMockLogger()
+    {
+        return $this->getMockBuilder('Clue\PharComposer\Logger')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+    }
+
+    public function testConstructorBundlerComposerWithoutAdditionalIncludes()
     {
         $package = new Package(array(
             'extra' => array(
@@ -41,22 +47,129 @@ class PackageTest extends TestCase
             )
         ), 'dir/');
 
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit', $package->getBundler());
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit',
+                                $package->getBundler($this->createMockLogger())
+        );
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
-    public function testConstructorBundlerInvalid()
+    public function testConstructorBundlerComposerWithAdditionalInclude()
     {
         $package = new Package(array(
             'extra' => array(
                 'phar' => array(
-                    'bundler' => 'invalid'
+                    'bundler'  => 'composer',
+                    'includes' => 'another.php'
+                 )
+            )
+        ), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit',
+                                $package->getBundler($this->createMockLogger())
+        );
+    }
+
+    public function testConstructorBundlerComposerWithAdditionalIncludes()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'bundler'  => 'composer',
+                    'include' => array('another.php', __DIR__)
+                 )
+            )
+        ), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit',
+                                $package->getBundler($this->createMockLogger())
+        );
+    }
+
+    public function testConstructorBundlerCompleteWithExplicitConfig()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'bundler' => 'complete'
+                 )
+            )
+        ), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+                                $package->getBundler($this->createMockLogger())
+        );
+    }
+
+    public function testConstructorBundlerCompleteAsDefault()
+    {
+        $package = new Package(array(), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+                                $package->getBundler($this->createMockLogger())
+        );
+    }
+
+    public function testConstructorBundlerInvalid()
+    {
+        $package = new Package(array(
+            'name'  => 'cool-package',
+            'extra' => array(
+                'phar' => array(
+                    'bundler' => 'foo'
                 )
             )
         ), 'dir/');
 
-        $package->getBundler();
+        $mockLogger = $this->createMockLogger();
+        $mockLogger->expects($this->once())
+                   ->method('log')
+                   ->with($this->equalTo('Invalid bundler "foo" specified in package "cool-package", will fall back to "complete" bundler'));
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+                                $package->getBundler($mockLogger)
+        );
+    }
+
+    public function testBlacklistContainsComposerAndPharComposerByDefault()
+    {
+        $package = new Package(array(), 'dir/');
+        $this->assertEquals(array('dir/composer.phar',
+                                  'dir/phar-composer.phar'
+                            ),
+                            $package->getBlacklist()
+        );
+    }
+
+    public function testBlacklistContainsAdditionalExcludeFromConfig()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'exclude' => 'phpunit.xml.dist'
+                )
+            )
+        ), 'dir/');
+        $this->assertEquals(array('dir/phpunit.xml.dist',
+                                  'dir/composer.phar',
+                                  'dir/phar-composer.phar'
+                            ),
+                            $package->getBlacklist()
+        );
+    }
+
+    public function testBlacklistContainsAdditionalExcludesFromConfig()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'exclude' => array('phpunit.xml.dist', '.travis.yml')
+                )
+            )
+        ), 'dir/');
+        $this->assertEquals(array('dir/phpunit.xml.dist',
+                                  'dir/.travis.yml',
+                                  'dir/composer.phar',
+                                  'dir/phar-composer.phar'
+                            ),
+                            $package->getBlacklist()
+        );
     }
 }
