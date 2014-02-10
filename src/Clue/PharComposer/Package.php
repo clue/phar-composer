@@ -45,9 +45,9 @@ class Package
         }
 
         if ($bundlerName === 'composer') {
-            return new ExplicitBundler();
+            return new ExplicitBundler($this);
         } elseif ($bundlerName === 'complete') {
-            return new CompleteBundler();
+            return new CompleteBundler($this);
         } else {
             // TODO: instead of failing, just return a default bundler
             throw new UnexpectedValueException('Invalid bundler "' . $bundlerName . '" specified');
