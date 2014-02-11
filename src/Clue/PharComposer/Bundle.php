@@ -7,7 +7,7 @@ use Symfony\Component\Finder\Finder;
  * A bundle represents all resources from a package that should be bundled into
  * the target phar.
  */
-class Bundle
+class Bundle implements \IteratorAggregate
 {
     /**
      * list of resources in this bundle
@@ -97,8 +97,8 @@ class Bundle
      *
      * @return  \Traversable
      */
-    public function getResources()
+    public function getIterator()
     {
-        return $this->resources;
+        return new \ArrayIterator($this->resources);
     }
 }

@@ -62,7 +62,7 @@ class TargetPhar
      */
     public function addBundle(Bundle $bundle)
     {
-        foreach ($bundle->getResources() as $resource) {
+        foreach ($bundle as $resource) {
             if (is_string($resource)) {
                 $this->addFile($resource);
             } else {
