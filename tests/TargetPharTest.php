@@ -1,5 +1,6 @@
 <?php
 
+use Clue\PharComposer\Bundle;
 use Clue\PharComposer\TargetPhar;
 
 class TargetPharTest extends TestCase
@@ -66,6 +67,31 @@ class TargetPharTest extends TestCase
                       ->method('buildFromIterator')
                       ->with($this->equalTo($mockTraversable), $this->equalTo('path/to/package'));
         $this->targetPhar->buildFromIterator($mockTraversable);
+    }
+
+    /**
+     * @test
+     */
+    public function addPackageAddsResourcesFromCalculatedBundle()
+    {
+        $bundle = new Bundle();
+        $bundle->addFile('path/to/package/file.php');
+        $this->mockPharComposer->expects($this->once())
+                               ->method('getPathLocalToBase')
+                               ->with($this->equalTo('path/to/package/file.php'))
+                               ->will($this->returnValue('file.php'));
+        $this->mockBox->expects($this->once())
+                      ->method('addFile')
+                      ->with($this->equalTo('path/to/package/file.php'), $this->equalTo('file.php'));
+        $mockFinder = $this->createMock('Symfony\Component\Finder\Finder');
+        $bundle->addDir($mockFinder);
+        $this->mockPharComposer->expects($this->once())
+                               ->method('getBase')
+                               ->will($this->returnValue('path/to/package'));
+        $this->mockBox->expects($this->once())
+                      ->method('buildFromIterator')
+                      ->with($this->equalTo($mockFinder), $this->equalTo('path/to/package'));
+        $this->targetPhar->addBundle($bundle);
     }
 
     /**

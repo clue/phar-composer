@@ -55,9 +55,20 @@ class TargetPhar
         $this->box->getPhar()->stopBuffering();
     }
 
-    public function addFromString($local, $contents)
+    /**
+     * adds given list of resources to phar
+     *
+     * @param  Bundle  $bundle
+     */
+    public function addBundle(Bundle $bundle)
     {
-        $this->box->addFromString($local, $contents);
+        foreach ($bundle->getResources() as $resource) {
+            if (is_string($resource)) {
+                $this->addFile($resource);
+            } else {
+                $this->buildFromIterator($resource);
+            }
+        }
     }
 
      /**
@@ -90,5 +101,10 @@ class TargetPhar
     public function setStub($stub)
     {
         $this->box->getPhar()->setStub($stub);
+    }
+
+    public function addFromString($local, $contents)
+    {
+        $this->box->addFromString($local, $contents);
     }
 }

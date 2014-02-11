@@ -161,7 +161,7 @@ class PharComposer
 
         $targetPhar = TargetPhar::create($target, $this);
         $this->log('  - Adding main package');
-        $this->addPackage($this->getPackageRoot(), $targetPhar);
+        $targetPhar->addBundle(Bundle::from($this->getPackageRoot(), $this->logger));
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
@@ -174,7 +174,7 @@ class PharComposer
 
         foreach ($this->getPackagesDependencies() as $package) {
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
-            $this->addPackage($package, $targetPhar);
+            $targetPhar->addBundle(Bundle::from($package, $this->logger));
         }
 
 
@@ -253,10 +253,5 @@ class PharComposer
             throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
         }
         return $ret;
-    }
-
-    private function addPackage(Package $package, TargetPhar $targetPhar)
-    {
-        $package->getBundler()->build($targetPhar, $this->logger);
     }
 }

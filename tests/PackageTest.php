@@ -10,7 +10,6 @@ class PackageTest extends TestCase
 
         $this->assertEquals(null, $package->getAutoload());
         $this->assertEquals(array(), $package->getBins());
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete', $package->getBundler());
         $this->assertEquals('dir/', $package->getDirectory());
         $this->assertEquals('unknown', $package->getName());
         $this->assertEquals('dir/vendor/', $package->getPathVendor());
@@ -31,6 +30,13 @@ class PackageTest extends TestCase
         $this->assertEquals('dir/src/vendors/', $package->getPathVendor());
     }
 
+    private function createMockLogger()
+    {
+        return $this->getMockBuilder('Clue\PharComposer\Logger')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+    }
+
     public function testConstructorBundlerComposer()
     {
         $package = new Package(array(
@@ -41,7 +47,9 @@ class PackageTest extends TestCase
             )
         ), 'dir/');
 
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit', $package->getBundler());
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit',
+                                $package->getBundler($this->createMockLogger())
+        );
     }
 
     public function testConstructorBundlerCompleteWithExplicitConfig()
@@ -54,29 +62,37 @@ class PackageTest extends TestCase
             )
         ), 'dir/');
 
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete', $package->getBundler());
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+                                $package->getBundler($this->createMockLogger())
+        );
     }
 
     public function testConstructorBundlerCompleteAsDefault()
     {
         $package = new Package(array(), 'dir/');
 
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete', $package->getBundler());
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+                                $package->getBundler($this->createMockLogger())
+        );
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
     public function testConstructorBundlerInvalid()
     {
         $package = new Package(array(
+            'name'  => 'cool-package',
             'extra' => array(
                 'phar' => array(
-                    'bundler' => 'invalid'
+                    'bundler' => 'foo'
                 )
             )
         ), 'dir/');
 
-        $package->getBundler();
+        $mockLogger = $this->createMockLogger();
+        $mockLogger->expects($this->once())
+                   ->method('log')
+                   ->with($this->equalTo('Invalid bundler "foo" specified in package "cool-package", will fall back to "complete" bundler'));
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+                                $package->getBundler($mockLogger)
+        );
     }
 }
