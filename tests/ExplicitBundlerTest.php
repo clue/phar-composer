@@ -25,7 +25,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox          = $this->createMock('Herrera\Box\Box');
         $this->mockPharComposer = $this->createMock('Clue\PharComposer\PharComposer');
         $this->mockPackage      = $this->createMock('Clue\PharComposer\Package');
-        $this->explicitBundler  = new ExplicitBundler();
+        $this->explicitBundler  = new ExplicitBundler($this->mockPackage);
     }
 
     private function createMock($class)
@@ -50,7 +50,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('bin/example'), $this->equalTo('/local/path/to/bin/example'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -75,7 +75,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('foo.php'), $this->equalTo('/local/path/to/foo.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -100,7 +100,7 @@ class ExplicitBundlerTest extends TestCase
         $this->mockBox->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('src/Example/SomeClass.php'), $this->equalTo('/local/path/to/src/Example/SomeClass.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -120,7 +120,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(__DIR__));
         $this->mockBox->expects($this->once())
                       ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -141,7 +141,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue($path . '/Clue'));
         $this->mockBox->expects($this->once())
                       ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 
     /**
@@ -162,6 +162,6 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue($path . '/Clue'));
         $this->mockBox->expects($this->exactly(2))
                       ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox, $this->mockPackage);
+        $this->explicitBundler->build($this->mockPharComposer, $this->mockBox);
     }
 }

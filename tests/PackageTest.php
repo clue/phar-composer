@@ -44,6 +44,26 @@ class PackageTest extends TestCase
         $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit', $package->getBundler());
     }
 
+    public function testConstructorBundlerCompleteWithExplicitConfig()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'bundler' => 'complete'
+                 )
+            )
+        ), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete', $package->getBundler());
+    }
+
+    public function testConstructorBundlerCompleteAsDefault()
+    {
+        $package = new Package(array(), 'dir/');
+
+        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete', $package->getBundler());
+    }
+
     /**
      * @expectedException UnexpectedValueException
      */

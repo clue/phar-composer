@@ -268,6 +268,6 @@ class PharComposer
 
     private function addPackage(Package $package, Box $box)
     {
-        $package->getBundler()->build($this, $box, $package);
+        $package->getBundler()->build($this, $box);
     }
 }
