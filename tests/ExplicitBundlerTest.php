@@ -30,25 +30,9 @@ class ExplicitBundlerTest extends TestCase
                     ->getMock();
     }
 
-    private function assertBundleContainsFile($file, Bundle $bundle)
-    {
-        $this->assertContains($file, $bundle->getResources());
-    }
-
     private function assertBundleContainsDirectory($directory, Bundle $bundle)
     {
-        foreach ($bundle->getResources() as $resource) {
-            if ($resource instanceof Symfony\Component\Finder\Finder) {
-                foreach ($resource as $containedDirectory) {
-                    /* @var $containedDirectory \SplFileInfo */
-                    if (substr($containedDirectory->getRealPath(), 0, strlen($directory)) === $directory) {
-                        return true;
-                    }
-                }
-            }
-        }
 
-        $this->fail('Directory ' . $directory . ' is not contained in bundle');
     }
 
     /**
@@ -59,7 +43,9 @@ class ExplicitBundlerTest extends TestCase
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array('bin/example')));
-        $this->assertBundleContainsFile('bin/example', $this->explicitBundler->bundle());
+        $this->assertTrue($this->explicitBundler->bundle()->contains('bin/example'),
+                          'Failed asserting that "bin/example" is contained in bundle'
+        );
     }
 
     /**
@@ -77,7 +63,9 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo('foo.php'))
                           ->will($this->returnValue('foo.php'));
-        $this->assertBundleContainsFile('foo.php', $this->explicitBundler->bundle());
+        $this->assertTrue($this->explicitBundler->bundle()->contains('foo.php'),
+                          'Failed asserting that "foo.php" is contained in bundle'
+        );
     }
 
     /**
@@ -95,7 +83,9 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo('Example/SomeClass.php'))
                           ->will($this->returnValue('src/Example/SomeClass.php'));
-        $this->assertBundleContainsFile('src/Example/SomeClass.php', $this->explicitBundler->bundle());
+        $this->assertTrue($this->explicitBundler->bundle()->contains('src/Example/SomeClass.php'),
+                          'Failed asserting that "src/Example/SomeClass.php" is contained in bundle'
+        );
     }
 
     /**
@@ -113,7 +103,9 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo(__DIR__))
                           ->will($this->returnValue(__DIR__));
-        $this->assertBundleContainsDirectory(__DIR__, $this->explicitBundler->bundle());
+        $this->assertTrue($this->explicitBundler->bundle()->contains(__DIR__),
+                          'Failed asserting that ' . __DIR__ . ' is contained in bundle'
+        );
     }
 
     /**
@@ -132,7 +124,9 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo($path . '/Clue'))
                           ->will($this->returnValue($path . '/Clue'));
-        $this->assertBundleContainsDirectory($path, $this->explicitBundler->bundle());
+        $this->assertTrue($this->explicitBundler->bundle()->contains($path),
+                          'Failed asserting that ' . $path . ' is contained in bundle'
+        );
     }
 
     /**
@@ -152,7 +146,11 @@ class ExplicitBundlerTest extends TestCase
                           ->with($this->equalTo($path . '/Clue'))
                           ->will($this->onConsecutiveCalls($path . '/Clue/PharComposer/Bundler', $path . '/Clue/PharComposer/Command'));
         $bundle = $this->explicitBundler->bundle();
-        $this->assertBundleContainsDirectory($path . '/Clue/PharComposer/Bundler', $bundle);
-        $this->assertBundleContainsDirectory($path . '/Clue/PharComposer/Command', $bundle);
+        $this->assertTrue($bundle->contains($path . '/Clue/PharComposer/Bundler'),
+                          'Failed asserting that ' . $path . '/Clue/PharComposer/Bundler' . ' is contained in bundle'
+        );
+        $this->assertTrue($bundle->contains($path . '/Clue/PharComposer/Command'),
+                          'Failed asserting that ' . $path . '/Clue/PharComposer/Command' . ' is contained in bundle'
+        );
     }
 }

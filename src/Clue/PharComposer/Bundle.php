@@ -53,6 +53,46 @@ class Bundle
     }
 
     /**
+     * checks if a bundle contains given resource
+     *
+     * @param   string  $resource
+     * @return  bool
+     */
+    public function contains($resource)
+    {
+        foreach ($this->resources as $containedResource) {
+            if (is_string($containedResource) && $containedResource == $resource) {
+                return true;
+            }
+
+            if ($containedResource instanceof Finder && $this->directoryContains($containedResource, $resource)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * checks if given directory contains given resource
+     *
+     * @param   Finder  $dir
+     * @param   string  $resource
+     * @return  bool
+     */
+    private function directoryContains(Finder $dir, $resource)
+    {
+        foreach ($dir as $containedResource) {
+            /* @var $containedResource \SplFileInfo */
+            if (substr($containedResource->getRealPath(), 0, strlen($resource)) == $resource) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * returns list of resources
      *
      * @return  \Traversable
