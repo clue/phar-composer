@@ -5,7 +5,7 @@ namespace Clue\PharComposer\Bundler;
 use Clue\PharComposer\Package;
 
 use Symfony\Component\Finder\Finder;
-use Clue\PharComposer\PharComposer;
+use Clue\PharComposer\Logger;
 use Clue\PharComposer\TargetPhar;
 
 class Complete implements BundlerInterface
@@ -22,7 +22,7 @@ class Complete implements BundlerInterface
         $this->package = $package;
     }
 
-    public function build(PharComposer $pharcomposer, TargetPhar $targetPhar)
+    public function build(TargetPhar $targetPhar, Logger $logger)
     {
         $iterator = Finder::create()
             ->files()
@@ -31,7 +31,7 @@ class Complete implements BundlerInterface
             ->exclude($this->package->getPathVendor())
             ->in($this->package->getDirectory());
 
-        $pharcomposer->log('    Adding whole project directory "' . $this->package->getDirectory() . '"');
+        $logger->log('    Adding whole project directory "' . $this->package->getDirectory() . '"');
         $targetPhar->buildFromIterator($iterator);
     }
 }
