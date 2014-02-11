@@ -6,7 +6,7 @@ use Clue\PharComposer\Package;
 
 use Symfony\Component\Finder\Finder;
 use Clue\PharComposer\PharComposer;
-use Herrera\Box\Box;
+use Clue\PharComposer\TargetPhar;
 
 class Complete implements BundlerInterface
 {
@@ -22,7 +22,7 @@ class Complete implements BundlerInterface
         $this->package = $package;
     }
 
-    public function build(PharComposer $pharcomposer, Box $box)
+    public function build(PharComposer $pharcomposer, TargetPhar $targetPhar)
     {
         $iterator = Finder::create()
             ->files()
@@ -32,6 +32,6 @@ class Complete implements BundlerInterface
             ->in($this->package->getDirectory());
 
         $pharcomposer->log('    Adding whole project directory "' . $this->package->getDirectory() . '"');
-        $box->buildFromIterator($iterator, $pharcomposer->getBase());
+        $targetPhar->buildFromIterator($iterator);
     }
 }

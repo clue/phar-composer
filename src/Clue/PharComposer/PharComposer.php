@@ -4,7 +4,6 @@ namespace Clue\PharComposer;
 
 use Symfony\Component\Finder\Finder;
 
-use Herrera\Box\Box;
 use Herrera\Box\StubGenerator;
 use UnexpectedValueException;
 use InvalidArgumentException;
@@ -159,24 +158,22 @@ class PharComposer
             }
         }
 
-        $box = Box::create($target);
-        $box->getPhar()->startBuffering();
-
+        $targetPhar = TargetPhar::create($target, $this);
         $this->log('  - Adding main package');
-        $this->addPackage($this->getPackageRoot(), $box);
+        $this->addPackage($this->getPackageRoot(), $targetPhar);
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
-        $box->addFile($pathVendor . 'autoload.php', $this->getPathLocalToBase($pathVendor . 'autoload.php'));
+        $targetPhar->addFile($pathVendor . 'autoload.php');
 
         // TODO: check for vendor/bin !
 
         // only add composer base directory (no sub-directories!)
-        $box->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME), $this->getBase());
+        $targetPhar->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME));
 
         foreach ($this->getPackagesDependencies() as $package) {
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
-            $this->addPackage($package, $box);
+            $this->addPackage($package, $targetPhar);
         }
 
 
@@ -198,16 +195,16 @@ class PharComposer
 
                 // remove shebang from main file and add (overwrite)
                 unset($lines[0]);
-                $box->addFromString($this->getPathLocalToBase($main), implode("\n", $lines));
+                $targetPhar->addFromString($this->getPathLocalToBase($main), implode("\n", $lines));
             }
 
-            $box->getPhar()->setStub($generator->generate());
+            $targetPhar->setStub($generator->generate());
 
             $chmod = octdec(substr(decoct(fileperms($main)),-4));
             $this->log('    Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
-        $box->getPhar()->stopBuffering();
+        $targetPhar->finalize();
 
         if ($chmod !== null) {
             $this->log('    Applying chmod ' . sprintf('%04o', $chmod));
@@ -266,8 +263,8 @@ class PharComposer
         return $ret;
     }
 
-    private function addPackage(Package $package, Box $box)
+    private function addPackage(Package $package, TargetPhar $targetPhar)
     {
-        $package->getBundler()->build($this, $box);
+        $package->getBundler()->build($this, $targetPhar);
     }
 }
