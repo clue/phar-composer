@@ -16,7 +16,7 @@ class PharComposer
     private $package;
     private $main = null;
     private $target = null;
-    private $output = true;
+    private $logger;
     private $step = '?';
 
     public function __construct($path)
@@ -25,6 +25,7 @@ class PharComposer
 
         $this->package = $this->loadJson($path);
         $this->pathProject = dirname($path) . '/';
+        $this->logger = new Logger();
     }
 
     /**
@@ -34,7 +35,7 @@ class PharComposer
      */
     public function setOutput($output)
     {
-        $this->output = $output;
+        $this->logger->setOutput($output);
     }
 
     public function getTarget()
@@ -160,7 +161,7 @@ class PharComposer
 
         $targetPhar = TargetPhar::create($target, $this);
         $this->log('  - Adding main package');
-        $this->addPackage($this->getPackageRoot(), $targetPhar);
+        $targetPhar->addBundle(Bundle::from($this->getPackageRoot(), $this->logger));
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
@@ -173,7 +174,7 @@ class PharComposer
 
         foreach ($this->getPackagesDependencies() as $package) {
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
-            $this->addPackage($package, $targetPhar);
+            $targetPhar->addBundle(Bundle::from($package, $this->logger));
         }
 
 
@@ -236,21 +237,12 @@ class PharComposer
 
     public function log($message)
     {
-        $this->output($message . PHP_EOL);
+        $this->logger->log($message);
     }
 
     public function setStep($step)
     {
         $this->step = $step;
-    }
-
-    private function output($message)
-    {
-        if ($this->output === true) {
-            echo $message;
-        } elseif ($this->output !== false) {
-            call_user_func($this->output, $message);
-        }
     }
 
     private function loadJson($path)
@@ -261,10 +253,5 @@ class PharComposer
             throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
         }
         return $ret;
-    }
-
-    private function addPackage(Package $package, TargetPhar $targetPhar)
-    {
-        $package->getBundler()->build($this, $targetPhar);
     }
 }

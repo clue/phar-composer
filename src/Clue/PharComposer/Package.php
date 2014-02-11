@@ -4,10 +4,8 @@ namespace Clue\PharComposer;
 
 use Symfony\Component\Finder\SplFileInfo;
 
-use Clue\PharComposer\Bundler\BundlerInterface;
 use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
 use Clue\PharComposer\Bundler\Complete as CompleteBundler;
-use UnexpectedValueException;
 
 class Package
 {
@@ -37,7 +35,7 @@ class Package
         return $this->directory;
     }
 
-    public function getBundler()
+    public function getBundler(Logger $logger)
     {
         $bundlerName = 'complete';
         if (isset($this->package['extra']['phar']['bundler'])) {
@@ -45,12 +43,12 @@ class Package
         }
 
         if ($bundlerName === 'composer') {
-            return new ExplicitBundler($this);
+            return new ExplicitBundler($this, $logger);
         } elseif ($bundlerName === 'complete') {
-            return new CompleteBundler($this);
+            return new CompleteBundler($this, $logger);
         } else {
-            // TODO: instead of failing, just return a default bundler
-            throw new UnexpectedValueException('Invalid bundler "' . $bundlerName . '" specified');
+            $logger->log('Invalid bundler "' . $bundlerName . '" specified in package "' . $this->getName() . '", will fall back to "complete" bundler');
+            return new CompleteBundler($this, $logger);
         }
     }
 

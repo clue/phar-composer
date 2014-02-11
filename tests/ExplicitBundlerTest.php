@@ -1,5 +1,6 @@
 <?php
 
+use Clue\PharComposer\Bundle;
 use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
 
 class ExplicitBundlerTest extends TestCase
@@ -11,10 +12,6 @@ class ExplicitBundlerTest extends TestCase
      */
     private $explicitBundler;
 
-    private $mockTargetPhar;
-
-    private $mockPharComposer;
-
     private $mockPackage;
 
     /**
@@ -22,10 +19,8 @@ class ExplicitBundlerTest extends TestCase
      */
     public function setUp()
     {
-        $this->mockTargetPhar   = $this->createMock('Clue\PharComposer\TargetPhar');
-        $this->mockPharComposer = $this->createMock('Clue\PharComposer\PharComposer');
         $this->mockPackage      = $this->createMock('Clue\PharComposer\Package');
-        $this->explicitBundler  = new ExplicitBundler($this->mockPackage);
+        $this->explicitBundler  = new ExplicitBundler($this->mockPackage, $this->createMock('Clue\PharComposer\Logger'));
     }
 
     private function createMock($class)
@@ -35,18 +30,36 @@ class ExplicitBundlerTest extends TestCase
                     ->getMock();
     }
 
+    private function assertBundleContainsFile($file, Bundle $bundle)
+    {
+        $this->assertContains($file, $bundle->getResources());
+    }
+
+    private function assertBundleContainsDirectory($directory, Bundle $bundle)
+    {
+        foreach ($bundle->getResources() as $resource) {
+            if ($resource instanceof Symfony\Component\Finder\Finder) {
+                foreach ($resource as $containedDirectory) {
+                    /* @var $containedDirectory \SplFileInfo */
+                    if (substr($containedDirectory->getRealPath(), 0, strlen($directory)) === $directory) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        $this->fail('Directory ' . $directory . ' is not contained in bundle');
+    }
+
     /**
      * @test
      */
-    public function addsBinariesDefinedByPackageToBox()
+    public function addsBinariesDefinedByPackage()
     {
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array('bin/example')));
-        $this->mockTargetPhar->expects($this->once())
-                             ->method('addFile')
-                             ->with($this->equalTo('bin/example'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->assertBundleContainsFile('bin/example', $this->explicitBundler->bundle());
     }
 
     /**
@@ -64,10 +77,7 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo('foo.php'))
                           ->will($this->returnValue('foo.php'));
-        $this->mockTargetPhar->expects($this->once())
-                             ->method('addFile')
-                             ->with($this->equalTo('foo.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->assertBundleContainsFile('foo.php', $this->explicitBundler->bundle());
     }
 
     /**
@@ -85,10 +95,7 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo('Example/SomeClass.php'))
                           ->will($this->returnValue('src/Example/SomeClass.php'));
-        $this->mockTargetPhar->expects($this->once())
-                             ->method('addFile')
-                             ->with($this->equalTo('src/Example/SomeClass.php'));
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->assertBundleContainsFile('src/Example/SomeClass.php', $this->explicitBundler->bundle());
     }
 
     /**
@@ -106,9 +113,7 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo(__DIR__))
                           ->will($this->returnValue(__DIR__));
-        $this->mockTargetPhar->expects($this->once())
-                             ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->assertBundleContainsDirectory(__DIR__, $this->explicitBundler->bundle());
     }
 
     /**
@@ -127,9 +132,7 @@ class ExplicitBundlerTest extends TestCase
                           ->method('getAbsolutePath')
                           ->with($this->equalTo($path . '/Clue'))
                           ->will($this->returnValue($path . '/Clue'));
-        $this->mockTargetPhar->expects($this->once())
-                             ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+        $this->assertBundleContainsDirectory($path, $this->explicitBundler->bundle());
     }
 
     /**
@@ -147,9 +150,9 @@ class ExplicitBundlerTest extends TestCase
         $this->mockPackage->expects($this->exactly(2))
                           ->method('getAbsolutePath')
                           ->with($this->equalTo($path . '/Clue'))
-                          ->will($this->returnValue($path . '/Clue'));
-        $this->mockTargetPhar->expects($this->exactly(2))
-                             ->method('buildFromIterator');
-        $this->explicitBundler->build($this->mockPharComposer, $this->mockTargetPhar);
+                          ->will($this->onConsecutiveCalls($path . '/Clue/PharComposer/Bundler', $path . '/Clue/PharComposer/Command'));
+        $bundle = $this->explicitBundler->bundle();
+        $this->assertBundleContainsDirectory($path . '/Clue/PharComposer/Bundler', $bundle);
+        $this->assertBundleContainsDirectory($path . '/Clue/PharComposer/Command', $bundle);
     }
 }
