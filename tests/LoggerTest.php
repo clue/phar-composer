@@ -37,7 +37,8 @@ class LoggerTest extends TestCase
      */
     public function callsGivenOutputFunctionWhenSet()
     {
-        $this->logger->setOutput(function($message) { $this->assertEquals('some informational message' . PHP_EOL, $message);});
+        $that = $this;
+        $this->logger->setOutput(function($message) use($that) { $that->assertEquals('some informational message' . PHP_EOL, $message);});
         $this->logger->log('some informational message');
     }
 }
