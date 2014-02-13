@@ -120,8 +120,8 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(new Autoload(array('psr-0' => array('Clue' => $path)))));
         $this->mockPackage->expects($this->once())
                           ->method('getAbsolutePath')
-                          ->with($this->equalTo($path . '/Clue'))
-                          ->will($this->returnValue($path . '/Clue'));
+                          ->with($this->equalTo($path . '/Clue/'))
+                          ->will($this->returnValue($path . '/Clue/'));
         $this->assertTrue($this->explicitBundler->bundle()->contains($path),
                           'Failed asserting that ' . $path . ' is contained in bundle'
         );
@@ -141,7 +141,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(new Autoload(array('psr-0' => array('Clue' => array($path, $path))))));
         $this->mockPackage->expects($this->exactly(2))
                           ->method('getAbsolutePath')
-                          ->with($this->equalTo($path . '/Clue'))
+                          ->with($this->equalTo($path . '/Clue/'))
                           ->will($this->onConsecutiveCalls($path . '/Clue/PharComposer/Bundler', $path . '/Clue/PharComposer/Command'));
         $bundle = $this->explicitBundler->bundle();
         $this->assertTrue($bundle->contains($path . '/Clue/PharComposer/Bundler'),

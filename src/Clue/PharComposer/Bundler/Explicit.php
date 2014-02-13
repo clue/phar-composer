@@ -48,7 +48,7 @@ class Explicit implements BundlerInterface
     private function bundleBins(Bundle $bundle)
     {
         foreach ($this->package->getBins() as $bin) {
-            $this->logger->log('    adding "' . $file . '"');
+            $this->logger->log('    adding "' . $bin . '"');
             $bundle->addFile($bin);
         }
     }
@@ -56,8 +56,7 @@ class Explicit implements BundlerInterface
     private function bundlePsr0(Bundle $bundle, Autoload $autoload)
     {
         foreach ($autoload->getPsr0() as $path) {
-            $dir = $this->package->getAbsolutePath($path);
-            $bundle->addDir($this->createDirectory($dir));
+            $this->addDir($bundle, $path);
         }
     }
 
@@ -81,14 +80,14 @@ class Explicit implements BundlerInterface
         $bundle->addFile($this->package->getAbsolutePath($file));
     }
 
-    private function createDirectory($dir)
+    private function addDir(Bundle $bundle, $dir)
     {
-        $dir = rtrim($dir, '/') . '/';
+        $dir = $this->package->getAbsolutePath(rtrim($dir, '/') . '/');
         $this->logger->log('    adding "' . $dir . '"');
-        return Finder::create()
-            ->files()
-            //->filter($this->getBlacklistFilter())
-            ->ignoreVCS(true)
-            ->in($dir);
+        $bundle->addDir(Finder::create()
+                              ->files()
+                              //->filter($this->getBlacklistFilter())
+                              ->ignoreVCS(true)
+                              ->in($dir));
     }
 }
