@@ -4,6 +4,7 @@ namespace Clue\PharComposer\Bundler;
 use Clue\PharComposer\Bundle;
 use Clue\PharComposer\Logger;
 use Clue\PharComposer\Package;
+use Clue\PharComposer\Package\Autoload;
 use Symfony\Component\Finder\Finder;
 
 class Explicit implements BundlerInterface
@@ -26,11 +27,6 @@ class Explicit implements BundlerInterface
         $this->logger  = $logger;
     }
 
-    private function logFile($file)
-    {
-        $this->logger->log('    adding "' . $file . '"');
-    }
-
     /**
      * returns a bundle
      *
@@ -40,12 +36,11 @@ class Explicit implements BundlerInterface
     {
         $bundle = new Bundle();
         $this->bundleBins($bundle);
+
         $autoload = $this->package->getAutoload();
-        if ($autoload !== null) {
-            $this->bundlePsr0($bundle, $autoload);
-            $this->bundleClassmap($bundle, $autoload);
-            $this->bundleFiles($bundle, $autoload);
-        }
+        $this->bundlePsr0($bundle, $autoload);
+        $this->bundleClassmap($bundle, $autoload);
+        $this->bundleFiles($bundle, $autoload);
 
         return $bundle;
     }
@@ -53,87 +48,46 @@ class Explicit implements BundlerInterface
     private function bundleBins(Bundle $bundle)
     {
         foreach ($this->package->getBins() as $bin) {
-            $this->logFile($bin);
+            $this->logger->log('    adding "' . $bin . '"');
             $bundle->addFile($bin);
         }
     }
 
-    private function bundlePsr0(Bundle $bundle, array $autoload)
+    private function bundlePsr0(Bundle $bundle, Autoload $autoload)
     {
-        if (!isset($autoload['psr-0'])) {
-            return;
-        }
-
-        foreach ($autoload['psr-0'] as $namespace => $paths) {
-            if (!is_array($paths)) {
-                // PSR autoloader may define a single or multiple paths
-                $paths = array($paths);
-            }
-
-            foreach($paths as $path) {
-                // TODO: this is not correct actually... should work for most repos nevertheless
-                // TODO: we have to take target-dir into account
-                $dir = $this->package->getAbsolutePath($this->buildNamespacePath($namespace, $path));
-                $bundle->addDir($this->createDirectory($dir));
-            }
+        foreach ($autoload->getPsr0() as $path) {
+            $this->addDir($bundle, $path);
         }
     }
 
-    private function buildNamespacePath($namespace, $path)
+    private function bundleClassmap(Bundle $bundle, Autoload $autoload)
     {
-        if ($namespace === '') {
-            return $path;
-        }
-
-        $namespace = str_replace('\\', '/', $namespace);
-        if ($path === '') {
-            // namespace in project root => namespace is path
-            return $namespace;
-        }
-
-        // namespace in sub-directory => add namespace to path
-        return rtrim($path, '/') . '/' . $namespace;
-    }
-
-    private function bundleClassmap(Bundle $bundle, array $autoload)
-    {
-        if (!isset($autoload['classmap'])) {
-            return;
-        }
-
-        foreach($autoload['classmap'] as $path) {
-            $this->addPath($bundle, $this->package->getAbsolutePath($path));
+        foreach($autoload->getClassmap() as $path) {
+            $this->addFile($bundle, $path);
         }
     }
 
-    private function bundleFiles(Bundle $bundle, array $autoload)
+    private function bundleFiles(Bundle $bundle, Autoload $autoload)
     {
-        if (isset($autoload['files'])) {
-            foreach($autoload['files'] as $path) {
-                $this->logFile($path);
-                $bundle->addFile($this->package->getAbsolutePath($path));
-            }
+        foreach($autoload->getFiles() as $path) {
+            $this->addFile($bundle, $path);
         }
     }
 
-
-    private function addPath(Bundle $bundle, $path)
+    private function addFile(Bundle $bundle, $file)
     {
-        if (is_dir($path)) {
-            $bundle->addDir($this->createDirectory($path));
-        } else {
-            $bundle->addFile($path);
-        }
+        $this->logger->log('    adding "' . $file . '"');
+        $bundle->addFile($this->package->getAbsolutePath($file));
     }
 
-    private function createDirectory($dir)
+    private function addDir(Bundle $bundle, $dir)
     {
-        $dir = rtrim($dir, '/') . '/';
+        $dir = $this->package->getAbsolutePath(rtrim($dir, '/') . '/');
         $this->logger->log('    adding "' . $dir . '"');
-        return Finder::create()
-            ->files()
-            //->filter($this->getBlacklistFilter())
-            ->ignoreVCS(true)
-            ->in($dir);
+        $bundle->addDir(Finder::create()
+                              ->files()
+                              //->filter($this->getBlacklistFilter())
+                              ->ignoreVCS(true)
+                              ->in($dir));
     }
 }

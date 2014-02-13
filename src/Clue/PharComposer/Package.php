@@ -6,6 +6,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
 use Clue\PharComposer\Bundler\Complete as CompleteBundler;
+use Clue\PharComposer\Package\Autoload;
 
 class Package
 {
@@ -54,7 +55,7 @@ class Package
 
     public function getAutoload()
     {
-        return isset($this->package['autoload']) ? $this->package['autoload'] : null;
+        return new Autoload(isset($this->package['autoload']) ? $this->package['autoload'] : array());
     }
 
     public function getBins()

@@ -1,6 +1,7 @@
 <?php
 
 use Clue\PharComposer\Package;
+use Clue\PharComposer\Package\Autoload;
 
 class PackageTest extends TestCase
 {
@@ -8,7 +9,7 @@ class PackageTest extends TestCase
     {
         $package = new Package(array(), 'dir/');
 
-        $this->assertEquals(null, $package->getAutoload());
+        $this->assertEquals(new Autoload(array()), $package->getAutoload());
         $this->assertEquals(array(), $package->getBins());
         $this->assertEquals('dir/', $package->getDirectory());
         $this->assertEquals('unknown', $package->getName());
