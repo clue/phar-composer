@@ -4,6 +4,7 @@ namespace Clue\PharComposer\Bundler;
 use Clue\PharComposer\Bundle;
 use Clue\PharComposer\Logger;
 use Clue\PharComposer\Package;
+use Clue\PharComposer\Package\Autoload;
 use Symfony\Component\Finder\Finder;
 
 class Explicit implements BundlerInterface
@@ -40,12 +41,11 @@ class Explicit implements BundlerInterface
     {
         $bundle = new Bundle();
         $this->bundleBins($bundle);
+
         $autoload = $this->package->getAutoload();
-        if ($autoload !== null) {
-            $this->bundlePsr0($bundle, $autoload);
-            $this->bundleClassmap($bundle, $autoload);
-            $this->bundleFiles($bundle, $autoload);
-        }
+        $this->bundlePsr0($bundle, $autoload);
+        $this->bundleClassmap($bundle, $autoload);
+        $this->bundleFiles($bundle, $autoload);
 
         return $bundle;
     }
@@ -58,61 +58,26 @@ class Explicit implements BundlerInterface
         }
     }
 
-    private function bundlePsr0(Bundle $bundle, array $autoload)
+    private function bundlePsr0(Bundle $bundle, Autoload $autoload)
     {
-        if (!isset($autoload['psr-0'])) {
-            return;
-        }
-
-        foreach ($autoload['psr-0'] as $namespace => $paths) {
-            if (!is_array($paths)) {
-                // PSR autoloader may define a single or multiple paths
-                $paths = array($paths);
-            }
-
-            foreach($paths as $path) {
-                // TODO: this is not correct actually... should work for most repos nevertheless
-                // TODO: we have to take target-dir into account
-                $dir = $this->package->getAbsolutePath($this->buildNamespacePath($namespace, $path));
-                $bundle->addDir($this->createDirectory($dir));
-            }
+        foreach ($autoload->getPsr0() as $path) {
+            $dir = $this->package->getAbsolutePath($path);
+            $bundle->addDir($this->createDirectory($dir));
         }
     }
 
-    private function buildNamespacePath($namespace, $path)
+    private function bundleClassmap(Bundle $bundle, Autoload $autoload)
     {
-        if ($namespace === '') {
-            return $path;
-        }
-
-        $namespace = str_replace('\\', '/', $namespace);
-        if ($path === '') {
-            // namespace in project root => namespace is path
-            return $namespace;
-        }
-
-        // namespace in sub-directory => add namespace to path
-        return rtrim($path, '/') . '/' . $namespace;
-    }
-
-    private function bundleClassmap(Bundle $bundle, array $autoload)
-    {
-        if (!isset($autoload['classmap'])) {
-            return;
-        }
-
-        foreach($autoload['classmap'] as $path) {
+        foreach($autoload->getClassmap() as $path) {
             $this->addPath($bundle, $this->package->getAbsolutePath($path));
         }
     }
 
-    private function bundleFiles(Bundle $bundle, array $autoload)
+    private function bundleFiles(Bundle $bundle, Autoload $autoload)
     {
-        if (isset($autoload['files'])) {
-            foreach($autoload['files'] as $path) {
-                $this->logFile($path);
-                $bundle->addFile($this->package->getAbsolutePath($path));
-            }
+        foreach($autoload->getFiles() as $path) {
+            $this->logFile($path);
+            $bundle->addFile($this->package->getAbsolutePath($path));
         }
     }
 

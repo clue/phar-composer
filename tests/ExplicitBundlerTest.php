@@ -1,7 +1,7 @@
 <?php
 
-use Clue\PharComposer\Bundle;
 use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
+use Clue\PharComposer\Package\Autoload;
 
 class ExplicitBundlerTest extends TestCase
 {
@@ -30,11 +30,6 @@ class ExplicitBundlerTest extends TestCase
                     ->getMock();
     }
 
-    private function assertBundleContainsDirectory($directory, Bundle $bundle)
-    {
-
-    }
-
     /**
      * @test
      */
@@ -43,6 +38,9 @@ class ExplicitBundlerTest extends TestCase
         $this->mockPackage->expects($this->once())
                           ->method('getBins')
                           ->will($this->returnValue(array('bin/example')));
+        $this->mockPackage->expects($this->once())
+                          ->method('getAutoload')
+                          ->will($this->returnValue(new Autoload(array())));
         $this->assertTrue($this->explicitBundler->bundle()->contains('bin/example'),
                           'Failed asserting that "bin/example" is contained in bundle'
         );
@@ -58,7 +56,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(array()));
         $this->mockPackage->expects($this->once())
                           ->method('getAutoload')
-                          ->will($this->returnValue(array('files' => array('foo.php'))));
+                          ->will($this->returnValue(new Autoload(array('files' => array('foo.php')))));
         $this->mockPackage->expects($this->once())
                           ->method('getAbsolutePath')
                           ->with($this->equalTo('foo.php'))
@@ -78,7 +76,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(array()));
         $this->mockPackage->expects($this->once())
                           ->method('getAutoload')
-                          ->will($this->returnValue(array('classmap' => array('Example/SomeClass.php'))));
+                          ->will($this->returnValue(new Autoload(array('classmap' => array('Example/SomeClass.php')))));
         $this->mockPackage->expects($this->once())
                           ->method('getAbsolutePath')
                           ->with($this->equalTo('Example/SomeClass.php'))
@@ -98,7 +96,7 @@ class ExplicitBundlerTest extends TestCase
                           ->will($this->returnValue(array()));
         $this->mockPackage->expects($this->once())
                           ->method('getAutoload')
-                          ->will($this->returnValue(array('classmap' => array(__DIR__))));
+                          ->will($this->returnValue(new Autoload(array('classmap' => array(__DIR__)))));
         $this->mockPackage->expects($this->once())
                           ->method('getAbsolutePath')
                           ->with($this->equalTo(__DIR__))
@@ -119,7 +117,7 @@ class ExplicitBundlerTest extends TestCase
         $path = realpath(__DIR__ . '/../src');
         $this->mockPackage->expects($this->once())
                           ->method('getAutoload')
-                          ->will($this->returnValue(array('psr-0' => array('Clue' => $path))));
+                          ->will($this->returnValue(new Autoload(array('psr-0' => array('Clue' => $path)))));
         $this->mockPackage->expects($this->once())
                           ->method('getAbsolutePath')
                           ->with($this->equalTo($path . '/Clue'))
@@ -140,7 +138,7 @@ class ExplicitBundlerTest extends TestCase
         $path = realpath(__DIR__ . '/../src');
         $this->mockPackage->expects($this->once())
                           ->method('getAutoload')
-                          ->will($this->returnValue(array('psr-0' => array('Clue' => array($path, $path)))));
+                          ->will($this->returnValue(new Autoload(array('psr-0' => array('Clue' => array($path, $path))))));
         $this->mockPackage->expects($this->exactly(2))
                           ->method('getAbsolutePath')
                           ->with($this->equalTo($path . '/Clue'))
