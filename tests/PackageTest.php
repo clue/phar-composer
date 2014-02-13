@@ -13,6 +13,7 @@ class PackageTest extends TestCase
         $this->assertEquals('dir/', $package->getDirectory());
         $this->assertEquals('unknown', $package->getName());
         $this->assertEquals('dir/vendor/', $package->getPathVendor());
+        $this->assertFalse($package->getForceExtract());
     }
 
     public function testConstructorData()
@@ -94,5 +95,18 @@ class PackageTest extends TestCase
         $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
                                 $package->getBundler($mockLogger)
         );
+    }
+
+    public function testConstructorForceExtractConfig()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'force-extract' => true
+                 )
+            )
+        ), 'dir/');
+
+        $this->assertTrue($package->getForceExtract());
     }
 }
