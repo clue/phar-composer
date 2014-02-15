@@ -76,17 +76,19 @@ class Explicit implements BundlerInterface
 
     private function addFile(Bundle $bundle, $file)
     {
-        $this->logger->log('    adding "' . $file . '"');
-        $bundle->addFile($this->package->getAbsolutePath($file));
+        if (!$this->package->isBlacklisted($this->package->getAbsolutePath($file))) {
+            $this->logger->log('    adding "' . $file . '"');
+            $bundle->addFile($this->package->getAbsolutePath($file));
+        }
     }
 
     private function addDir(Bundle $bundle, $dir)
     {
-        $dir = $this->package->getAbsolutePath(rtrim($dir, '/') . '/');
         $this->logger->log('    adding "' . $dir . '"');
+        $dir = $this->package->getAbsolutePath(rtrim($dir, '/') . '/');
         $bundle->addDir(Finder::create()
                               ->files()
-                              //->filter($this->getBlacklistFilter())
+                              ->filter($this->package->getBlacklistFilter())
                               ->ignoreVCS(true)
                               ->in($dir));
     }

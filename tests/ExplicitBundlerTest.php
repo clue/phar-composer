@@ -86,8 +86,8 @@ class ExplicitBundlerTest extends TestCase
      */
     public function addsAllPathesDefinedByPsr0WithSeveralPathes()
     {
-        $this->package = new Package(array('autoload' => array('psr-0' => array('Clue' => array('src/',
-                                                                                                'src/'
+        $this->package = new Package(array('autoload' => array('psr-0' => array('Clue' => array('src',
+                                                                                                'src'
                                                                                           )
                                                                           )
                                                          )
@@ -96,8 +96,46 @@ class ExplicitBundlerTest extends TestCase
                          );
         $this->explicitBundler = new ExplicitBundler($this->package, $this->createMock('Clue\PharComposer\Logger'));
         $bundle = $this->explicitBundler->bundle();
-        $this->assertTrue($bundle->contains($this->path . '/src'),
-                          'Failed asserting that ' . $this->path . '/src' . ' is contained in bundle'
+        $this->assertTrue($bundle->contains($this->path . '/src/Clue'),
+                          'Failed asserting that ' . $this->path . '/src/Clue' . ' is contained in bundle'
         );
+    }
+
+    /**
+     * @test
+     * @group exclude
+     */
+    public function doesNotAddBlacklistedFiles()
+    {
+        $this->package = new Package(array('autoload' => array('files'    => array('foo.php'),
+                                                               'classmap' => array('src/Example/SomeClass.php'),
+                                                               'psr-0'    => array('Clue' => 'src')
+                                                         ),
+                                           'extra'    => array('phar'     => array('exclude' => array('foo.php', 'src')))
+                                     ),
+                                     $this->path . '/'
+                         );
+        $this->explicitBundler = new ExplicitBundler($this->package, $this->createMock('Clue\PharComposer\Logger'));
+        $bundle = $this->explicitBundler->bundle();
+        $this->assertFalse($bundle->contains($this->path . '/foo.php'));
+    }
+
+    /**
+     * @test
+     * @group exclude
+     */
+    public function doesNotAddBlacklistedFilesFromClassmap()
+    {
+        $this->package = new Package(array('autoload' => array('files'    => array('foo.php'),
+                                                               'classmap' => array('src/Example/SomeClass.php'),
+                                                               'psr-0'    => array('Clue' => 'src')
+                                                         ),
+                                           'extra'    => array('phar'     => array('exclude' => array('foo.php', 'src')))
+                                     ),
+                                     $this->path . '/'
+                         );
+        $this->explicitBundler = new ExplicitBundler($this->package, $this->createMock('Clue\PharComposer\Logger'));
+        $bundle = $this->explicitBundler->bundle();
+        $this->assertFalse($bundle->contains($this->path . '/src/Example/SomeClass.php'));
     }
 }

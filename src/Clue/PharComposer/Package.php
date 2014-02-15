@@ -10,6 +10,8 @@ use Clue\PharComposer\Package\Autoload;
 
 class Package
 {
+    private $blacklist;
+
     public function __construct(array $package, $directory)
     {
         $this->package = $package;
@@ -72,12 +74,37 @@ class Package
         return $bins;
     }
 
+    /**
+     * checks if given resource is blacklisted which means it should not be added to the target phar
+     *
+     * @param   string  $resource
+     * @return  bool
+     */
+    public function isBlacklisted($resource)
+    {
+        if (in_array($resource, $this->getBlacklist())) {
+            return true;
+        }
+
+        foreach ($this->getBlacklist() as $path) {
+            if (substr($resource, 0, strlen($path)) === $path) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getBlacklist()
     {
-        $blacklist   = $this->getAdditionalExcludes();
-        $blacklist[] = 'composer.phar';
-        $blacklist[] = 'phar-composer.phar';
-        return array_map(array($this, 'getAbsolutePath'), $blacklist);
+        if (null === $this->blacklist) {
+            $blacklist   = $this->getAdditionalExcludes();
+            $blacklist[] = 'composer.phar';
+            $blacklist[] = 'phar-composer.phar';
+            $this->blacklist = array_map(array($this, 'getAbsolutePath'), $blacklist);
+        }
+
+        return $this->blacklist;
     }
 
     private function getAdditionalExcludes()
