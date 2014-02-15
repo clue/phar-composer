@@ -112,7 +112,7 @@ class PackageTest extends TestCase
         $package = new Package(array(
             'extra' => array(
                 'phar' => array(
-                    'excludes' => 'phpunit.xml.dist'
+                    'exclude' => 'phpunit.xml.dist'
                 )
             )
         ), 'dir/');
@@ -129,7 +129,7 @@ class PackageTest extends TestCase
         $package = new Package(array(
             'extra' => array(
                 'phar' => array(
-                    'excludes' => array('phpunit.xml.dist', '.travis.yml')
+                    'exclude' => array('phpunit.xml.dist', '.travis.yml')
                 )
             )
         ), 'dir/');
