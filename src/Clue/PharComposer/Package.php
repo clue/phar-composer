@@ -74,10 +74,23 @@ class Package
 
     public function getBlacklist()
     {
-        return array(
-            $this->getAbsolutePath('composer.phar'),
-            $this->getAbsolutePath('phar-composer.phar')
-        );
+        $blacklist   = $this->getAdditionalExcludes();
+        $blacklist[] = 'composer.phar';
+        $blacklist[] = 'phar-composer.phar';
+        return array_map(array($this, 'getAbsolutePath'), $blacklist);
+    }
+
+    private function getAdditionalExcludes()
+    {
+        if (isset($this->package['extra']['phar']['excludes'])) {
+            if (!is_array($this->package['extra']['phar']['excludes'])) {
+                return array($this->package['extra']['phar']['excludes']);
+            }
+
+            return $this->package['extra']['phar']['excludes'];
+        }
+
+        return array();
     }
 
     /**
