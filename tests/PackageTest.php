@@ -97,7 +97,11 @@ class PackageTest extends TestCase
         );
     }
 
-    public function testBlacklistContainsComposerAndPharComposerByDefault()
+    /**
+     * @test
+     * @group exclude
+     */
+    public function blacklistContainsComposerAndPharComposerByDefault()
     {
         $package = new Package(array(), 'dir/');
         $this->assertEquals(array('dir/composer.phar',
@@ -107,7 +111,11 @@ class PackageTest extends TestCase
         );
     }
 
-    public function testBlacklistContainsAdditionalExcludeFromConfig()
+    /**
+     * @test
+     * @group exclude
+     */
+    public function blacklistContainsAdditionalExcludeFromConfig()
     {
         $package = new Package(array(
             'extra' => array(
@@ -124,7 +132,11 @@ class PackageTest extends TestCase
         );
     }
 
-    public function testBlacklistContainsAdditionalExcludesFromConfig()
+    /**
+     * @test
+     * @group exclude
+     */
+    public function blacklistContainsAdditionalExcludesFromConfig()
     {
         $package = new Package(array(
             'extra' => array(
