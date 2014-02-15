@@ -96,4 +96,14 @@ class PackageTest extends TestCase
                                 $package->getBundler($mockLogger)
         );
     }
+
+    public function testBlackListContainsComposerAndPharComposerByDefault()
+    {
+        $package = new Package(array(), 'dir/');
+        $this->assertEquals(array('dir/composer.phar',
+                                  'dir/phar-composer.phar'
+                            ),
+                            $package->getBlacklist()
+        );
+    }
 }
