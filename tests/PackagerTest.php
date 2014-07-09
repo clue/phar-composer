@@ -13,26 +13,17 @@ class PackagerTest extends TestCase
     {
         $packager = new Packager();
 
-        $collected = '';
-
-        $mock = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
-        $mock->expects($this->any())
-             ->method('write')
-             ->will($this->returnCallback(function ($chunk) use (&$collected) {
-                 $collected .= $chunk;
-             }));
-
-        $packager->setOutput($mock);
+        $this->expectOutputString($expectedOutput);
 
         $packager->exec($command);
-
-        $this->assertEquals($expectedOutput, $collected);
     }
 
     public function provideExecCommands()
     {
         return array(
             array("\n    output\n", 'echo output'),
+            array("\n    error\n", 'echo error >&2'),
+            array("\n    mixed\n    errors\n", 'echo mixed && echo errors >&1'),
         );
     }
 }
