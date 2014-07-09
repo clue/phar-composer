@@ -17,6 +17,17 @@ Feel free to report any issues you encounter.
 
 Once clue/phar-composer is [installed](#install), you can use it via command line like this.
 
+### phar-composer
+
+This tool supports several sub-commands. To get you started, you can now use the following simple command:
+
+```bash
+$ phar-composer
+```
+
+This will actually execute the `search` command that allows you to interactively search and build any package
+listed on packagist (see below description of the [search command](#phar-composer-search) for more details).
+
 ### phar-composer build
 
 The `build` command can be used to build an executable single-file phar (php archive) for any project
@@ -181,4 +192,3 @@ $ php composer.phar install
 ## License
 
 MIT
-
