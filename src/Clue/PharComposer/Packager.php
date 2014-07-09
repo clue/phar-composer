@@ -218,7 +218,6 @@ class Packager
 
     public function exec($cmd, $chdir = null)
     {
-        $ok = true;
         $nl = true;
 
         //
@@ -227,7 +226,7 @@ class Packager
         $process = new Process($cmd, $chdir);
         $process->setTimeout(null);
         $process->start();
-        $code = $process->wait(function($type, $data) use ($output, &$ok, &$nl) {
+        $code = $process->wait(function($type, $data) use ($output, &$nl) {
             if ($nl === true) {
                 $data = "\n" . $data;
                 $nl = false;
@@ -238,12 +237,7 @@ class Packager
             }
             $data = str_replace("\n", "\n    ", $data);
 
-            if ($type === Process::OUT) {
-                $output($data);
-            } else {
-                $output($data);
-                $ok = false;
-            }
+            $output($data);
         });
         if ($nl) {
             $this->log('');
@@ -251,10 +245,6 @@ class Packager
 
         if ($code !== 0) {
             throw new UnexpectedValueException('Error status code: ' . $process->getExitCodeText() . ' (code ' . $code . ')');
-        }
-
-        if (!$ok) {
-            throw new UnexpectedValueException('Error output present');
         }
     }
 
