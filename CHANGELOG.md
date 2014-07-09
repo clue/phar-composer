@@ -4,6 +4,28 @@ This file is a manually maintained list of changes for each release. Feel free
 to add your changes here when sending pull requests. Also send corrections if
 you spot any mistakes.
 
+## 0.5.0 (2014-07-09)
+
+*   Feature: The `search` command is the new default if you do not pass any command
+    ([#13](https://github.com/clue/phar-composer/pull/13)).
+    You can now use the following command to get started:
+
+    ```bash
+    $ phar-composer
+    ```
+
+*   Fix: Pass through STDERR output of child processes instead of aborting
+    ([#33](https://github.com/clue/phar-composer/pull/33))
+
+*   Fix: Do not timeout when child process takes longer than 60s, also helps users with slower internet connections
+    ([#31](https://github.com/clue/phar-composer/pull/31))
+
+*   Fix: Update broken dependencies
+    ([#18](https://github.com/clue/phar-composer/pull/18))
+
+*   Fix: Fixed an undocumented config key
+    ([#14](https://github.com/clue/phar-composer/pull/14), thanks @mikey179)
+
 ## 0.4.0 (2013-09-12)
 
 *   Feature: New `install` command will now both build the given package and then
