@@ -4,13 +4,18 @@
     "keywords": ["executable phar", "build process", "bundle dependencies"],
     "homepage": "https://github.com/clue/phar-composer",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Lück",
+            "email": "christian@lueck.tv"
+        }
+    ],
     "require": {
         "herrera-io/box": "~1.5",
         "symfony/console": "~2.1",
         "symfony/finder": "~2.1",
         "symfony/process": "~2.1",
-        "knplabs/packagist-api": "~1.0",
-        "clue/zenity-react": "0.1.*"
+        "knplabs/packagist-api": "~1.0"
     },
     "autoload": {
         "psr-0": {"Clue": "src/"}

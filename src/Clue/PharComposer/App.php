@@ -16,7 +16,9 @@ class App extends BaseApplication
         $this->add(new Command\Build());
         $this->add(new Command\Search());
         $this->add(new Command\Install());
-        $this->add(new Command\Gui());
+
+        // GUI feature disabled for now, see #35
+        // $this->add(new Command\Gui());
     }
 
     /**
@@ -37,7 +39,7 @@ class App extends BaseApplication
 
     private function getDefaultCommandName()
     {
-        $gui = $this->get('gui');
+        $gui = $this->has('gui') ? $this->get('gui') : null;
         if ($gui instanceof Command\Gui && $gui->hasZenity()) {
             return 'gui';
         }
