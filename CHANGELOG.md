@@ -4,7 +4,7 @@ This file is a manually maintained list of changes for each release. Feel free
 to add your changes here when sending pull requests. Also send corrections if
 you spot any mistakes.
 
-## 0.5.0 (2014-07-09)
+## 0.5.0 (2014-07-10)
 
 *   Feature: The `search` command is the new default if you do not pass any command
     ([#13](https://github.com/clue/phar-composer/pull/13)).
@@ -17,7 +17,8 @@ you spot any mistakes.
 *   Fix: Pass through STDERR output of child processes instead of aborting
     ([#33](https://github.com/clue/phar-composer/pull/33))
 
-*   Fix: Do not timeout when child process takes longer than 60s, also helps users with slower internet connections
+*   Fix: Do not timeout when child process takes longer than 60s.
+    This also helps users with slower internet connections.
     ([#31](https://github.com/clue/phar-composer/pull/31))
 
 *   Fix: Update broken dependencies
