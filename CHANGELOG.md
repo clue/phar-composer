@@ -4,6 +4,12 @@ This file is a manually maintained list of changes for each release. Feel free
 to add your changes here when sending pull requests. Also send corrections if
 you spot any mistakes.
 
+## 0.6.0 (2014-xx-xx)
+
+*   Feature: Can now be installed as a `require-dev` composer dependency and
+    supports running as `./vendor/bin/phar-composer`.
+    ([#36](https://github.com/clue/phar-composer/pull/36), thanks @radford)
+
 ## 0.5.0 (2014-07-10)
 
 *   Feature: The `search` command is the new default if you do not pass any command
