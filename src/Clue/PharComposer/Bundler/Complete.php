@@ -40,7 +40,7 @@ class Complete implements BundlerInterface
             ->files()
             ->ignoreVCS(true)
             ->filter($this->package->getBlacklistFilter())
-            ->exclude($this->package->getPathVendor())
+            ->exclude($this->package->getPathVendorRelative())
             ->in($this->package->getDirectory());
         $this->logger->log('    Adding whole project directory "' . $this->package->getDirectory() . '"');
         return $bundle->addDir($iterator);
