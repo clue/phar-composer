@@ -2,13 +2,16 @@
 
 namespace Clue\PharComposer;
 
-use Symfony\Component\Finder\Finder;
-
-use Herrera\Box\StubGenerator;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
+
+use Herrera\Box\StubGenerator;
+
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class PharComposer
 {
@@ -247,6 +250,19 @@ class PharComposer
 
     private function loadJson($path)
     {
+        $executableFinder = new ExecutableFinder();
+        foreach (['composer', 'composer.phar'] as $candidateName) {
+            if ($composerPath = $executableFinder->find($candidateName, null, array(getcwd()))) {
+                $process = new Process($candidateName . ' validate '. escapeshellarg($path));
+                $process->run();
+                
+                if (!$process->isSuccessful()) {
+                    throw new \RuntimeException($process->getErrorOutput());
+                }                
+                break;
+            }
+        }
+        
         $ret = json_decode(file_get_contents($path), true);
         if ($ret === null) {
             var_dump(json_last_error(), JSON_ERROR_SYNTAX);

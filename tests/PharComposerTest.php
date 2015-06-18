@@ -35,6 +35,14 @@ class PharComposerTest extends TestCase
         return $pharcomposer;
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testComposerJsonValidation()
+    {
+        new PharComposer(__DIR__ . '/fixtures/invalid_composer.json');
+    }
+
     private function getPathProjectAbsolute($path)
     {
         return realpath(__DIR__ . '/../' . $path);

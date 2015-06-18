@@ -9,6 +9,10 @@ you spot any mistakes.
 *   Feature: Can now be installed as a `require-dev` composer dependency and
     supports running as `./vendor/bin/phar-composer`.
     ([#36](https://github.com/clue/phar-composer/pull/36), thanks @radford)
+*   Feature: When composer or composer.phar is available in CLI `.json` files
+    passed to `PharComposer` are validated. In case of validation errors a
+    RuntimeException will be thrown.
+    ([#36](https://github.com/clue/phar-composer/pull/48), thanks @staabm)
 
 ## 0.5.0 (2014-07-10)
 
