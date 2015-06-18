@@ -14,7 +14,7 @@ class Install extends Command
     protected function configure()
     {
         $this->setName('install')
-             ->setDescription('Interactive search for project name')
+             ->setDescription('Install phar into system wide binary directory')
              ->addArgument('name', InputArgument::OPTIONAL, 'Project name or path', '.')
              ->addArgument('path', InputArgument::OPTIONAL, 'Path to install to', '/usr/local/bin');
     }
