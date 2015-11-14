@@ -189,9 +189,8 @@ class Packager
         $pharer->setStep($step);
 
         $pathVendor = $pharer->getPathVendor();
-        if (!is_dir($pathVendor)) {
-            $this->log('<error>Project is not installed via composer. Run "composer install" manually</error>');
-            return;
+        if (!is_dir($pathVendor)) {        
+            throw new RuntimeException('Project is not installed via composer. Run "composer install" manually');
         }
 
         return $pharer;
