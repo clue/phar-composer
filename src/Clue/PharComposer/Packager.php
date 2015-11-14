@@ -6,6 +6,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ExecutableFinder;
 use UnexpectedValueException;
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Packager
@@ -47,6 +48,13 @@ class Packager
         $this->output = $fn;
     }
 
+    /**
+     * ensure writing phar files is enabled or respawn with PHP setting which allows writing
+     *
+     * @param int $wait
+     * @return void
+     * @uses assertWritable()
+     */
     public function coerceWritable($wait = 1)
     {
         try {
@@ -71,6 +79,11 @@ class Packager
         }
     }
 
+    /**
+     * ensure writing phar files is enabled or throw an exception
+     *
+     * @throws UnexpectedValueException
+     */
     public function assertWritable()
     {
         if (ini_get('phar.readonly') === '1') {
@@ -84,8 +97,6 @@ class Packager
             // TODO: should be the other way around
             $path .= ':' . $version;
         }
-
-        $this->assertWritable();
 
         $step = 1;
         $steps = 1;
@@ -190,8 +201,7 @@ class Packager
 
         $pathVendor = $pharer->getPathVendor();
         if (!is_dir($pathVendor)) {
-            $this->log('<error>Project is not installed via composer. Run "composer install" manually</error>');
-            return;
+            throw new RuntimeException('Project is not installed via composer. Run "composer install" manually');
         }
 
         return $pharer;
