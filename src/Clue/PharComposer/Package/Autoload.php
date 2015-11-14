@@ -4,6 +4,8 @@ namespace Clue\PharComposer\Package;
 
 /**
  * Provides access to pathes defined in package autoload configuration.
+ *
+ * @see Package
  */
 class Autoload
 {

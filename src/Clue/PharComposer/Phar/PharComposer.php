@@ -12,6 +12,9 @@ use Clue\PharComposer\Logger;
 use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Package\Package;
 
+/**
+ * The PharComposer is responsible for collecting options and then building the target phar
+ */
 class PharComposer
 {
     private $pathProject;

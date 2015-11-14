@@ -8,6 +8,9 @@ use Clue\PharComposer\Package\Package;
 use Clue\PharComposer\Package\Autoload;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Only bundle files explicitly defined in this package's bin and autoload section
+ */
 class Explicit implements BundlerInterface
 {
     /**
