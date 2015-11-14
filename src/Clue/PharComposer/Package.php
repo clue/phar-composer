@@ -21,14 +21,18 @@ class Package
         return isset($this->package['name']) ? $this->package['name'] : 'unknown';
     }
 
-    public function getPathVendor()
+    public function getPathVendorRelative()
     {
         $vendor = 'vendor';
         if (isset($this->package['config']['vendor-dir'])) {
             $vendor = $this->package['config']['vendor-dir'];
         }
+        return $vendor;
+    }
 
-        return $this->getAbsolutePath($vendor . '/');
+    public function getPathVendor()
+    {
+        return $this->getAbsolutePath($this->getPathVendorRelative() . '/');
     }
 
     public function getDirectory()
