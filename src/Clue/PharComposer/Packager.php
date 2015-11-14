@@ -6,6 +6,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ExecutableFinder;
 use UnexpectedValueException;
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Packager
@@ -189,7 +190,7 @@ class Packager
         $pharer->setStep($step);
 
         $pathVendor = $pharer->getPathVendor();
-        if (!is_dir($pathVendor)) {        
+        if (!is_dir($pathVendor)) {
             throw new RuntimeException('Project is not installed via composer. Run "composer install" manually');
         }
 
