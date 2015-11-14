@@ -48,6 +48,13 @@ class Packager
         $this->output = $fn;
     }
 
+    /**
+     * ensure writing phar files is enabled or respawn with PHP setting which allows writing
+     *
+     * @param int $wait
+     * @return void
+     * @uses assertWritable()
+     */
     public function coerceWritable($wait = 1)
     {
         try {
@@ -72,6 +79,11 @@ class Packager
         }
     }
 
+    /**
+     * ensure writing phar files is enabled or throw an exception
+     *
+     * @throws UnexpectedValueException
+     */
     public function assertWritable()
     {
         if (ini_get('phar.readonly') === '1') {
@@ -85,8 +97,6 @@ class Packager
             // TODO: should be the other way around
             $path .= ':' . $version;
         }
-
-        $this->assertWritable();
 
         $step = 1;
         $steps = 1;
