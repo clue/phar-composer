@@ -25,10 +25,6 @@ for your project among with its bundled dependencies.
     * [Updating manually](#updating-manually)
 * [License](#license)
 
-> Note: This project is in beta stage! It's been tested against a wide range
-of packages and we have yet to find any major issues.
-Feel free to report any issues you encounter.
-
 ## Usage
 
 Once clue/phar-composer is [installed](#install), you can use it via command line like this.
@@ -65,7 +61,7 @@ The above will download and install the latest stable tagged release (if any).
 You can also specify a tagged version like this:
 
 ```bash
-$ phar-composer build clue/phar-composer:0.3.*
+$ phar-composer build clue/phar-composer:~1.0
 ```
 
 Or you can specify to install the head of a given branch like this:
@@ -185,8 +181,6 @@ $ phar-composer install clue/phar-composer
 
 Alternatively, you can also install phar-composer as part of your development dependencies.
 You will likely want to use the `require-dev` section to exclude phar-composer in your production environment.
-
-This method also requires PHP 5.3+ and Composer.
 
 You can either modify your `composer.json` manually or run the following command to include the latest tagged release:
 

@@ -1,14 +1,25 @@
-# CHANGELOG
+# Changelog
 
-This file is a manually maintained list of changes for each release. Feel free
-to add your changes here when sending pull requests. Also send corrections if
-you spot any mistakes.
+## 1.0.0 (2015-11-15)
 
-## 0.6.0 (2014-xx-xx)
+*   First stable release, now following SemVer.
 
-*   Feature: Can now be installed as a `require-dev` composer dependency and
+*   Feature: Can now be installed as a `require-dev` Composer dependency and
     supports running as `./vendor/bin/phar-composer`.
-    ([#36](https://github.com/clue/phar-composer/pull/36), thanks @radford)
+    (#36 by @radford)
+
+*   Fix: Actually exclude `vendor/` directory. This prevents processing all
+    vendor files twice and reduces build time by 50%.
+    (#38 by @radford)
+
+*   Fix: Fix error reporting when processing invalid project paths.
+    (#56 by @staabm and @clue)
+
+*   Fix: Fix description of `phar-composer install` command.
+    (#47 by @staabm)
+
+*   Updated documentation, tests and project structure.
+    (#54, #57, #58 and #59 by @clue)
 
 ## 0.5.0 (2014-07-10)
 
