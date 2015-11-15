@@ -7,7 +7,23 @@ for your project among with its bundled dependencies.
 
 * Create a single executable phar archive, including its dependencies (i.e. vendor directory included)
 * Automated build process
-* Zero additional configuration 
+* Zero additional configuration
+
+**Table of contents**
+
+* [Usage](#usage)
+  * [phar-composer](#phar-composer)
+  * [phar-composer build](#phar-composer-build)
+  * [phar-composer install](#phar-composer-install)
+  * [phar-composer search](#phar-composer-search)
+* [Install](#install)
+  * [As a phar (recommended)](#as-a-phar-recommended)
+    * [Updating phar](#updating-phar)
+  * [Installation using Composer](#installation-using-composer)
+    * [Updating dependency](#updating-dependency)
+  * [Manual Installation from Source](#manual-installation-from-source)
+    * [Updating manually](#updating-manually)
+* [License](#license)
 
 > Note: This project is in beta stage! It's been tested against a wide range
 of packages and we have yet to find any major issues.
