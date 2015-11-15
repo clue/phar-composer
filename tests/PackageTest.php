@@ -96,4 +96,61 @@ class PackageTest extends TestCase
                                 $package->getBundler($mockLogger)
         );
     }
+
+    /**
+     * @test
+     * @group exclude
+     */
+    public function blacklistContainsComposerAndPharComposerByDefault()
+    {
+        $package = new Package(array(), 'dir/');
+        $this->assertEquals(array('dir/composer.phar',
+                                  'dir/phar-composer.phar'
+                            ),
+                            $package->getBlacklist()
+        );
+    }
+
+    /**
+     * @test
+     * @group exclude
+     */
+    public function blacklistContainsAdditionalExcludeFromConfig()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'exclude' => 'phpunit.xml.dist'
+                )
+            )
+        ), 'dir/');
+        $this->assertEquals(array('dir/phpunit.xml.dist',
+                                  'dir/composer.phar',
+                                  'dir/phar-composer.phar'
+                            ),
+                            $package->getBlacklist()
+        );
+    }
+
+    /**
+     * @test
+     * @group exclude
+     */
+    public function blacklistContainsAdditionalExcludesFromConfig()
+    {
+        $package = new Package(array(
+            'extra' => array(
+                'phar' => array(
+                    'exclude' => array('phpunit.xml.dist', '.travis.yml')
+                )
+            )
+        ), 'dir/');
+        $this->assertEquals(array('dir/phpunit.xml.dist',
+                                  'dir/.travis.yml',
+                                  'dir/composer.phar',
+                                  'dir/phar-composer.phar'
+                            ),
+                            $package->getBlacklist()
+        );
+    }
 }
