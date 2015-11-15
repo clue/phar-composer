@@ -158,6 +158,13 @@ $ phar-composer --version
 There's no separate `update` procedure, simply download the latest release again
 and overwrite the existing phar.
 
+Again, if you have already installed phar-composer system-wide, this is as easy as
+running a self-installation like this:
+
+```bash
+$ phar-composer install clue/phar-composer
+```
+
 ### Manual Installation from Source
 
 This project requires PHP 5.3+ and Composer:
