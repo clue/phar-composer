@@ -115,15 +115,16 @@ You can grab a copy of clue/phar-composer in either of the following ways.
 ### As a phar (recommended)
 
 You can simply download a pre-compiled and ready-to-use version as a Phar
-to any directory:
+to any directory.
+Simply download the latest `phar-composer.phar` file from our
+[releases page](https://github.com/clue/phar-composer/releases):
+
+[Latest release](https://github.com/clue/phar-composer/releases/latest)
+
+That's it already. You can now verify everything works by running this:
 
 ```bash
-$ wget http://www.lueck.tv/phar-composer/phar-composer.phar
-```
-
-That's it. You can now verify everything works by running:
-
-```bash
+$ cd ~/Downloads
 $ php phar-composer.phar --version
 ```
 
@@ -154,7 +155,8 @@ $ phar-composer --version
 
 #### Updating phar
 
-There's no separate `update` procedure, simply overwrite the existing phar with the new version downloaded.
+There's no separate `update` procedure, simply download the latest release again
+and overwrite the existing phar.
 
 ### Manual Installation from Source
 
