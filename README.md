@@ -115,15 +115,16 @@ You can grab a copy of clue/phar-composer in either of the following ways.
 ### As a phar (recommended)
 
 You can simply download a pre-compiled and ready-to-use version as a Phar
-to any directory:
+to any directory.
+Simply download the latest `phar-composer.phar` file from our
+[releases page](https://github.com/clue/phar-composer/releases):
+
+[Latest release](https://github.com/clue/phar-composer/releases/latest)
+
+That's it already. You can now verify everything works by running this:
 
 ```bash
-$ wget http://www.lueck.tv/phar-composer/phar-composer.phar
-```
-
-That's it. You can now verify everything works by running:
-
-```bash
+$ cd ~/Downloads
 $ php phar-composer.phar --version
 ```
 
@@ -154,7 +155,42 @@ $ phar-composer --version
 
 #### Updating phar
 
-There's no separate `update` procedure, simply overwrite the existing phar with the new version downloaded.
+There's no separate `update` procedure, simply download the latest release again
+and overwrite the existing phar.
+
+Again, if you have already installed phar-composer system-wide, this is as easy as
+running a self-installation like this:
+
+```bash
+$ phar-composer install clue/phar-composer
+```
+
+### Installation using Composer
+
+Alternatively, you can also install phar-composer as part of your development dependencies.
+You will likely want to use the `require-dev` section to exclude phar-composer in your production environment.
+
+This method also requires PHP 5.3+ and Composer.
+
+You can either modify your `composer.json` manually or run the following command to include the latest tagged release:
+
+```bash
+$ composer require --dev clue/phar-composer
+```
+
+Now you should be able to invoke the following command in your project root:
+
+```bash
+$ ./vendor/bin/phar-composer --version
+```
+
+> Note: You should only invoke and rely on the main phar-composer bin file.
+Installing this project as a non-dev dependency in order to use its
+source code as a library is *not supported*.
+
+#### Updating dependency
+
+Just run `composer update clue/phar-composer` to update to the latest release.
 
 ### Manual Installation from Source
 
