@@ -184,6 +184,10 @@ Now you should be able to invoke the following command in your project root:
 $ ./vendor/bin/phar-composer --version
 ```
 
+> Note: You should only invoke and rely on the main phar-composer bin file.
+Installing this project as a non-dev dependency in order to use its
+source code as a library is *not supported*.
+
 #### Updating dependency
 
 Just run `composer update clue/phar-composer` to update to the latest release.
