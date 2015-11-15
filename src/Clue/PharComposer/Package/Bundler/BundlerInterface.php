@@ -1,6 +1,6 @@
 <?php
 
-namespace Clue\PharComposer\Bundler;
+namespace Clue\PharComposer\Package\Bundler;
 
 interface BundlerInterface
 {

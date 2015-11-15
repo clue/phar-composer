@@ -1,14 +1,16 @@
 <?php
 
-namespace Clue\PharComposer;
+namespace Clue\PharComposer\Phar;
 
 use Symfony\Component\Finder\Finder;
-
 use Herrera\Box\StubGenerator;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
+use Clue\PharComposer\Logger;
+use Clue\PharComposer\Package\Bundle;
+use Clue\PharComposer\Package\Package;
 
 class PharComposer
 {

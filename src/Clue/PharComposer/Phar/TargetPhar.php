@@ -1,9 +1,11 @@
 <?php
 
-namespace Clue\PharComposer;
+namespace Clue\PharComposer\Phar;
 
 use Herrera\Box\Box;
 use Traversable;
+use Clue\PharComposer\Package\Bundle;
+
 /**
  * Represents the target phar to be created.
  *

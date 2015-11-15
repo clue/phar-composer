@@ -1,9 +1,10 @@
 <?php
-namespace Clue\PharComposer\Bundler;
 
-use Clue\PharComposer\Bundle;
+namespace Clue\PharComposer\Package\Bundler;
+
+use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Logger;
-use Clue\PharComposer\Package;
+use Clue\PharComposer\Package\Package;
 use Clue\PharComposer\Package\Autoload;
 use Symfony\Component\Finder\Finder;
 

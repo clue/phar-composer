@@ -1,12 +1,12 @@
 <?php
 
-namespace Clue\PharComposer;
+namespace Clue\PharComposer\Package;;
 
 use Symfony\Component\Finder\SplFileInfo;
-
-use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
-use Clue\PharComposer\Bundler\Complete as CompleteBundler;
+use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
+use Clue\PharComposer\Package\Bundler\Complete as CompleteBundler;
 use Clue\PharComposer\Package\Autoload;
+use Clue\PharComposer\Logger;
 
 class Package
 {

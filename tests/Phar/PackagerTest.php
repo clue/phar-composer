@@ -1,6 +1,6 @@
 <?php
 
-use Clue\PharComposer\Packager;
+use Clue\PharComposer\Phar\Packager;
 
 class PackagerTest extends TestCase
 {
@@ -39,7 +39,7 @@ class PackagerTest extends TestCase
      */
     public function testEmptyNotInstalled()
     {
-        $this->packager->getPharer(__DIR__ . '/fixtures/01-empty');
+        $this->packager->getPharer(__DIR__ . '/../fixtures/01-empty');
     }
 
     /**
@@ -48,7 +48,7 @@ class PackagerTest extends TestCase
      */
     public function testNoComposer()
     {
-        $this->packager->getPharer(__DIR__ . '/fixtures/02-no-composer');
+        $this->packager->getPharer(__DIR__ . '/../fixtures/02-no-composer');
     }
 
     /**
@@ -57,6 +57,6 @@ class PackagerTest extends TestCase
      */
     public function testNoComposerMissing()
     {
-        $this->packager->getPharer(__DIR__ . '/fixtures/02-no-composer/composer.json');
+        $this->packager->getPharer(__DIR__ . '/../fixtures/02-no-composer/composer.json');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Clue\PharComposer\Package;
 
 /**

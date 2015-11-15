@@ -1,6 +1,6 @@
 <?php
 
-use Clue\PharComposer\Package;
+use Clue\PharComposer\Package\Package;
 use Clue\PharComposer\Package\Autoload;
 
 class PackageTest extends TestCase
@@ -48,7 +48,7 @@ class PackageTest extends TestCase
             )
         ), 'dir/');
 
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Explicit',
+        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Explicit',
                                 $package->getBundler($this->createMockLogger())
         );
     }
@@ -63,7 +63,7 @@ class PackageTest extends TestCase
             )
         ), 'dir/');
 
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Complete',
                                 $package->getBundler($this->createMockLogger())
         );
     }
@@ -72,7 +72,7 @@ class PackageTest extends TestCase
     {
         $package = new Package(array(), 'dir/');
 
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Complete',
                                 $package->getBundler($this->createMockLogger())
         );
     }
@@ -92,7 +92,7 @@ class PackageTest extends TestCase
         $mockLogger->expects($this->once())
                    ->method('log')
                    ->with($this->equalTo('Invalid bundler "foo" specified in package "cool-package", will fall back to "complete" bundler'));
-        $this->assertInstanceOf('Clue\PharComposer\Bundler\Complete',
+        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Complete',
                                 $package->getBundler($mockLogger)
         );
     }

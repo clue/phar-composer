@@ -1,11 +1,10 @@
 <?php
 
-namespace Clue\PharComposer\Bundler;
+namespace Clue\PharComposer\Package\Bundler;
 
-use Clue\PharComposer\Bundle;
+use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Logger;
-use Clue\PharComposer\Package;
-
+use Clue\PharComposer\Package\Package;
 use Symfony\Component\Finder\Finder;
 
 class Complete implements BundlerInterface
