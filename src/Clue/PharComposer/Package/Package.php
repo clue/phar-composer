@@ -1,26 +1,45 @@
 <?php
 
-namespace Clue\PharComposer;
+namespace Clue\PharComposer\Package;;
 
 use Symfony\Component\Finder\SplFileInfo;
-
-use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
-use Clue\PharComposer\Bundler\Complete as CompleteBundler;
+use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
+use Clue\PharComposer\Package\Bundler\Complete as CompleteBundler;
 use Clue\PharComposer\Package\Autoload;
+use Clue\PharComposer\Logger;
 
+/**
+ * The package represents either the main/root package or one of the vendor packages.
+ */
 class Package
 {
+    /**
+     * Instantiate package
+     *
+     * @param array  $package   package information (parsed composer.json)
+     * @param string $directory base directory of this package
+     */
     public function __construct(array $package, $directory)
     {
         $this->package = $package;
         $this->directory = $directory;
     }
 
+    /**
+     * get package name as defined in composer.json
+     *
+     * @return string
+     */
     public function getName()
     {
         return isset($this->package['name']) ? $this->package['name'] : 'unknown';
     }
 
+    /**
+     * Get path to vendor directory (relative to package directory)
+     *
+     * @return string
+     */
     public function getPathVendorRelative()
     {
         $vendor = 'vendor';
@@ -30,16 +49,32 @@ class Package
         return $vendor;
     }
 
+    /**
+     * Get absolute path to vendor directory
+     *
+     * @return string
+     */
     public function getPathVendor()
     {
         return $this->getAbsolutePath($this->getPathVendorRelative() . '/');
     }
 
+    /**
+     * Get package directory (the directory containing its composer.json)
+     *
+     * @return string
+     */
     public function getDirectory()
     {
         return $this->directory;
     }
 
+    /**
+     * Get Bundler instance to bundle this package
+     *
+     * @param Logger $logger
+     * @return BundlerInterface
+     */
     public function getBundler(Logger $logger)
     {
         $bundlerName = 'complete';
@@ -57,11 +92,23 @@ class Package
         }
     }
 
+    /**
+     * Get Autoload instance containing all autoloading information
+     *
+     * Only used for ExplicitBundler at the moment.
+     *
+     * @return Autoload
+     */
     public function getAutoload()
     {
         return new Autoload(isset($this->package['autoload']) ? $this->package['autoload'] : array());
     }
 
+    /**
+     * Get list of files defined as "bin" (absolute paths)
+     *
+     * @return string[]
+     */
     public function getBins()
     {
         if (!isset($this->package['bin'])) {
@@ -76,6 +123,13 @@ class Package
         return $bins;
     }
 
+    /**
+     * Get blacklisted files which are not to be included
+     *
+     * Hardcoded to exclude composer.phar and phar-composer.phar at the moment.
+     *
+     * @return string[]
+     */
     public function getBlacklist()
     {
         return array(
@@ -85,6 +139,9 @@ class Package
     }
 
     /**
+     * Gets a filter function to exclude blacklisted files
+     *
+     * Only used for CompleteBundler at the moment
      *
      * @return Closure
      * @uses self::getBlacklist()
@@ -98,6 +155,12 @@ class Package
         };
     }
 
+    /**
+     * Get absolute path for the given package-relative path
+     *
+     * @param string $path
+     * @return string
+     */
     public function getAbsolutePath($path)
     {
         return $this->directory . ltrim($path, '/');

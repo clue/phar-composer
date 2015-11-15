@@ -1,15 +1,20 @@
 <?php
 
-namespace Clue\PharComposer;
+namespace Clue\PharComposer\Phar;
 
 use Symfony\Component\Finder\Finder;
-
 use Herrera\Box\StubGenerator;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Finder\SplFileInfo;
+use Clue\PharComposer\Logger;
+use Clue\PharComposer\Package\Bundle;
+use Clue\PharComposer\Package\Package;
 
+/**
+ * The PharComposer is responsible for collecting options and then building the target phar
+ */
 class PharComposer
 {
     private $pathProject;

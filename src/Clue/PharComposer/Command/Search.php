@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Clue\PharComposer\PharComposer;
+use Clue\PharComposer\Phar\PharComposer;
 use InvalidArgumentException;
 use UnexpectedValueException;
 use Symfony\Component\Console\Output\Output;
@@ -20,7 +20,7 @@ use Packagist\Api\Client;
 use Packagist\Api\Result\Result;
 use Packagist\Api\Result\Package;
 use Packagist\Api\Result\Package\Version;
-use Clue\PharComposer\Packager;
+use Clue\PharComposer\Phar\Packager;
 
 class Search extends Command
 {

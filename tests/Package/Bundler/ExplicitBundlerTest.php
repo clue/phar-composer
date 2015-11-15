@@ -1,7 +1,7 @@
 <?php
 
-use Clue\PharComposer\Bundler\Explicit as ExplicitBundler;
-use Clue\PharComposer\Package;
+use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
+use Clue\PharComposer\Package\Package;
 
 class ExplicitBundlerTest extends TestCase
 {
@@ -21,7 +21,7 @@ class ExplicitBundlerTest extends TestCase
      */
     public function setUp()
     {
-        $this->path    = realpath(__DIR__ . '/../');
+        $this->path    = realpath(__DIR__ . '/../../../');
         $this->package = new Package(array('bin'      => array('bin/example'),
                                            'autoload' => array('files'    => array('foo.php'),
                                                                'classmap' => array('src/Example/SomeClass.php'),

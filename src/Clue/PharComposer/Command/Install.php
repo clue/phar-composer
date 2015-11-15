@@ -3,7 +3,7 @@
 namespace Clue\PharComposer\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Clue\PharComposer\Packager;
+use Clue\PharComposer\Phar\Packager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

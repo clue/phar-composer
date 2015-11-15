@@ -1,8 +1,10 @@
 <?php
 
-namespace Clue\PharComposer;
+namespace Clue\PharComposer\Package;
 
 use Symfony\Component\Finder\Finder;
+use Clue\PharComposer\Logger;
+
 /**
  * A bundle represents all resources from a package that should be bundled into
  * the target phar.

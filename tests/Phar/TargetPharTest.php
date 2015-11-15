@@ -1,7 +1,7 @@
 <?php
 
-use Clue\PharComposer\Bundle;
-use Clue\PharComposer\TargetPhar;
+use Clue\PharComposer\Package\Bundle;
+use Clue\PharComposer\Phar\TargetPhar;
 
 class TargetPharTest extends TestCase
 {
@@ -28,7 +28,7 @@ class TargetPharTest extends TestCase
         $this->mockBox->expects($this->any())
                       ->method('getPhar')
                       ->will($this->returnValue($this->mockPhar));
-        $this->mockPharComposer = $this->createMock('Clue\PharComposer\PharComposer');
+        $this->mockPharComposer = $this->createMock('Clue\PharComposer\Phar\PharComposer');
         $this->targetPhar       = new TargetPhar($this->mockBox, $this->mockPharComposer);
     }
 

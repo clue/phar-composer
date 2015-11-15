@@ -1,17 +1,17 @@
 <?php
 
-use Clue\PharComposer\PharComposer;
+use Clue\PharComposer\Phar\PharComposer;
 
 class PharComposerTest extends TestCase
 {
     public function testConstructor()
     {
-        $pharcomposer = new PharComposer(__DIR__ . '/../composer.json');
+        $pharcomposer = new PharComposer(__DIR__ . '/../../composer.json');
 
         $this->assertEquals($this->getPathProjectAbsolute('/') . '/', $pharcomposer->getBase());
         $this->assertEquals($this->getPathProjectAbsolute('bin/phar-composer'), $pharcomposer->getMain());
 
-        $this->assertInstanceOf('Clue\PharComposer\Package', $pharcomposer->getPackageRoot());
+        $this->assertInstanceOf('Clue\PharComposer\Package\Package', $pharcomposer->getPackageRoot());
         $this->assertNotCount(0, $pharcomposer->getPackagesDependencies());
 
         $this->assertEquals($this->getPathProjectAbsolute('vendor') . '/', $pharcomposer->getPathVendor());
@@ -37,6 +37,6 @@ class PharComposerTest extends TestCase
 
     private function getPathProjectAbsolute($path)
     {
-        return realpath(__DIR__ . '/../' . $path);
+        return realpath(__DIR__ . '/../../' . $path);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Clue\PharComposer;
+namespace Clue\PharComposer\Phar;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ExecutableFinder;
