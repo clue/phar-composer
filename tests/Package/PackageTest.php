@@ -31,6 +31,17 @@ class PackageTest extends TestCase
         $this->assertEquals('dir/src/vendors/', $package->getPathVendor());
     }
 
+    public function testExplicitExtraPharMainSetting()
+    {
+        $package = new Package(array(
+            'name' => 'test/test',
+            'bin' => array('bin/main', 'bin2'),
+            'extra' => array('phar' => array('main' => 'explicit.php')),
+        ), 'dir/');
+
+        $this->assertEquals(array('dir/explicit.php'), $package->getBins());
+    }
+
     private function createMockLogger()
     {
         return $this->getMockBuilder('Clue\PharComposer\Logger')
