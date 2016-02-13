@@ -34,7 +34,7 @@ class Autoload
 
         $resources = array();
         foreach ($this->autoload['psr-0'] as $namespace => $paths) {
-            foreach($this->correctSinglePath($paths) as $path) {
+            foreach((array)$paths as $path) {
                 // TODO: this is not correct actually... should work for most repos nevertheless
                 // TODO: we have to take target-dir into account
                 $resources[] = $this->buildNamespacePath($namespace, $path);
@@ -45,20 +45,31 @@ class Autoload
     }
 
     /**
-     * corrects a single path into a list of pathes
+     * Returns all paths defined by PSR-4 block of the autoload configuration.
      *
-     * PSR autoloader may define a single or multiple paths.
-     *
-     * @param   string|string[]  $paths
-     * @return  string[]
+     * @return string[]
      */
-    private function correctSinglePath($paths)
+    public function getPsr4()
     {
-        if (is_array($paths)) {
-            return $paths;
+        // If there is not a psr-4 listing, then just there are no related resources.
+        // Return quickly, in this case.
+        if (!isset($this->autoload['psr-4'])) {
+            return array();
         }
 
-        return array($paths);
+        // Build out the list of resources based on each psr-4 entry.
+        $resources = array();
+        foreach($this->autoload['psr-4'] as $namespace => $paths) {
+            // Normalize single-path configurations and multi-path configurations by casting to an array. Once
+            // normalized, loop over the list and capture each path as a resource.
+            foreach((array)$paths as $path) {
+                // For psr-4 the path is the root for the namespace. List it as a resource, as is.
+                $resources[] = $path;
+            }
+        }
+
+        // Hand back the list of resources.
+        return $resources;
     }
 
     /**

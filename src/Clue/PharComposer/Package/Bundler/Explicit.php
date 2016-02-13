@@ -43,6 +43,7 @@ class Explicit implements BundlerInterface
 
         $autoload = $this->package->getAutoload();
         $this->bundlePsr0($bundle, $autoload);
+        $this->bundlePsr4($bundle, $autoload);
         $this->bundleClassmap($bundle, $autoload);
         $this->bundleFiles($bundle, $autoload);
 
@@ -60,6 +61,13 @@ class Explicit implements BundlerInterface
     private function bundlePsr0(Bundle $bundle, Autoload $autoload)
     {
         foreach ($autoload->getPsr0() as $path) {
+            $this->addDir($bundle, $path);
+        }
+    }
+
+    private function bundlePsr4(Bundle $bundle, Autoload $autoload)
+    {
+        foreach ($autoload->getPsr4() as $path) {
             $this->addDir($bundle, $path);
         }
     }

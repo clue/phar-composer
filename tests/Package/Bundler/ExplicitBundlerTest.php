@@ -100,4 +100,63 @@ class ExplicitBundlerTest extends TestCase
                           'Failed asserting that ' . $this->path . '/src' . ' is contained in bundle'
         );
     }
+
+    /**
+     * @test
+     */
+    public function addsAllPathsDefinedByPsr4WithSinglePath()
+    {
+        $packageConfig = array(
+            'autoload' => array(
+                'psr-4' => array(
+                    'Clue' => 'src/',
+                    'Foo' => 'tests/'
+                )
+            )
+        );
+
+        // Expect both of the defined paths, prefixed by the path defined by this instance.
+        $expected = array($this->path . '/src', $this->path . '/tests');
+
+        $this->package = new Package($packageConfig, $this->path . '/');
+        $this->explicitBundler = new ExplicitBundler($this->package, $this->createMock('Clue\PharComposer\Logger'));
+        $bundle = $this->explicitBundler->bundle();
+
+        // Check fo each expected path.
+        foreach ($expected as $expectedPath) {
+            $this->assertTrue($bundle->contains($expectedPath));
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function addsAllPathsDefinedByPsr4WithSeveralPath()
+    {
+        $packageConfig = array(
+            'autoload' => array(
+                'psr-4' => array(
+                    'Clue' => array('src/', 'bin/'),
+                    'Foo' => array('tests/Package', 'tests/fixtures/')
+                )
+            )
+        );
+
+        // Expect both of the defined paths, prefixed by the path defined by this instance.
+        $expected = array(
+            $this->path . '/src',
+            $this->path . '/bin',
+            $this->path . '/tests/Package',
+            $this->path . '/tests/fixtures'
+        );
+
+        $this->package = new Package($packageConfig, $this->path . '/');
+        $this->explicitBundler = new ExplicitBundler($this->package, $this->createMock('Clue\PharComposer\Logger'));
+        $bundle = $this->explicitBundler->bundle();
+
+        // Check fo each expected path.
+        foreach ($expected as $expectedPath) {
+            $this->assertTrue($bundle->contains($expectedPath));
+        }
+    }
 }
