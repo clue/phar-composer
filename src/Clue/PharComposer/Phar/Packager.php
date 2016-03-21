@@ -8,6 +8,8 @@ use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class Packager
 {
@@ -91,7 +93,7 @@ class Packager
         }
     }
 
-    public function getPharer($path, $version = null)
+    public function getPharer($path, $version = null, $replaceTag = '@git-version@')
     {
         if ($version !== null) {
             // TODO: should be the other way around
@@ -136,6 +138,11 @@ class Packager
 
             $pharcomposer = new PharComposer($path . '/composer.json');
             $package = $pharcomposer->getPackageRoot()->getName();
+
+            if ($version === null) {
+                $version = exec('cd ' . $path . ' && ' . $git . ' describe --always --tag');
+            }
+            $this->replaceVersionTagInFile($path, $replaceTag, $version);
 
             if (is_file('composer.phar')) {
                 $command = $finder->find('php', '/usr/bin/php') . ' composer.phar';
@@ -205,6 +212,25 @@ class Packager
         }
 
         return $pharer;
+    }
+
+    /**
+     * Replaces the version tag in the project with the given version
+     *
+     * @param string $directory - Temporary project directory
+     * @param string $versionTag - Version tag that should be replaced in all files of the project
+     * @param string $version - Version that should be used instead of the $versionTag
+     */
+    private function replaceVersionTagInFile($directory, $versionTag = '@git-version@', $version = null)
+    {
+        $di = new RecursiveDirectoryIterator($directory);
+        foreach (new RecursiveIteratorIterator($di) as $filename => $file) {
+            if (is_file($filename) && is_writable($filename)) {
+                $sourceCode = file_get_contents($filename);
+                $sourceCode = str_replace($versionTag, $version, $sourceCode);
+                file_put_contents($filename, $sourceCode);
+            }
+        }
     }
 
     public function measure($fn)
