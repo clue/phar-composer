@@ -66,7 +66,7 @@ class Packager
                 return;
             }
 
-            $this->log('<info>' . $e->getMessage() . ', trying to re-spawn with correct config</info>');
+            $this->log('<error>' . $e->getMessage() . ', trying to re-spawn with correct config</error>');
             if ($wait) {
                 sleep($wait);
             }
