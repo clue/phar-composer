@@ -13,7 +13,7 @@ matrix:
 
 install:
   - composer install --prefer-source --no-interaction
- - phpunit --version
+  - phpunit --version
 script:
   - phpunit --coverage-text
 
