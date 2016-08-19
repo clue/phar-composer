@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 5.3
   - 5.6
   - 7
   - hhvm
@@ -16,6 +15,5 @@ install:
   - wget https://phar.phpunit.de/phpunit.phar
   - chmod +x phpunit.phar
 script:
-  -  echo "<?php phpinfo();" | php | grep phar
   - ./phpunit.phar --coverage-text
 
