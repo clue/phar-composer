@@ -16,5 +16,6 @@ install:
   - wget https://phar.phpunit.de/phpunit.phar
   - chmod +x phpunit.phar
 script:
+  -  echo "<?php phpinfo();" | php | grep phar
   - ./phpunit.phar --coverage-text
 
