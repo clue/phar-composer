@@ -32,7 +32,7 @@ class TargetPharTest extends TestCase
         $this->targetPhar       = new TargetPhar($this->mockBox, $this->mockPharComposer);
     }
 
-    private function createMock($class)
+    protected function createMock($class)
     {
         return $this->getMockBuilder($class)
                     ->disableOriginalConstructor()
