@@ -13,7 +13,8 @@ matrix:
 
 install:
   - composer install --prefer-source --no-interaction
-  - phpunit --version
+  - wget https://phar.phpunit.de/phpunit.phar
+  - chmod +x phpunit.phar
 script:
-  - phpunit --coverage-text
+  - ./phpunit.phar --coverage-text
 
