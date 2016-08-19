@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 5.3
   - 5.6
   - 7
   - hhvm
@@ -13,7 +12,8 @@ matrix:
 
 install:
   - composer install --prefer-source --no-interaction
-
+  - wget https://phar.phpunit.de/phpunit.phar
+  - chmod +x phpunit.phar
 script:
-  - phpunit --coverage-text
+  - ./phpunit.phar --coverage-text
 

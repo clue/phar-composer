@@ -33,7 +33,7 @@ class ExplicitBundlerTest extends TestCase
         $this->explicitBundler = new ExplicitBundler($this->package, $this->createMock('Clue\PharComposer\Logger'));
     }
 
-    private function createMock($class)
+    protected function createMock($class)
     {
         return $this->getMockBuilder($class)
                     ->disableOriginalConstructor()
