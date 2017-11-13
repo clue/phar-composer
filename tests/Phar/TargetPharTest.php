@@ -32,7 +32,7 @@ class TargetPharTest extends TestCase
         $this->targetPhar       = new TargetPhar($this->mockBox, $this->mockPharComposer);
     }
 
-    private function createMock($class)
+    protected function createMock($class)
     {
         return $this->getMockBuilder($class)
                     ->disableOriginalConstructor()
@@ -59,7 +59,7 @@ class TargetPharTest extends TestCase
      */
     public function buildFromIteratorProvidesBasePathForBox()
     {
-        $mockTraversable = $this->getMock('\Iterator');
+        $mockTraversable = $this->createMock('\Iterator');
         $this->mockPharComposer->expects($this->once())
                                ->method('getBase')
                                ->will($this->returnValue('path/to/package'));
