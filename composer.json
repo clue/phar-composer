@@ -17,6 +17,9 @@
         "symfony/process": "~2.1",
         "knplabs/packagist-api": "~1.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~4.8.35 || ~5.7 || ~6.4"
+    },
     "autoload": {
         "psr-0": {"Clue": "src/"}
     },
