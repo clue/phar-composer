@@ -18,7 +18,7 @@
         "knplabs/packagist-api": "~1.0"
     },
     "autoload": {
-        "psr-0": {"Clue": "src/"}
+        "psr-0": {"Clue": "src"}
     },
     "bin": ["bin/phar-composer"],
     "extra": {
