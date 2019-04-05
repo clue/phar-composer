@@ -2,6 +2,7 @@
 
 use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
 use Clue\PharComposer\Package\Package;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ExplicitBundlerTest extends TestCase
 {
@@ -19,7 +20,7 @@ class ExplicitBundlerTest extends TestCase
     /**
      * set up test environment
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->path    = realpath(__DIR__ . '/../../../');
         $this->package = new Package(array('bin'      => array('bin/example'),
@@ -33,7 +34,7 @@ class ExplicitBundlerTest extends TestCase
         $this->explicitBundler = new ExplicitBundler($this->package, $this->createMock('Clue\PharComposer\Logger'));
     }
 
-    private function createMock($class)
+    protected function createMock($class): MockObject
     {
         return $this->getMockBuilder($class)
                     ->disableOriginalConstructor()

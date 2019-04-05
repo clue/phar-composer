@@ -26,5 +26,8 @@
         "phar": {
             "bundler": "composer"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.1"
     }
 }

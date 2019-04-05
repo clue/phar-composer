@@ -2,6 +2,7 @@
 
 use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Phar\TargetPhar;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class TargetPharTest extends TestCase
 {
@@ -21,7 +22,7 @@ class TargetPharTest extends TestCase
     /**
      * set up test environment
      */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->mockPhar = $this->createMock('\Phar');
         $this->mockBox  = $this->createMock('Herrera\Box\Box');
@@ -32,7 +33,7 @@ class TargetPharTest extends TestCase
         $this->targetPhar       = new TargetPhar($this->mockBox, $this->mockPharComposer);
     }
 
-    private function createMock($class)
+    protected function createMock($class): MockObject
     {
         return $this->getMockBuilder($class)
                     ->disableOriginalConstructor()
@@ -59,7 +60,7 @@ class TargetPharTest extends TestCase
      */
     public function buildFromIteratorProvidesBasePathForBox()
     {
-        $mockTraversable = $this->getMock('\Iterator');
+        $mockTraversable = $this->createMock('\Iterator');
         $this->mockPharComposer->expects($this->once())
                                ->method('getBase')
                                ->will($this->returnValue('path/to/package'));
