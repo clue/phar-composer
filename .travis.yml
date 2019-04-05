@@ -11,8 +11,13 @@ matrix:
     - php: hhvm
 
 install:
+  - composer require symfony/console:${SYMFONY_VERSION} symfony/finder:${SYMFONY_VERSION} symfony/process:${SYMFONY_VERSION} --no-update
   - composer install --prefer-source --no-interaction
 
 script:
   - vendor/bin/phpunit --coverage-text
 
+env:
+  - SYMFONY_VERSION="~2.1"
+  - SYMFONY_VERSION="~3.0"
+  - SYMFONY_VERSION="~4.0"
