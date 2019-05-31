@@ -3,7 +3,7 @@
 use Clue\PharComposer\Package\Package;
 use Clue\PharComposer\Package\Autoload;
 
-class PackageTest extends TestCase
+class PackageTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorDefaults()
     {

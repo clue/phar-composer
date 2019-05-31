@@ -2,7 +2,7 @@
 
 use Clue\PharComposer\Package\Autoload;
 
-class AutoloadTest extends TestCase
+class AutoloadTest extends \PHPUnit\Framework\TestCase
 {
     private function createAutoload(array $autoload)
     {

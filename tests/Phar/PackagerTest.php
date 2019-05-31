@@ -2,7 +2,7 @@
 
 use Clue\PharComposer\Phar\Packager;
 
-class PackagerTest extends TestCase
+class PackagerTest extends \PHPUnit\Framework\TestCase
 {
     private $packager;
 

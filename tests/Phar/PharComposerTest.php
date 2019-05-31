@@ -2,7 +2,7 @@
 
 use Clue\PharComposer\Phar\PharComposer;
 
-class PharComposerTest extends TestCase
+class PharComposerTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

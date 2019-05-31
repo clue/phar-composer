@@ -3,7 +3,7 @@
 use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
 use Clue\PharComposer\Package\Package;
 
-class ExplicitBundlerTest extends TestCase
+class ExplicitBundlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * instance to test

@@ -2,7 +2,7 @@
 
 use Clue\PharComposer\Logger as Logger;
 
-class LoggerTest extends TestCase
+class LoggerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * instance to test

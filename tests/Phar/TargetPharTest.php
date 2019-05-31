@@ -3,7 +3,7 @@
 use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Phar\TargetPhar;
 
-class TargetPharTest extends TestCase
+class TargetPharTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * instance to test
