@@ -23,6 +23,7 @@ class PharComposer
     private $target = null;
     private $logger;
     private $step = '?';
+    private $forceExtract = null;
 
     public function __construct($path)
     {
@@ -85,6 +86,20 @@ class PharComposer
     public function setMain($main)
     {
         $this->main = $main;
+        return $this;
+    }
+
+    public function getForceExtract()
+    {
+        if ($this->forceExtract === null) {
+          $this->forceExtract = $this->getPackageRoot()->getForceExtract();
+        }
+        return (Boolean) $this->forceExtract;
+    }
+
+    public function setForceExtract($forceExtract)
+    {
+        $this->forceExtract = $forceExtract;
         return $this;
     }
 
@@ -189,9 +204,13 @@ class PharComposer
         if ($main === null) {
             $this->log('    WARNING: No main bin file defined! Resulting phar will NOT be executable');
         } else {
+            $forceExtract = $this->getForceExtract();
+            if ($forceExtract) {
+                $this->log('    Forcing the use of the Extract class');
+            }
             $generator = StubGenerator::create()
                 ->index($this->getPathLocalToBase($main))
-                ->extract(true)
+                ->extract(true, $forceExtract)
                 ->banner("Bundled by phar-composer with the help of php-box.\n\n@link https://github.com/clue/phar-composer");
 
             $lines = file($main, FILE_IGNORE_NEW_LINES);
