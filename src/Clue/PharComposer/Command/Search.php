@@ -158,5 +158,7 @@ class Search extends Command
         } else {
             $pharer->build();
         }
+
+        return 0;
     }
 }

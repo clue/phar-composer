@@ -58,6 +58,22 @@ class InstallTest extends TestCase
         $command->run($input, $output);
     }
 
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testNotBlockedByLegacyInstallation()
+    {
+        // Symfony 5+ added parameter type declarations, so we can use this to check which version is installed
+        $ref = new ReflectionMethod('Symfony\Component\Console\Command\Command', 'setName');
+        $params = $ref->getParameters();
+        if (PHP_VERSION_ID >= 70000 && isset($params[0]) && $params[0]->hasType()) {
+            $this->markTestSkipped('Unable to run this test (mocked QuestionHelper) with legacy PHPUnit against Symfony v5+');
+        }
+    }
+
+    /**
+     * @depends testNotBlockedByLegacyInstallation
+     */
     public function testExecuteInstallWillInstallPackagerWhenTargetPathAlreadyExistsAndDialogQuestionYieldsYes()
     {
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
@@ -87,6 +103,9 @@ class InstallTest extends TestCase
         $command->run($input, $output);
     }
 
+    /**
+     * @depends testNotBlockedByLegacyInstallation
+     */
     public function testExecuteInstallWillNotInstallPackagerWhenTargetPathAlreadyExistsAndDialogQuestionShouldNotOverwrite()
     {
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');

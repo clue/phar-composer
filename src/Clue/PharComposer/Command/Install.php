@@ -54,5 +54,7 @@ class Install extends Command
         }
 
         $this->packager->install($pharer, $path);
+
+        return 0;
     }
 }

@@ -22,8 +22,22 @@ class SearchTest extends TestCase
     }
 
     /**
+     * @doesNotPerformAssertions
+     */
+    public function testNotBlockedByLegacyInstallation()
+    {
+        // Symfony 5+ added parameter type declarations, so we can use this to check which version is installed
+        $ref = new ReflectionMethod('Symfony\Component\Console\Command\Command', 'setName');
+        $params = $ref->getParameters();
+        if (PHP_VERSION_ID >= 70000 && isset($params[0]) && $params[0]->hasType()) {
+            $this->markTestSkipped('Unable to run this test (mocked QuestionHelper) with legacy PHPUnit against Symfony v5+');
+        }
+    }
+
+    /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
+     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithoutProjectWillAskForProjectAndRunSearch()
     {
@@ -51,6 +65,7 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
+     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectWillRunSearchWithoutAskingForProject()
     {
@@ -78,6 +93,7 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
+     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectAndSearchReturnsNoMatchesWillReportAndAskForOtherProject()
     {
@@ -109,6 +125,7 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
+     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectAndSearchReturnsOneMatchWillAskForProject()
     {
@@ -138,6 +155,7 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
+     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectSelectedWillSearchVersions()
     {
@@ -172,6 +190,9 @@ class SearchTest extends TestCase
         $command->run($input, $output);
     }
 
+    /**
+     * @depends testNotBlockedByLegacyInstallation
+     */
     public function testExecuteWithProjectAndVersionSelectedWillQuitWhenAskedForActionYieldsQuit()
     {
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
@@ -209,6 +230,9 @@ class SearchTest extends TestCase
         $command->run($input, $output);
     }
 
+    /**
+     * @depends testNotBlockedByLegacyInstallation
+     */
     public function testExecuteWithProjectAndVersionSelectedWillBuildWhenAskedForActionYieldsBuild()
     {
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
@@ -250,6 +274,9 @@ class SearchTest extends TestCase
         $command->run($input, $output);
     }
 
+    /**
+     * @depends testNotBlockedByLegacyInstallation
+     */
     public function testExecuteWithProjectAndVersionSelectedWillInstallWhenAskedForActionYieldsInstall()
     {
         $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
