@@ -23,6 +23,10 @@ class TargetPharTest extends TestCase
      */
     public function setUp()
     {
+        if (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID <= 50600) {
+            $this->markTestSkipped('Unable to mock \Phar on PHP 5.4/5.5');
+        }
+
         $this->mockPhar = $this->createMock('\Phar');
         $this->mockBox  = $this->createMock('Herrera\Box\Box');
         $this->mockBox->expects($this->any())

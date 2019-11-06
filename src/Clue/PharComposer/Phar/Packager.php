@@ -235,8 +235,7 @@ class Packager
 
         $process = new Process($cmd, $chdir);
         $process->setTimeout(null);
-        $process->start();
-        $code = $process->wait(function($type, $data) use ($output, &$nl) {
+        $code = $process->run(function($type, $data) use ($output, &$nl) {
             if ($nl === true) {
                 $data = "\n" . $data;
                 $nl = false;
