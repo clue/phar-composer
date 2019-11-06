@@ -21,15 +21,29 @@ class PackagerTest extends TestCase
     {
         $this->expectOutputString($expectedOutput);
 
+        // Travis CI occasionally discards (parts of) the output, so wrap in shell and add some delay just in case
+        if (getenv('TRAVIS') === 'true') {
+            $command = 'exec sh -c ' . escapeshellarg($command . '; sleep 0.1');
+        }
+
         $this->packager->exec($command);
     }
 
     public function provideExecCommands()
     {
         return array(
-            array("\n    output\n", 'echo output'),
-            array("\n    error\n", 'echo error >&2'),
-            array("\n    mixed\n    errors\n", 'echo mixed && echo errors >&1'),
+            array(
+                "\n    output\n",
+                'echo output'
+            ),
+            array(
+                "\n    error\n",
+                'echo error >&2'
+            ),
+            array(
+                "\n    mixed\n    errors\n",
+                'echo mixed && echo errors >&1'
+            )
         );
     }
 

@@ -23,6 +23,7 @@ for your project among with its bundled dependencies.
     * [Updating dependency](#updating-dependency)
   * [Manual Installation from Source](#manual-installation-from-source)
     * [Updating manually](#updating-manually)
+* [Tests](#tests)
 * [License](#license)
 
 ## Usage
@@ -124,6 +125,11 @@ its version and will then offer you to either `build` or `install` it.
 
 You can grab a copy of clue/phar-composer in either of the following ways.
 
+This project aims to run on any platform and thus does not require any PHP
+extensions and supports running on legacy PHP 5.3 through current PHP 7+ and
+HHVM.
+It's *highly recommended to use PHP 7+* for this project.
+
 ### As a phar (recommended)
 
 You can simply download a pre-compiled and ready-to-use version as a Phar
@@ -222,17 +228,32 @@ $ php bin/phar-composer --version
 Optionally, you can now build the above mentioned `phar-composer.phar` yourself by issuing:
 
 ```bash
+$ composer install --no-dev
 $ php bin/phar-composer build
 ```
 
 Optionally, you can now follow the above instructions for a [system-wide installation](#as-a-phar-recommended).
-
 
 #### Updating manually
 
 ```bash
 $ git pull
 $ php composer.phar install
+```
+
+## Tests
+
+To run the test suite, you first need to clone this repo and then install all
+dependencies [through Composer](http://getcomposer.org):
+
+```bash
+$ composer install
+```
+
+To run the test suite, go to the project root and run:
+
+```bash
+$ php vendor/bin/phpunit
 ```
 
 ## License
