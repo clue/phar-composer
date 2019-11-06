@@ -12,8 +12,7 @@ matrix:
     - php: hhvm
 
 install:
-  - composer install --prefer-source --no-interaction
+  - composer install --no-interaction
 
 script:
-  - phpunit --coverage-text
-
+  - vendor/bin/phpunit --coverage-text
