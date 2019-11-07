@@ -2,17 +2,20 @@
 
 namespace Clue\PharComposer\Package;;
 
-use Symfony\Component\Finder\SplFileInfo;
-use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
+use Clue\PharComposer\Package\Bundler\BundlerInterface;
 use Clue\PharComposer\Package\Bundler\Complete as CompleteBundler;
-use Clue\PharComposer\Package\Autoload;
+use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
 use Clue\PharComposer\Logger;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * The package represents either the main/root package or one of the vendor packages.
  */
 class Package
 {
+    private $package;
+    private $directory;
+
     /**
      * Instantiate package
      *
@@ -143,7 +146,7 @@ class Package
      *
      * Only used for CompleteBundler at the moment
      *
-     * @return Closure
+     * @return \Closure
      * @uses self::getBlacklist()
      */
     public function getBlacklistFilter()

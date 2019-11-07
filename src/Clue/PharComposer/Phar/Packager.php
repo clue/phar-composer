@@ -32,6 +32,9 @@ class Packager
         $this->binSudo = $bin;
     }
 
+    /**
+     * @param OutputInterface|bool|callable $fn
+     */
     public function setOutput($fn)
     {
         if ($fn instanceof OutputInterface) {
@@ -91,6 +94,14 @@ class Packager
         }
     }
 
+    /**
+     * @param string $path
+     * @param string $version
+     * @return PharComposer
+     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
     public function getPharer($path, $version = null)
     {
         if ($version !== null) {

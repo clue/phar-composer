@@ -2,8 +2,8 @@
 
 namespace Clue\PharComposer\Package;
 
-use Symfony\Component\Finder\Finder;
 use Clue\PharComposer\Logger;
+use Symfony\Component\Finder\Finder;
 
 /**
  * A bundle represents all resources from a package that should be bundled into
@@ -23,7 +23,7 @@ class Bundle implements \IteratorAggregate
      *
      * @param   Package  $package
      * @param   Logger  $logger
-     * @return  Bundle
+     * @return self
      */
     public static function from(Package $package, Logger $logger)
     {

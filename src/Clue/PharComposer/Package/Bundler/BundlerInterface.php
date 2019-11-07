@@ -10,7 +10,7 @@ interface BundlerInterface
    /**
      * returns a bundle
      *
-     * @return  Bundle
+     * @return \Clue\PharComposer\Package\Bundle
      */
     public function bundle();
 }
