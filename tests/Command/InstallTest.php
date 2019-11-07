@@ -67,11 +67,11 @@ class InstallTest extends TestCase
         )->willReturnOnConsecutiveCalls('dir', null);
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->once())->method('askConfirmation')->willReturn(true);
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->once())->method('ask')->willReturn(true);
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
@@ -97,11 +97,11 @@ class InstallTest extends TestCase
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
         $output->expects($this->once())->method('writeln')->with('Aborting');
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->once())->method('askConfirmation')->willReturn(false);
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->once())->method('ask')->willReturn(false);
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();

@@ -237,6 +237,12 @@ class Packager
         $this->log('    <info>OK</info> - ' . $success .' (after ' . round($time, 1) . 's)');
     }
 
+    /**
+     * @param string $cmd
+     * @param ?string $chdir
+     * @return void
+     * @throws UnexpectedValueException
+     */
     public function exec($cmd, $chdir = null)
     {
         $nl = true;

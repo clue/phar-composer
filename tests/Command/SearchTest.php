@@ -31,11 +31,11 @@ class SearchTest extends TestCase
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn(null);
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->once())->method('ask')->willReturn('foo');
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->once())->method('ask')->willReturn('foo');
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
@@ -58,11 +58,11 @@ class SearchTest extends TestCase
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->never())->method('ask');
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->never())->method('ask');
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
@@ -89,11 +89,11 @@ class SearchTest extends TestCase
             array('<error>No matching packages found</error>')
         );
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->once())->method('ask')->willThrowException(new RuntimeException('stop1'));
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->once())->method('ask')->willThrowException(new RuntimeException('stop1'));
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
@@ -116,12 +116,11 @@ class SearchTest extends TestCase
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->once())->method('select')->willThrowException(new RuntimeException('stop1'));
-        $dialogHelper->expects($this->never())->method('ask');
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->once())->method('ask')->willThrowException(new RuntimeException('stop1'));
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
@@ -150,12 +149,13 @@ class SearchTest extends TestCase
             array('Selected <info>foo/bar</info>, listing versions...')
         );
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->once())->method('select')->willReturn(1);
-        $dialogHelper->expects($this->never())->method('ask');
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->once())->method('ask')->willReturn(
+            '<info>foo</info>/bar                                  (⤓)'
+        );
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
@@ -178,12 +178,15 @@ class SearchTest extends TestCase
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
-
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->exactly(3))->method('select')->willReturnOnConsecutiveCalls(1, 1, 0);
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->exactly(3))->method('ask')->willReturnOnConsecutiveCalls(
+            '<info>foo</info>/bar                                  (⤓)',
+            'dev-master (<error>no executable bin</error>)',
+            'Quit'
+        );
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
@@ -212,11 +215,15 @@ class SearchTest extends TestCase
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->exactly(3))->method('select')->willReturnOnConsecutiveCalls(1, 1, 1);
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->exactly(3))->method('ask')->willReturnOnConsecutiveCalls(
+            '<info>foo</info>/bar                                  (⤓)',
+            'dev-master (<error>no executable bin</error>)',
+            'Build project'
+        );
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
@@ -249,11 +256,15 @@ class SearchTest extends TestCase
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
-        $dialogHelper = $this->getMock('Symfony\Component\Console\Helper\DialogHelper');
-        $dialogHelper->expects($this->exactly(3))->method('select')->willReturnOnConsecutiveCalls(1, 1, 2);
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->exactly(3))->method('ask')->willReturnOnConsecutiveCalls(
+            '<info>foo</info>/bar                                  (⤓)',
+            'dev-master (<error>no executable bin</error>)',
+            'Install project system-wide'
+        );
 
         $helpers = new HelperSet(array(
-            'dialog' => $dialogHelper
+            'question' => $questionHelper
         ));
 
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
