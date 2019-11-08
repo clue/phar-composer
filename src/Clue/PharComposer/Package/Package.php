@@ -114,6 +114,13 @@ class Package
      */
     public function getBins()
     {
+        if (isset($this->package['extra']) &&
+            isset($this->package['extra']['phar']) &&
+            isset($this->package['extra']['phar']['main'])) {
+            // explicit definition of phar bin is here, returning it ignoring package bin?
+            return array($this->getAbsolutePath($this->package['extra']['phar']['main']));
+        }
+
         if (!isset($this->package['bin'])) {
             return array();
         }
