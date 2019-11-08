@@ -31,11 +31,11 @@ class Package
     /**
      * get package name as defined in composer.json
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
-        return isset($this->package['name']) ? $this->package['name'] : 'unknown';
+        return isset($this->package['name']) ? $this->package['name'] : null;
     }
 
     /**

@@ -210,7 +210,7 @@ class Packager
         $pharer->setOutput($this->output);
         $pharer->setStep($step);
 
-        $pathVendor = $pharer->getPathVendor();
+        $pathVendor = $pharer->getPackageRoot()->getPathVendor();
         if (!is_dir($pathVendor)) {
             throw new RuntimeException('Project is not installed via composer. Run "composer install" manually');
         }

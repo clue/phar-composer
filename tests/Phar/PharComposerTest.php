@@ -8,13 +8,12 @@ class PharComposerTest extends TestCase
     {
         $pharcomposer = new PharComposer(__DIR__ . '/../../composer.json');
 
-        $this->assertEquals($this->getPathProjectAbsolute('/') . '/', $pharcomposer->getBase());
         $this->assertEquals($this->getPathProjectAbsolute('bin/phar-composer'), $pharcomposer->getMain());
 
         $this->assertInstanceOf('Clue\PharComposer\Package\Package', $pharcomposer->getPackageRoot());
         $this->assertNotCount(0, $pharcomposer->getPackagesDependencies());
 
-        $this->assertEquals($this->getPathProjectAbsolute('vendor') . '/', $pharcomposer->getPathVendor());
+        $this->assertEquals($this->getPathProjectAbsolute('vendor') . '/', $pharcomposer->getPackageRoot()->getPathVendor());
         $this->assertEquals('phar-composer.phar', $pharcomposer->getTarget());
 
         return $pharcomposer;

@@ -92,7 +92,7 @@ class TargetPhar
      */
     public function buildFromIterator(Traversable $iterator)
     {
-        $this->box->buildFromIterator($iterator, $this->pharComposer->getBase());
+        $this->box->buildFromIterator($iterator, $this->pharComposer->getPackageRoot()->getDirectory());
     }
 
     /**

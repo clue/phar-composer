@@ -2,22 +2,16 @@
 
 namespace Clue\PharComposer\Phar;
 
-use Symfony\Component\Finder\Finder;
-use Herrera\Box\StubGenerator;
-use UnexpectedValueException;
-use InvalidArgumentException;
-use RuntimeException;
-use Symfony\Component\Finder\SplFileInfo;
 use Clue\PharComposer\Logger;
 use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Package\Package;
+use Herrera\Box\StubGenerator;
 
 /**
  * The PharComposer is responsible for collecting options and then building the target phar
  */
 class PharComposer
 {
-    private $pathProject;
     private $package;
     private $main = null;
     private $target = null;
@@ -26,10 +20,7 @@ class PharComposer
 
     public function __construct($path)
     {
-        $path = realpath($path);
-
-        $this->package = $this->loadJson($path);
-        $this->pathProject = dirname($path) . '/';
+        $this->package = new Package($this->loadJson($path), dirname(realpath($path)) . '/');
         $this->logger = new Logger();
     }
 
@@ -46,11 +37,12 @@ class PharComposer
     public function getTarget()
     {
         if ($this->target === null) {
-            if (isset($this->package['name'])) {
+            $this->target = $this->package->getName();
+            if ($this->target !== null) {
                 // skip vendor name from package name
-                $this->target = substr($this->package['name'], strpos($this->package['name'], '/') + 1);
+                $this->target = substr($this->target, strpos($this->target, '/') + 1);
             } else {
-                $this->target = basename($this->pathProject);
+                $this->target = basename($this->package->getDirectory());
             }
             $this->target .= '.phar';
         }
@@ -71,9 +63,9 @@ class PharComposer
     public function getMain()
     {
         if ($this->main === null) {
-            foreach ($this->getPackageRoot()->getBins() as $path) {
+            foreach ($this->package->getBins() as $path) {
                 if (!file_exists($path)) {
-                    throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
+                    throw new \UnexpectedValueException('Bin file "' . $path . '" does not exist');
                 }
                 $this->main = $path;
                 break;
@@ -89,32 +81,12 @@ class PharComposer
     }
 
     /**
-     * base project path. all files MUST BE relative to this location
-     *
-     * @return string
-     */
-    public function getBase()
-    {
-        return $this->pathProject;
-    }
-
-    /**
-     * get absolute path to vendor directory
-     *
-     * @return string
-     */
-    public function getPathVendor()
-    {
-        return $this->getPackageRoot()->getPathVendor();
-    }
-
-    /**
      *
      * @return Package
      */
     public function getPackageRoot()
     {
-        return new Package($this->package, $this->pathProject);
+        return $this->package;
     }
 
     /**
@@ -125,7 +97,7 @@ class PharComposer
     {
         $packages = array();
 
-        $pathVendor = $this->getPathVendor();
+        $pathVendor = $this->package->getPathVendor();
 
         // load all installed packages (use installed.json which also includes version instead of composer.lock)
         if (is_file($pathVendor . 'composer/installed.json')) {
@@ -151,16 +123,16 @@ class PharComposer
         $this->log('[' . $this->step . '/' . $this->step.'] Creating phar <info>' . $this->getTarget() . '</info>');
         $time = microtime(true);
 
-        $pathVendor = $this->getPathVendor();
+        $pathVendor = $this->package->getPathVendor();
         if (!is_dir($pathVendor)) {
-            throw new RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
+            throw new \RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
         }
 
         $target = $this->getTarget();
         if (file_exists($target)) {
             $this->log('  - Remove existing file <info>' . $target . '</info> (' . $this->getSize($target) . ')');
             if(unlink($target) === false) {
-                throw new UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
+                throw new \UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
             }
         }
 
@@ -215,7 +187,7 @@ class PharComposer
         if ($chmod !== null) {
             $this->log('    Applying chmod ' . sprintf('%04o', $chmod));
             if (chmod($target, $chmod) === false) {
-                throw new UnexpectedValueException('Unable to chmod target file "' . $target .'"');
+                throw new \UnexpectedValueException('Unable to chmod target file "' . $target .'"');
             }
         }
 
@@ -234,10 +206,11 @@ class PharComposer
 
     public function getPathLocalToBase($path)
     {
-        if (strpos($path, $this->pathProject) !== 0) {
-            throw new UnexpectedValueException('Path "' . $path . '" is not within base project path "' . $this->pathProject . '"');
+        $root = $this->package->getDirectory();
+        if (strpos($path, $root) !== 0) {
+            throw new \UnexpectedValueException('Path "' . $path . '" is not within base project path "' . $root . '"');
         }
-        return substr($path, strlen($this->pathProject));
+        return substr($path, strlen($root));
     }
 
     public function log($message)
@@ -255,7 +228,7 @@ class PharComposer
         $ret = json_decode(file_get_contents($path), true);
         if ($ret === null) {
             var_dump(json_last_error(), JSON_ERROR_SYNTAX);
-            throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
+            throw new \InvalidArgumentException('Unable to parse given path "' . $path . '"');
         }
         return $ret;
     }

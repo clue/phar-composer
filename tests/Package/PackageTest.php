@@ -12,7 +12,7 @@ class PackageTest extends TestCase
         $this->assertEquals(new Autoload(array()), $package->getAutoload());
         $this->assertEquals(array(), $package->getBins());
         $this->assertEquals('dir/', $package->getDirectory());
-        $this->assertEquals('unknown', $package->getName());
+        $this->assertEquals(null, $package->getName());
         $this->assertEquals('dir/vendor/', $package->getPathVendor());
     }
 
