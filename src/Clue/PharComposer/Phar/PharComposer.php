@@ -3,7 +3,6 @@
 namespace Clue\PharComposer\Phar;
 
 use Clue\PharComposer\Logger;
-use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Package\Package;
 use Herrera\Box\StubGenerator;
 
@@ -131,7 +130,7 @@ class PharComposer
 
         $targetPhar = TargetPhar::create($target, $this);
         $this->log('  - Adding main package');
-        $targetPhar->addBundle(Bundle::from($this->getPackageRoot(), $this->logger));
+        $targetPhar->addBundle($this->package->getBundler($this->logger)->bundle());
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
@@ -144,7 +143,7 @@ class PharComposer
 
         foreach ($this->getPackagesDependencies() as $package) {
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
-            $targetPhar->addBundle(Bundle::from($package, $this->logger));
+            $targetPhar->addBundle($package->getBundler($this->logger)->bundle());
         }
 
 
