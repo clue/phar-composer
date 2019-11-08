@@ -37,14 +37,7 @@ class PharComposer
     public function getTarget()
     {
         if ($this->target === null) {
-            $this->target = $this->package->getName();
-            if ($this->target !== null) {
-                // skip vendor name from package name
-                $this->target = substr($this->target, strpos($this->target, '/') + 1);
-            } else {
-                $this->target = basename($this->package->getDirectory());
-            }
-            $this->target .= '.phar';
+            $this->target = $this->package->getShortName() . '.phar';
         }
         return $this->target;
     }

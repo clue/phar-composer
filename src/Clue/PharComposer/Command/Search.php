@@ -153,7 +153,7 @@ class Search extends Command
         $pharer = $this->packager->getPharer($project, $version);
 
         if ($action === 'install') {
-            $path = $this->packager->getSystemBin($pharer);
+            $path = $this->packager->getSystemBin($pharer->getPackageRoot());
             $this->packager->install($pharer, $path);
         } else {
             $pharer->build();

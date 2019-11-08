@@ -31,11 +31,27 @@ class Package
     /**
      * get package name as defined in composer.json
      *
-     * @return string|null
+     * @return ?string
      */
     public function getName()
     {
         return isset($this->package['name']) ? $this->package['name'] : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getShortName()
+    {
+        // skip vendor name from package name or default to last directory component
+        $name = $this->getName();
+        if ($name === null) {
+            $name = realpath($this->directory);
+            if ($name === false) {
+                $name = $this->directory;
+            }
+        }
+        return basename($name);
     }
 
     /**

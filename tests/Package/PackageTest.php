@@ -13,13 +13,21 @@ class PackageTest extends TestCase
         $this->assertEquals(array(), $package->getBins());
         $this->assertEquals('dir/', $package->getDirectory());
         $this->assertEquals(null, $package->getName());
+        $this->assertEquals('dir', $package->getShortName());
         $this->assertEquals('dir/vendor/', $package->getPathVendor());
+    }
+
+    public function testGetShortNameReturnsLastPathComponentWhenNameIsUnknown()
+    {
+        $package = new Package(array(), __DIR__);
+
+        $this->assertEquals('Package', $package->getShortName());
     }
 
     public function testConstructorData()
     {
         $package = new Package(array(
-            'name' => 'test/test',
+            'name' => 'acme/test',
             'bin' => array('bin/main', 'bin2'),
             'config' => array(
                 'vendor-dir' => 'src/vendors'
@@ -27,7 +35,8 @@ class PackageTest extends TestCase
         ), 'dir/');
 
         $this->assertEquals(array('dir/bin/main', 'dir/bin2'), $package->getBins());
-        $this->assertEquals('test/test', $package->getName());
+        $this->assertEquals('acme/test', $package->getName());
+        $this->assertEquals('test', $package->getShortName());
         $this->assertEquals('dir/src/vendors/', $package->getPathVendor());
     }
 
