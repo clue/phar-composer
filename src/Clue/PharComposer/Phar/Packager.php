@@ -237,6 +237,12 @@ class Packager
         $this->log('    <info>OK</info> - ' . $success .' (after ' . round($time, 1) . 's)');
     }
 
+    /**
+     * @param string $cmd
+     * @param ?string $chdir
+     * @return void
+     * @throws UnexpectedValueException
+     */
     public function exec($cmd, $chdir = null)
     {
         $nl = true;
@@ -244,7 +250,16 @@ class Packager
         //
         $output = $this->output;
 
-        $process = new Process($cmd, $chdir);
+        // Symfony 5+ requires 'fromShellCommandline', older versions support direct instantiation with command line
+        // @codeCoverageIgnoreStart
+        try {
+            new \ReflectionMethod('Symfony\Component\Process\Process', 'fromShellCommandline');
+            $process = Process::fromShellCommandline($cmd, $chdir);
+        } catch (\ReflectionException $e) {
+            $process = new Process($cmd, $chdir);
+        }
+        // @codeCoverageIgnoreEnd
+
         $process->setTimeout(null);
         $code = $process->run(function($type, $data) use ($output, &$nl) {
             if ($nl === true) {

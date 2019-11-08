@@ -4,10 +4,11 @@ namespace Clue\PharComposer\Command;
 
 use Clue\PharComposer\Phar\Packager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class Install extends Command
 {
@@ -42,15 +43,18 @@ class Install extends Command
         $path = $this->packager->getSystemBin($pharer, $input->getArgument('target'));
 
         if (is_file($path)) {
-            $dialog = $this->getHelper('dialog');
-            assert($dialog instanceof DialogHelper);
+            $helper = $this->getHelper('question');
+            assert($helper instanceof QuestionHelper);
 
-            if (!$dialog->askConfirmation($output, 'Overwrite existing file <info>' . $path . '</info>? [y] > ')) {
+            $question = new ConfirmationQuestion('Overwrite existing file <info>' . $path . '</info>? [y] > ', true);
+            if (!$helper->ask($input, $output, $question)) {
                 $output->writeln('Aborting');
                 return 0;
             }
         }
 
         $this->packager->install($pharer, $path);
+
+        return 0;
     }
 }

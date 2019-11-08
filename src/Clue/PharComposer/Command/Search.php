@@ -9,10 +9,12 @@ use Packagist\Api\Result\Package;
 use Packagist\Api\Result\Package\Version;
 use Packagist\Api\Result\Result;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 
 class Search extends Command
 {
@@ -44,30 +46,31 @@ class Search extends Command
     }
 
     /**
+     * @param InputInterface       $input
      * @param OutputInterface      $output
      * @param string               $label
      * @param array<string,string> $choices
      * @param ?string              $abortable
      * @return ?string
      */
-    protected function select(OutputInterface $output, $label, array $choices, $abortable = null)
+    protected function select(InputInterface $input, OutputInterface $output, $label, array $choices, $abortable = null)
     {
-        $dialog = $this->getHelper('dialog');
-        assert($dialog instanceof DialogHelper);
+        $helper = $this->getHelper('question');
+        assert($helper instanceof QuestionHelper);
 
         if (!$choices) {
             $output->writeln('<error>No matching packages found</error>');
             return null;
         }
 
-        // TODO: skip dialog, if exact match
-
+        // use numeric keys for all options
         $select = array_merge(array(0 => $abortable), array_values($choices));
         if ($abortable === null) {
             unset($select[0]);
         }
 
-        $index = $dialog->select($output, $label, $select);
+        $question = new ChoiceQuestion($label, $select);
+        $index = array_search($helper->ask($input, $output, $question), $select);
 
         if ($index === 0) {
             return null;
@@ -82,15 +85,16 @@ class Search extends Command
         $this->packager->setOutput($output);
         $this->packager->coerceWritable();
 
-        $dialog = $this->getHelper('dialog');
-        assert($dialog instanceof DialogHelper);
+        $helper = $this->getHelper('question');
+        assert($helper instanceof QuestionHelper);
 
         $project = $input->getArgument('project');
 
         do {
             if ($project === null) {
                 // ask for input
-                $project = $dialog->ask($output, 'Enter (partial) project name > ');
+                $question = new Question('Enter (partial) project name > ', '');
+                $project = $helper->ask($input, $output, $question);
             } else {
                 $output->writeln('Searching for <info>' . $project . '</info>...');
             }
@@ -108,7 +112,7 @@ class Search extends Command
                 $choices[$result->getName()] = $label;
             }
 
-            $project = $this->select($output, 'Select matching package', $choices, 'Start new search');
+            $project = $this->select($input, $output, 'Select matching package', $choices, 'Start new search');
         } while ($project === null);
 
         $output->writeln('Selected <info>' . $project . '</info>, listing versions...');
@@ -129,9 +133,10 @@ class Search extends Command
             $choices[$version->getVersion()] = $label;
         }
 
-        $version = $this->select($output, 'Select available version', $choices);
+        $version = $this->select($input, $output, 'Select available version', $choices);
 
         $action = $this->select(
+            $input,
             $output,
             'Action',
             array(
@@ -153,5 +158,7 @@ class Search extends Command
         } else {
             $pharer->build();
         }
+
+        return 0;
     }
 }

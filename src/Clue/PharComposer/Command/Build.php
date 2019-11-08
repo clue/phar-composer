@@ -44,5 +44,7 @@ class Build extends Command
         }
 
         $pharer->build();
+
+        return 0;
     }
 }
