@@ -143,38 +143,6 @@ class Package
     }
 
     /**
-     * Get blacklisted files which are not to be included
-     *
-     * Hardcoded to exclude composer.phar and phar-composer.phar at the moment.
-     *
-     * @return string[]
-     */
-    public function getBlacklist()
-    {
-        return array(
-            $this->getAbsolutePath('composer.phar'),
-            $this->getAbsolutePath('phar-composer.phar')
-        );
-    }
-
-    /**
-     * Gets a filter function to exclude blacklisted files
-     *
-     * Only used for CompleteBundler at the moment
-     *
-     * @return \Closure
-     * @uses self::getBlacklist()
-     */
-    public function getBlacklistFilter()
-    {
-        $blacklist = $this->getBlacklist();
-
-        return function (SplFileInfo $file) use ($blacklist) {
-            return in_array($file->getPathname(), $blacklist) ? false : null;
-        };
-    }
-
-    /**
      * Get absolute path for the given package-relative path
      *
      * @param string $path

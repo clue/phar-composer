@@ -90,7 +90,6 @@ class Explicit implements BundlerInterface
         $this->logger->log('    adding "' . $dir . '"');
         $bundle->addDir(Finder::create()
                               ->files()
-                              //->filter($this->getBlacklistFilter())
                               ->ignoreVCS(true)
                               ->in($dir));
     }
