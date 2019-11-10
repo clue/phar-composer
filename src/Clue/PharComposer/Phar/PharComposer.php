@@ -17,9 +17,13 @@ class PharComposer
     private $logger;
     private $step = '?';
 
+    /**
+     * @param string $path path to composer.json file
+     * @throws \InvalidArgumentException when given $path can not be parsed as JSON
+     */
     public function __construct($path)
     {
-        $this->package = new Package($this->loadJson($path), dirname(realpath($path)) . '/');
+        $this->package = new Package($this->loadJson($path), dirname(realpath($path)));
         $this->logger = new Logger();
     }
 
@@ -33,6 +37,11 @@ class PharComposer
         $this->logger->setOutput($output);
     }
 
+    /**
+     * Get path to target phar file (absolute path or relative to current directory)
+     *
+     * @return string
+     */
     public function getTarget()
     {
         if ($this->target === null) {
@@ -41,6 +50,15 @@ class PharComposer
         return $this->target;
     }
 
+    /**
+     * Set path to target phar file (absolute path or relative to current directory)
+     *
+     * If the given path is a directory, the default target (package short name)
+     * will be appended automatically.
+     *
+     * @param string $target
+     * @return $this
+     */
     public function setTarget($target)
     {
         // path is actually a directory => append package name
@@ -52,11 +70,17 @@ class PharComposer
         return $this;
     }
 
+    /**
+     * Get path to main bin (relative to package directory)
+     *
+     * @return string
+     * @throws \UnexpectedValueException
+     */
     public function getMain()
     {
         if ($this->main === null) {
             foreach ($this->package->getBins() as $path) {
-                if (!file_exists($path)) {
+                if (!file_exists($this->package->getDirectory() . $path)) {
                     throw new \UnexpectedValueException('Bin file "' . $path . '" does not exist');
                 }
                 $this->main = $path;
@@ -66,6 +90,12 @@ class PharComposer
         return $this->main;
     }
 
+    /**
+     * set path to main bin (relative to package directory)
+     *
+     * @param string $main
+     * @return $this
+     */
     public function setMain($main)
     {
         $this->main = $main;
@@ -89,7 +119,7 @@ class PharComposer
     {
         $packages = array();
 
-        $pathVendor = $this->package->getPathVendor();
+        $pathVendor = $this->package->getDirectory() . $this->package->getPathVendor();
 
         // load all installed packages (use installed.json which also includes version instead of composer.lock)
         if (is_file($pathVendor . 'composer/installed.json')) {
@@ -115,7 +145,7 @@ class PharComposer
         $this->log('[' . $this->step . '/' . $this->step.'] Creating phar <info>' . $this->getTarget() . '</info>');
         $time = microtime(true);
 
-        $pathVendor = $this->package->getPathVendor();
+        $pathVendor = $this->package->getDirectory() . $this->package->getPathVendor();
         if (!is_dir($pathVendor)) {
             throw new \RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
         }
@@ -129,7 +159,7 @@ class PharComposer
         }
 
         $targetPhar = TargetPhar::create($target, $this);
-        $this->log('  - Adding main package');
+        $this->log('  - Adding main package "' . $this->package->getName() . '"');
         $targetPhar->addBundle($this->package->getBundler($this->logger)->bundle());
 
         $this->log('  - Adding composer base files');
@@ -154,23 +184,23 @@ class PharComposer
             $this->log('    WARNING: No main bin file defined! Resulting phar will NOT be executable');
         } else {
             $generator = StubGenerator::create()
-                ->index($this->getPathLocalToBase($main))
+                ->index($main)
                 ->extract(true)
                 ->banner("Bundled by phar-composer with the help of php-box.\n\n@link https://github.com/clue/phar-composer");
 
-            $lines = file($main, FILE_IGNORE_NEW_LINES);
+            $lines = file($this->package->getDirectory() . $main, FILE_IGNORE_NEW_LINES);
             if (substr($lines[0], 0, 2) === '#!') {
                 $this->log('    Using referenced shebang "'. $lines[0] . '"');
                 $generator->shebang($lines[0]);
 
                 // remove shebang from main file and add (overwrite)
                 unset($lines[0]);
-                $targetPhar->addFromString($this->getPathLocalToBase($main), implode("\n", $lines));
+                $targetPhar->addFromString($main, implode("\n", $lines));
             }
 
             $targetPhar->setStub($generator->generate());
 
-            $chmod = octdec(substr(decoct(fileperms($main)),-4));
+            $chmod = octdec(substr(decoct(fileperms($this->package->getDirectory() . $main)),-4));
             $this->log('    Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
@@ -215,12 +245,16 @@ class PharComposer
         $this->step = $step;
     }
 
+    /**
+     * @param string $path
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
     private function loadJson($path)
     {
-        $ret = json_decode(file_get_contents($path), true);
+        $ret = @json_decode(file_get_contents($path), true);
         if ($ret === null) {
-            var_dump(json_last_error(), JSON_ERROR_SYNTAX);
-            throw new \InvalidArgumentException('Unable to parse given path "' . $path . '"');
+            throw new \InvalidArgumentException('Unable to parse given path "' . $path . '"', json_last_error());
         }
         return $ret;
     }

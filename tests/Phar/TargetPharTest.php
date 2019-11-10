@@ -71,7 +71,7 @@ class TargetPharTest extends TestCase
                                ->willReturn($mockPackage);
         $this->mockBox->expects($this->once())
                       ->method('buildFromIterator')
-                      ->with($this->equalTo($mockTraversable), $this->equalTo('path/to/package'));
+                      ->with($this->equalTo($mockTraversable), $this->equalTo('path/to/package/'));
         $this->targetPhar->buildFromIterator($mockTraversable);
     }
 
@@ -97,7 +97,7 @@ class TargetPharTest extends TestCase
                                ->willReturn($mockPackage);
         $this->mockBox->expects($this->once())
                       ->method('buildFromIterator')
-                      ->with($this->equalTo($mockFinder), $this->equalTo('path/to/package'));
+                      ->with($this->equalTo($mockFinder), $this->equalTo('path/to/package/'));
         $this->targetPhar->addBundle($bundle);
     }
 

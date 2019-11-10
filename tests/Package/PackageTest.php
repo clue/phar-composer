@@ -14,7 +14,7 @@ class PackageTest extends TestCase
         $this->assertEquals('dir/', $package->getDirectory());
         $this->assertEquals(null, $package->getName());
         $this->assertEquals('dir', $package->getShortName());
-        $this->assertEquals('dir/vendor/', $package->getPathVendor());
+        $this->assertEquals('vendor/', $package->getPathVendor());
     }
 
     public function testGetShortNameReturnsLastPathComponentWhenNameIsUnknown()
@@ -34,10 +34,10 @@ class PackageTest extends TestCase
             )
         ), 'dir/');
 
-        $this->assertEquals(array('dir/bin/main', 'dir/bin2'), $package->getBins());
+        $this->assertEquals(array('bin/main', 'bin2'), $package->getBins());
         $this->assertEquals('acme/test', $package->getName());
         $this->assertEquals('test', $package->getShortName());
-        $this->assertEquals('dir/src/vendors/', $package->getPathVendor());
+        $this->assertEquals('src/vendors/', $package->getPathVendor());
     }
 
     private function createMockLogger()
