@@ -8,6 +8,7 @@ use UnexpectedValueException;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
+use Clue\PharComposer\Package\Package;
 
 class Packager
 {
@@ -210,7 +211,7 @@ class Packager
         $pharer->setOutput($this->output);
         $pharer->setStep($step);
 
-        $pathVendor = $pharer->getPathVendor();
+        $pathVendor = $pharer->getPackageRoot()->getDirectory() . $pharer->getPackageRoot()->getPathVendor();
         if (!is_dir($pathVendor)) {
             throw new RuntimeException('Project is not installed via composer. Run "composer install" manually');
         }
@@ -294,7 +295,12 @@ class Packager
         $this->log('    <info>OK</info> - Moved to <info>' . $path . '</info>');
     }
 
-    public function getSystemBin(PharComposer $pharer, $path = null)
+    /**
+     * @param Package $package
+     * @param ?string $path
+     * @return string
+     */
+    public function getSystemBin(Package $package, $path = null)
     {
         // no path given => place in system bin path
         if ($path === null) {
@@ -306,11 +312,9 @@ class Packager
             $path = self::PATH_BIN . '/' . $path;
         }
 
-        // TODO: check path is in $PATH environment
-
         // path is actually a directory => append package name
         if (is_dir($path)) {
-            $path = rtrim($path, '/') . '/' . basename($pharer->getTarget(), '.phar');
+            $path = rtrim($path, '/') . '/' . $package->getShortName();
         }
 
         return $path;

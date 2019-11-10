@@ -40,7 +40,7 @@ class Install extends Command
 
         $pharer = $this->packager->getPharer($input->getArgument('project'));
 
-        $path = $this->packager->getSystemBin($pharer, $input->getArgument('target'));
+        $path = $this->packager->getSystemBin($pharer->getPackageRoot(), $input->getArgument('target'));
 
         if (is_file($path)) {
             $helper = $this->getHelper('question');

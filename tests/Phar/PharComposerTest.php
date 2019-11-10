@@ -8,16 +8,24 @@ class PharComposerTest extends TestCase
     {
         $pharcomposer = new PharComposer(__DIR__ . '/../../composer.json');
 
-        $this->assertEquals($this->getPathProjectAbsolute('/') . '/', $pharcomposer->getBase());
-        $this->assertEquals($this->getPathProjectAbsolute('bin/phar-composer'), $pharcomposer->getMain());
+        $this->assertEquals('bin/phar-composer', $pharcomposer->getMain());
 
         $this->assertInstanceOf('Clue\PharComposer\Package\Package', $pharcomposer->getPackageRoot());
         $this->assertNotCount(0, $pharcomposer->getPackagesDependencies());
 
-        $this->assertEquals($this->getPathProjectAbsolute('vendor') . '/', $pharcomposer->getPathVendor());
+        $this->assertEquals('vendor/', $pharcomposer->getPackageRoot()->getPathVendor());
         $this->assertEquals('phar-composer.phar', $pharcomposer->getTarget());
 
         return $pharcomposer;
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Unable to parse given path
+     */
+    public function testConstructorThrowsWhenPathIsNotFile()
+    {
+        new PharComposer(__DIR__);
     }
 
     /**
@@ -33,6 +41,25 @@ class PharComposerTest extends TestCase
         $this->assertEquals('test.phar', $pharcomposer->getTarget());
 
         return $pharcomposer;
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     * @expectedExceptionMessage Bin file "bin/invalid" does not exist
+     */
+    public function testGetMainThrowsWhenBinDoesNotExist()
+    {
+        $pharer = new PharComposer(__DIR__ . '/../fixtures/05-invalid-bin/composer.json');
+
+        $pharer->getMain();
+    }
+
+    public function testSetTargetWillAppendPackageShortNameWhenTargetIsDirectory()
+    {
+        $pharer = new PharComposer(__DIR__ . '/../../composer.json');
+
+        $pharer->setTarget(__DIR__);
+        $this->assertEquals(__DIR__ . '/phar-composer.phar', $pharer->getTarget());
     }
 
     private function getPathProjectAbsolute($path)

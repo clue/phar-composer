@@ -1,5 +1,6 @@
 <?php
 
+use Clue\PharComposer\Package\Package;
 use Clue\PharComposer\Phar\Packager;
 
 class PackagerTest extends TestCase
@@ -72,5 +73,55 @@ class PackagerTest extends TestCase
     public function testNoComposerMissing()
     {
         $this->packager->getPharer(__DIR__ . '/../fixtures/02-no-composer/composer.json');
+    }
+
+    public function testGetSystemBinDefaultsToPackageNameInBin()
+    {
+        $package = new Package(array(
+            'name' => 'clue/phar-composer'
+        ), '');
+
+        $this->assertEquals('/usr/local/bin/phar-composer', $this->packager->getSystemBin($package, null));
+    }
+
+    public function testGetSystemBinReturnsPackageDirectoryBinWhenNameIsNotSet()
+    {
+        $package = new Package(array(), __DIR__);
+
+        $this->assertEquals('/usr/local/bin/Phar', $this->packager->getSystemBin($package, null));
+    }
+
+    public function testGetSystemBinReturnsPackageDirectoryRealNameInBinWhenNameIsNotSet()
+    {
+        $package = new Package(array(), __DIR__ . '/../');
+
+        $this->assertEquals('/usr/local/bin/tests', $this->packager->getSystemBin($package, null));
+    }
+
+    public function testGetSystemBinReturnsCustomPackageInBin()
+    {
+        $package = new Package(array(
+            'name' => 'clue/phar-composer'
+        ), '');
+
+        $this->assertEquals('/usr/local/bin/foo', $this->packager->getSystemBin($package, 'foo'));
+    }
+
+    public function testGetSystemBinReturnsCustomTargetPath()
+    {
+        $package = new Package(array(
+            'name' => 'clue/phar-composer'
+        ), '');
+
+        $this->assertEquals('/home/me/foo', $this->packager->getSystemBin($package, '/home/me/foo'));
+    }
+
+    public function testGetSystemBinReturnsDefaultPackageNameInCustomBin()
+    {
+        $package = new Package(array(
+            'name' => 'clue/phar-composer'
+        ), '');
+
+        $this->assertEquals('/home/me/phar-composer', $this->packager->getSystemBin($package, '/home/me'));
     }
 }

@@ -2,34 +2,28 @@
 
 namespace Clue\PharComposer\Phar;
 
-use Symfony\Component\Finder\Finder;
-use Herrera\Box\StubGenerator;
-use UnexpectedValueException;
-use InvalidArgumentException;
-use RuntimeException;
-use Symfony\Component\Finder\SplFileInfo;
 use Clue\PharComposer\Logger;
-use Clue\PharComposer\Package\Bundle;
 use Clue\PharComposer\Package\Package;
+use Herrera\Box\StubGenerator;
 
 /**
  * The PharComposer is responsible for collecting options and then building the target phar
  */
 class PharComposer
 {
-    private $pathProject;
     private $package;
     private $main = null;
     private $target = null;
     private $logger;
     private $step = '?';
 
+    /**
+     * @param string $path path to composer.json file
+     * @throws \InvalidArgumentException when given $path can not be parsed as JSON
+     */
     public function __construct($path)
     {
-        $path = realpath($path);
-
-        $this->package = $this->loadJson($path);
-        $this->pathProject = dirname($path) . '/';
+        $this->package = new Package($this->loadJson($path), dirname(realpath($path)));
         $this->logger = new Logger();
     }
 
@@ -43,20 +37,28 @@ class PharComposer
         $this->logger->setOutput($output);
     }
 
+    /**
+     * Get path to target phar file (absolute path or relative to current directory)
+     *
+     * @return string
+     */
     public function getTarget()
     {
         if ($this->target === null) {
-            if (isset($this->package['name'])) {
-                // skip vendor name from package name
-                $this->target = substr($this->package['name'], strpos($this->package['name'], '/') + 1);
-            } else {
-                $this->target = basename($this->pathProject);
-            }
-            $this->target .= '.phar';
+            $this->target = $this->package->getShortName() . '.phar';
         }
         return $this->target;
     }
 
+    /**
+     * Set path to target phar file (absolute path or relative to current directory)
+     *
+     * If the given path is a directory, the default target (package short name)
+     * will be appended automatically.
+     *
+     * @param string $target
+     * @return $this
+     */
     public function setTarget($target)
     {
         // path is actually a directory => append package name
@@ -68,12 +70,18 @@ class PharComposer
         return $this;
     }
 
+    /**
+     * Get path to main bin (relative to package directory)
+     *
+     * @return string
+     * @throws \UnexpectedValueException
+     */
     public function getMain()
     {
         if ($this->main === null) {
-            foreach ($this->getPackageRoot()->getBins() as $path) {
-                if (!file_exists($path)) {
-                    throw new UnexpectedValueException('Bin file "' . $path . '" does not exist');
+            foreach ($this->package->getBins() as $path) {
+                if (!file_exists($this->package->getDirectory() . $path)) {
+                    throw new \UnexpectedValueException('Bin file "' . $path . '" does not exist');
                 }
                 $this->main = $path;
                 break;
@@ -82,30 +90,16 @@ class PharComposer
         return $this->main;
     }
 
+    /**
+     * set path to main bin (relative to package directory)
+     *
+     * @param string $main
+     * @return $this
+     */
     public function setMain($main)
     {
         $this->main = $main;
         return $this;
-    }
-
-    /**
-     * base project path. all files MUST BE relative to this location
-     *
-     * @return string
-     */
-    public function getBase()
-    {
-        return $this->pathProject;
-    }
-
-    /**
-     * get absolute path to vendor directory
-     *
-     * @return string
-     */
-    public function getPathVendor()
-    {
-        return $this->getPackageRoot()->getPathVendor();
     }
 
     /**
@@ -114,7 +108,7 @@ class PharComposer
      */
     public function getPackageRoot()
     {
-        return new Package($this->package, $this->pathProject);
+        return $this->package;
     }
 
     /**
@@ -125,7 +119,7 @@ class PharComposer
     {
         $packages = array();
 
-        $pathVendor = $this->getPathVendor();
+        $pathVendor = $this->package->getDirectory() . $this->package->getPathVendor();
 
         // load all installed packages (use installed.json which also includes version instead of composer.lock)
         if (is_file($pathVendor . 'composer/installed.json')) {
@@ -151,22 +145,22 @@ class PharComposer
         $this->log('[' . $this->step . '/' . $this->step.'] Creating phar <info>' . $this->getTarget() . '</info>');
         $time = microtime(true);
 
-        $pathVendor = $this->getPathVendor();
+        $pathVendor = $this->package->getDirectory() . $this->package->getPathVendor();
         if (!is_dir($pathVendor)) {
-            throw new RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
+            throw new \RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
         }
 
         $target = $this->getTarget();
         if (file_exists($target)) {
             $this->log('  - Remove existing file <info>' . $target . '</info> (' . $this->getSize($target) . ')');
             if(unlink($target) === false) {
-                throw new UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
+                throw new \UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
             }
         }
 
         $targetPhar = TargetPhar::create($target, $this);
-        $this->log('  - Adding main package');
-        $targetPhar->addBundle(Bundle::from($this->getPackageRoot(), $this->logger));
+        $this->log('  - Adding main package "' . $this->package->getName() . '"');
+        $targetPhar->addBundle($this->package->getBundler($this->logger)->bundle());
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
@@ -179,7 +173,7 @@ class PharComposer
 
         foreach ($this->getPackagesDependencies() as $package) {
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
-            $targetPhar->addBundle(Bundle::from($package, $this->logger));
+            $targetPhar->addBundle($package->getBundler($this->logger)->bundle());
         }
 
 
@@ -190,23 +184,23 @@ class PharComposer
             $this->log('    WARNING: No main bin file defined! Resulting phar will NOT be executable');
         } else {
             $generator = StubGenerator::create()
-                ->index($this->getPathLocalToBase($main))
+                ->index($main)
                 ->extract(true)
                 ->banner("Bundled by phar-composer with the help of php-box.\n\n@link https://github.com/clue/phar-composer");
 
-            $lines = file($main, FILE_IGNORE_NEW_LINES);
+            $lines = file($this->package->getDirectory() . $main, FILE_IGNORE_NEW_LINES);
             if (substr($lines[0], 0, 2) === '#!') {
                 $this->log('    Using referenced shebang "'. $lines[0] . '"');
                 $generator->shebang($lines[0]);
 
                 // remove shebang from main file and add (overwrite)
                 unset($lines[0]);
-                $targetPhar->addFromString($this->getPathLocalToBase($main), implode("\n", $lines));
+                $targetPhar->addFromString($main, implode("\n", $lines));
             }
 
             $targetPhar->setStub($generator->generate());
 
-            $chmod = octdec(substr(decoct(fileperms($main)),-4));
+            $chmod = octdec(substr(decoct(fileperms($this->package->getDirectory() . $main)),-4));
             $this->log('    Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
@@ -215,7 +209,7 @@ class PharComposer
         if ($chmod !== null) {
             $this->log('    Applying chmod ' . sprintf('%04o', $chmod));
             if (chmod($target, $chmod) === false) {
-                throw new UnexpectedValueException('Unable to chmod target file "' . $target .'"');
+                throw new \UnexpectedValueException('Unable to chmod target file "' . $target .'"');
             }
         }
 
@@ -234,10 +228,11 @@ class PharComposer
 
     public function getPathLocalToBase($path)
     {
-        if (strpos($path, $this->pathProject) !== 0) {
-            throw new UnexpectedValueException('Path "' . $path . '" is not within base project path "' . $this->pathProject . '"');
+        $root = $this->package->getDirectory();
+        if (strpos($path, $root) !== 0) {
+            throw new \UnexpectedValueException('Path "' . $path . '" is not within base project path "' . $root . '"');
         }
-        return substr($path, strlen($this->pathProject));
+        return substr($path, strlen($root));
     }
 
     public function log($message)
@@ -250,12 +245,16 @@ class PharComposer
         $this->step = $step;
     }
 
+    /**
+     * @param string $path
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
     private function loadJson($path)
     {
-        $ret = json_decode(file_get_contents($path), true);
+        $ret = @json_decode(file_get_contents($path), true);
         if ($ret === null) {
-            var_dump(json_last_error(), JSON_ERROR_SYNTAX);
-            throw new InvalidArgumentException('Unable to parse given path "' . $path . '"');
+            throw new \InvalidArgumentException('Unable to parse given path "' . $path . '"', json_last_error());
         }
         return $ret;
     }

@@ -41,10 +41,11 @@ class Complete implements BundlerInterface
         $iterator = Finder::create()
             ->files()
             ->ignoreVCS(true)
-            ->filter($this->package->getBlacklistFilter())
-            ->exclude($this->package->getPathVendorRelative())
+            ->exclude(rtrim($this->package->getPathVendor(), '/'))
+            ->notPath('/^composer\.phar/')
+            ->notPath('/^phar-composer\.phar/')
             ->in($this->package->getDirectory());
-        $this->logger->log('    Adding whole project directory "' . $this->package->getDirectory() . '"');
+        $this->logger->log('    Adding whole project directory');
         return $bundle->addDir($iterator);
     }
 }

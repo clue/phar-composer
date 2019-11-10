@@ -294,12 +294,14 @@ class SearchTest extends TestCase
             'question' => $questionHelper
         ));
 
+        $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
+        $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
         $pharer->expects($this->never())->method('build');
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
         $packager->expects($this->once())->method('getPharer')->with('foo/bar', 'dev-master')->willReturn($pharer);
-        $packager->expects($this->once())->method('getSystemBin')->with($pharer)->willReturn('targetPath');
+        $packager->expects($this->once())->method('getSystemBin')->with($package)->willReturn('targetPath');
         $packager->expects($this->once())->method('install')->with($pharer, 'targetPath');
 
         $result = $this->getMock('Packagist\Api\Result\Result');

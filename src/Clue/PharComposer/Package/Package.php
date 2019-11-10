@@ -6,7 +6,6 @@ use Clue\PharComposer\Package\Bundler\BundlerInterface;
 use Clue\PharComposer\Package\Bundler\Complete as CompleteBundler;
 use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
 use Clue\PharComposer\Logger;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * The package represents either the main/root package or one of the vendor packages.
@@ -25,45 +24,51 @@ class Package
     public function __construct(array $package, $directory)
     {
         $this->package = $package;
-        $this->directory = $directory;
+        $this->directory = rtrim($directory, '/') . '/';
     }
 
     /**
      * get package name as defined in composer.json
      *
-     * @return string
+     * @return ?string
      */
     public function getName()
     {
-        return isset($this->package['name']) ? $this->package['name'] : 'unknown';
+        return isset($this->package['name']) ? $this->package['name'] : null;
     }
 
     /**
-     * Get path to vendor directory (relative to package directory)
-     *
      * @return string
      */
-    public function getPathVendorRelative()
+    public function getShortName()
     {
-        $vendor = 'vendor';
-        if (isset($this->package['config']['vendor-dir'])) {
-            $vendor = $this->package['config']['vendor-dir'];
+        // skip vendor name from package name or default to last directory component
+        $name = $this->getName();
+        if ($name === null) {
+            $name = realpath($this->directory);
+            if ($name === false) {
+                $name = $this->directory;
+            }
         }
-        return $vendor;
+        return basename($name);
     }
 
     /**
-     * Get absolute path to vendor directory
+     * Get path to vendor directory (relative to package directory, always ends with slash)
      *
      * @return string
      */
     public function getPathVendor()
     {
-        return $this->getAbsolutePath($this->getPathVendorRelative() . '/');
+        $vendor = 'vendor';
+        if (isset($this->package['config']['vendor-dir'])) {
+            $vendor = $this->package['config']['vendor-dir'];
+        }
+        return $vendor . '/';
     }
 
     /**
-     * Get package directory (the directory containing its composer.json)
+     * Get package directory (the directory containing its composer.json, always ends with slash)
      *
      * @return string
      */
@@ -108,64 +113,12 @@ class Package
     }
 
     /**
-     * Get list of files defined as "bin" (absolute paths)
+     * Get list of files defined as "bin" (relative to package directory)
      *
      * @return string[]
      */
     public function getBins()
     {
-        if (!isset($this->package['bin'])) {
-            return array();
-        }
-
-        $bins = array();
-        foreach ($this->package['bin'] as $bin) {
-            $bins []= $this->getAbsolutePath($bin);
-        }
-
-        return $bins;
-    }
-
-    /**
-     * Get blacklisted files which are not to be included
-     *
-     * Hardcoded to exclude composer.phar and phar-composer.phar at the moment.
-     *
-     * @return string[]
-     */
-    public function getBlacklist()
-    {
-        return array(
-            $this->getAbsolutePath('composer.phar'),
-            $this->getAbsolutePath('phar-composer.phar')
-        );
-    }
-
-    /**
-     * Gets a filter function to exclude blacklisted files
-     *
-     * Only used for CompleteBundler at the moment
-     *
-     * @return \Closure
-     * @uses self::getBlacklist()
-     */
-    public function getBlacklistFilter()
-    {
-        $blacklist = $this->getBlacklist();
-
-        return function (SplFileInfo $file) use ($blacklist) {
-            return in_array($file->getPathname(), $blacklist) ? false : null;
-        };
-    }
-
-    /**
-     * Get absolute path for the given package-relative path
-     *
-     * @param string $path
-     * @return string
-     */
-    public function getAbsolutePath($path)
-    {
-        return $this->directory . ltrim($path, '/');
+        return isset($this->package['bin']) ? $this->package['bin'] : array();
     }
 }

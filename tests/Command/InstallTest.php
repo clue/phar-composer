@@ -25,12 +25,14 @@ class InstallTest extends TestCase
         )->willReturnOnConsecutiveCalls('dir', null);
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
+        $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
+        $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
-        $packager->expects($this->once())->method('getSystemBin')->with($pharer, null)->willReturn('targetPath');
+        $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn('targetPath');
         $packager->expects($this->once())->method('install')->with($pharer, 'targetPath');
 
         $command = new Install($packager);
@@ -46,12 +48,14 @@ class InstallTest extends TestCase
         )->willReturnOnConsecutiveCalls('dir', 'targetDir');
         $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
 
+        $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
+        $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
-        $packager->expects($this->once())->method('getSystemBin')->with($pharer, 'targetDir')->willReturn('targetPath');
+        $packager->expects($this->once())->method('getSystemBin')->with($package, 'targetDir')->willReturn('targetPath');
         $packager->expects($this->once())->method('install')->with($pharer, 'targetPath');
 
         $command = new Install($packager);
@@ -90,12 +94,14 @@ class InstallTest extends TestCase
             'question' => $questionHelper
         ));
 
+        $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
+        $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
-        $packager->expects($this->once())->method('getSystemBin')->with($pharer, null)->willReturn(__FILE__);
+        $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn(__FILE__);
         $packager->expects($this->once())->method('install')->with($pharer, __FILE__);
 
         $command = new Install($packager);
@@ -123,12 +129,14 @@ class InstallTest extends TestCase
             'question' => $questionHelper
         ));
 
+        $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
+        $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
         $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
-        $packager->expects($this->once())->method('getSystemBin')->with($pharer, null)->willReturn(__FILE__);
+        $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn(__FILE__);
         $packager->expects($this->never())->method('install');
 
         $command = new Install($packager);

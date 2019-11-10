@@ -12,23 +12,32 @@ class PackageTest extends TestCase
         $this->assertEquals(new Autoload(array()), $package->getAutoload());
         $this->assertEquals(array(), $package->getBins());
         $this->assertEquals('dir/', $package->getDirectory());
-        $this->assertEquals('unknown', $package->getName());
-        $this->assertEquals('dir/vendor/', $package->getPathVendor());
+        $this->assertEquals(null, $package->getName());
+        $this->assertEquals('dir', $package->getShortName());
+        $this->assertEquals('vendor/', $package->getPathVendor());
+    }
+
+    public function testGetShortNameReturnsLastPathComponentWhenNameIsUnknown()
+    {
+        $package = new Package(array(), __DIR__);
+
+        $this->assertEquals('Package', $package->getShortName());
     }
 
     public function testConstructorData()
     {
         $package = new Package(array(
-            'name' => 'test/test',
+            'name' => 'acme/test',
             'bin' => array('bin/main', 'bin2'),
             'config' => array(
                 'vendor-dir' => 'src/vendors'
             )
         ), 'dir/');
 
-        $this->assertEquals(array('dir/bin/main', 'dir/bin2'), $package->getBins());
-        $this->assertEquals('test/test', $package->getName());
-        $this->assertEquals('dir/src/vendors/', $package->getPathVendor());
+        $this->assertEquals(array('bin/main', 'bin2'), $package->getBins());
+        $this->assertEquals('acme/test', $package->getName());
+        $this->assertEquals('test', $package->getShortName());
+        $this->assertEquals('src/vendors/', $package->getPathVendor());
     }
 
     private function createMockLogger()
