@@ -21,8 +21,7 @@ for your project among with its bundled dependencies.
     * [Updating phar](#updating-phar)
   * [Installation using Composer](#installation-using-composer)
     * [Updating dependency](#updating-dependency)
-  * [Manual Installation from Source](#manual-installation-from-source)
-    * [Updating manually](#updating-manually)
+* [Development](#development)
 * [Tests](#tests)
 * [License](#license)
 
@@ -208,38 +207,72 @@ source code as a library is *not supported*.
 
 Just run `composer update clue/phar-composer` to update to the latest release.
 
-### Manual Installation from Source
+## Development
 
-This project requires PHP 5.3+ and Composer:
+clue/phar-composer is an [open-source project](#license) and encourages everybody to
+participate in its development.
+You're interested in checking out how clue/phar-composer works under the hood and/or want
+to contribute to the development of clue/phar-composer?
+Then this section is for you!
+
+The recommended way to install clue/phar-composer is to clone (or download) this repository
+and use [Composer](http://getcomposer.org) to download its dependencies.
+Therefore you'll need PHP, Composer, git and curl installed.
+For example, on a recent Ubuntu/Debian-based system, simply run:
 
 ```bash
+$ sudo apt install php-cli git curl
+
 $ git clone https://github.com/clue/phar-composer.git
 $ cd phar-composer
+
 $ curl -s https://getcomposer.org/installer | php
-$ php composer.phar install
+$ sudo mv composer.phar /usr/local/bin/composer
+
+$ composer install
 ```
 
-You can now verify everything works by running phar-composer like this:
+You can now verify everything works by running clue/phar-composer like this:
 
 ```bash
 $ php bin/phar-composer --version
 ```
 
-Optionally, you can now build the above mentioned `phar-composer.phar` yourself by issuing:
+If you want to distribute clue/phar-composer as a single standalone release file, you may
+compile the project into a single `phar-composer.phar` file like this:
 
 ```bash
-$ composer install --no-dev
-$ php bin/phar-composer build
+$ composer build
 ```
 
-Optionally, you can now follow the above instructions for a [system-wide installation](#as-a-phar-recommended).
+> Note that compiling will temporarily install a copy of this project to the
+  local `build/` directory and install all non-development dependencies
+  for distribution. This should only take a second or two if you've previously
+  installed its dependencies already.
+  The build script optionally accepts the version number (`VERSION` env) and
+  an output file name or will otherwise try to look up the last release tag,
+  such as `phar-composer-1.0.0.phar`.
 
-#### Updating manually
+You can now verify the resulting `phar-composer.phar` file works by running it
+like this:
+
+```bash
+$ ./phar-composer.phar --version
+```
+
+To update your development version to the latest version, just run this:
 
 ```bash
 $ git pull
 $ php composer.phar install
 ```
+
+Made some changes to your local development version?
+
+Make sure to let the world know! :shipit:
+We welcome PRs and would love to hear from you!
+
+Happy hacking!
 
 ## Tests
 
