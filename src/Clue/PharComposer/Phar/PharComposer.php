@@ -158,7 +158,7 @@ class PharComposer
             }
         }
 
-        $targetPhar = TargetPhar::create($target, $this);
+        $targetPhar = new TargetPhar(new \Phar($target), $this);
         $this->log('  - Adding main package "' . $this->package->getName() . '"');
         $targetPhar->addBundle($this->package->getBundler($this->logger)->bundle());
 
@@ -175,7 +175,6 @@ class PharComposer
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
             $targetPhar->addBundle($package->getBundler($this->logger)->bundle());
         }
-
 
         $this->log('  - Setting main/stub');
         $chmod = 0755;
@@ -204,7 +203,7 @@ class PharComposer
             $this->log('    Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
-        $targetPhar->finalize();
+        $targetPhar->stopBuffering();
 
         if ($chmod !== null) {
             $this->log('    Applying chmod ' . sprintf('%04o', $chmod));
@@ -214,8 +213,6 @@ class PharComposer
         }
 
         $time = max(microtime(true) - $time, 0);
-
-
 
         $this->log('');
         $this->log('    <info>OK</info> - Creating <info>' . $this->getTarget() .'</info> (' . $this->getSize($this->getTarget()) . ') completed after ' . round($time, 1) . 's');
