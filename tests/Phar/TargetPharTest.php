@@ -15,8 +15,6 @@ class TargetPharTest extends TestCase
 
     private $mockPhar;
 
-    private $mockBox;
-
     private $mockPharComposer;
 
     /**
@@ -29,12 +27,8 @@ class TargetPharTest extends TestCase
         }
 
         $this->mockPhar = $this->createMock('\Phar');
-        $this->mockBox  = $this->createMock('Herrera\Box\Box');
-        $this->mockBox->expects($this->any())
-                      ->method('getPhar')
-                      ->will($this->returnValue($this->mockPhar));
         $this->mockPharComposer = $this->createMock('Clue\PharComposer\Phar\PharComposer');
-        $this->targetPhar       = new TargetPhar($this->mockBox, $this->mockPharComposer);
+        $this->targetPhar       = new TargetPhar($this->mockPhar, $this->mockPharComposer);
     }
 
     private function createMock($class)
@@ -53,7 +47,7 @@ class TargetPharTest extends TestCase
                                ->method('getPathLocalToBase')
                                ->with($this->equalTo('path/to/package/file.php'))
                                ->will($this->returnValue('file.php'));
-        $this->mockBox->expects($this->once())
+        $this->mockPhar->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('path/to/package/file.php'), $this->equalTo('file.php'));
         $this->targetPhar->addFile('path/to/package/file.php');
@@ -69,7 +63,7 @@ class TargetPharTest extends TestCase
         $this->mockPharComposer->expects($this->once())
                                ->method('getPackageRoot')
                                ->willReturn($mockPackage);
-        $this->mockBox->expects($this->once())
+        $this->mockPhar->expects($this->once())
                       ->method('buildFromIterator')
                       ->with($this->equalTo($mockTraversable), $this->equalTo('path/to/package/'));
         $this->targetPhar->buildFromIterator($mockTraversable);
@@ -86,7 +80,7 @@ class TargetPharTest extends TestCase
                                ->method('getPathLocalToBase')
                                ->with($this->equalTo('path/to/package/file.php'))
                                ->will($this->returnValue('file.php'));
-        $this->mockBox->expects($this->once())
+        $this->mockPhar->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('path/to/package/file.php'), $this->equalTo('file.php'));
         $mockFinder = $this->createMock('Symfony\Component\Finder\Finder');
@@ -95,7 +89,7 @@ class TargetPharTest extends TestCase
         $this->mockPharComposer->expects($this->once())
                                ->method('getPackageRoot')
                                ->willReturn($mockPackage);
-        $this->mockBox->expects($this->once())
+        $this->mockPhar->expects($this->once())
                       ->method('buildFromIterator')
                       ->with($this->equalTo($mockFinder), $this->equalTo('path/to/package/'));
         $this->targetPhar->addBundle($bundle);
@@ -115,10 +109,21 @@ class TargetPharTest extends TestCase
     /**
      * @test
      */
-    public function finalizeStopsBufferingOnUnderlyingPhar()
+    public function stopBufferingStopsBufferingOnUnderlyingPhar()
     {
         $this->mockPhar->expects($this->once())
                        ->method('stopBuffering');
-        $this->targetPhar->finalize();
+        $this->targetPhar->stopBuffering();
+    }
+
+    /**
+     * @test
+     */
+    public function addFromStringOnUnderlyingPhar()
+    {
+        $this->mockPhar->expects($this->once())
+                       ->method('addFromString')
+                       ->with('path/file', 'contents');
+        $this->targetPhar->addFromString('path/file', 'contents');
     }
 }

@@ -2,59 +2,32 @@
 
 namespace Clue\PharComposer\Phar;
 
-use Herrera\Box\Box;
-use Traversable;
 use Clue\PharComposer\Package\Bundle;
 
 /**
  * Represents the target phar to be created.
- *
- * TODO: replace PharComposer with a new BasePath class
  */
 class TargetPhar
 {
-    /**
-     *
-     * @type  PharComposer
-     */
+    /** @var \Phar */
+    private $phar;
+
+    /** @var  PharComposer */
     private $pharComposer;
-    /**
-     *
-     * @type  Box
-     */
-    private $box;
 
-    /**
-     * constructor
-     *
-     * @param  Box           $box
-     * @param  PharComposer  $pharComposer
-     */
-    public function __construct(Box $box, PharComposer $pharComposer)
+    public function __construct(\Phar $phar, PharComposer $pharComposer)
     {
-        $this->box = $box;
-        $this->box->getPhar()->startBuffering();
+        $phar->startBuffering();
+        $this->phar = $phar;
         $this->pharComposer = $pharComposer;
-    }
-
-    /**
-     * create new instance in target path
-     *
-     * @param   string        $target
-     * @param   PharComposer  $pharComposer
-     * @return  TargetPhar
-     */
-    public static function create($target, PharComposer $pharComposer)
-    {
-        return new self(Box::create($target), $pharComposer);
     }
 
     /**
      * finalize writing of phar file
      */
-    public function finalize()
+    public function stopBuffering()
     {
-        $this->box->getPhar()->stopBuffering();
+        $this->phar->stopBuffering();
     }
 
     /**
@@ -74,25 +47,18 @@ class TargetPhar
     }
 
      /**
-     * Adds a file to the Phar, after compacting it and replacing its
-     * placeholders.
+     * Adds a file to the Phar
      *
      * @param string $file  The file name.
      */
     public function addFile($file)
     {
-        $this->box->addFile($file, $this->pharComposer->getPathLocalToBase($file));
+        $this->phar->addFile($file, $this->pharComposer->getPathLocalToBase($file));
     }
 
-     /**
-     * Similar to Phar::buildFromIterator(), except the files will be compacted
-     * and their placeholders replaced.
-     *
-     * @param Traversable $iterator The iterator.
-     */
-    public function buildFromIterator(Traversable $iterator)
+    public function buildFromIterator(\Traversable $iterator)
     {
-        $this->box->buildFromIterator($iterator, $this->pharComposer->getPackageRoot()->getDirectory());
+        $this->phar->buildFromIterator($iterator, $this->pharComposer->getPackageRoot()->getDirectory());
     }
 
     /**
@@ -102,11 +68,11 @@ class TargetPhar
      */
     public function setStub($stub)
     {
-        $this->box->getPhar()->setStub($stub);
+        $this->phar->setStub($stub);
     }
 
     public function addFromString($local, $contents)
     {
-        $this->box->addFromString($local, $contents);
+        $this->phar->addFromString($local, $contents);
     }
 }
