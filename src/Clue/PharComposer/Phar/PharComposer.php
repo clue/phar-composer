@@ -150,23 +150,19 @@ class PharComposer
             throw new \RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
         }
 
+        // get target and tempory file name to write to
         $target = $this->getTarget();
-        if (file_exists($target)) {
-            $this->log('  - Remove existing file <info>' . $target . '</info> (' . $this->getSize($target) . ')');
-            if(unlink($target) === false) {
-                throw new \UnexpectedValueException('Unable to remove existing phar archive "'.$target.'"');
-            }
-        }
+        do {
+            $tmp = $target . '.' . mt_rand() . '.phar';
+        } while (file_exists($tmp));
 
-        $targetPhar = new TargetPhar(new \Phar($target), $this);
+        $targetPhar = new TargetPhar(new \Phar($tmp), $this);
         $this->log('  - Adding main package "' . $this->package->getName() . '"');
         $targetPhar->addBundle($this->package->bundle());
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
         $targetPhar->addFile($pathVendor . 'autoload.php');
-
-        // TODO: check for vendor/bin !
 
         // only add composer base directory (no sub-directories!)
         $targetPhar->buildFromIterator(new \GlobIterator($pathVendor . 'composer/*.*', \FilesystemIterator::KEY_AS_FILENAME));
@@ -203,13 +199,27 @@ class PharComposer
             $this->log('    Using referenced chmod ' . sprintf('%04o', $chmod));
         }
 
-        $targetPhar->stopBuffering();
+        // stop buffering contents in memory and write to file
+        // failure to write will emit a warning (ignore) and throw an (uncaught) exception
+        try {
+            @$targetPhar->stopBuffering();
+        } catch (\PharException $e) {
+            throw new \RuntimeException('Unable to write phar: ' . $e->getMessage());
+        }
 
         if ($chmod !== null) {
             $this->log('    Applying chmod ' . sprintf('%04o', $chmod));
-            if (chmod($target, $chmod) === false) {
+            if (chmod($tmp, $chmod) === false) {
                 throw new \UnexpectedValueException('Unable to chmod target file "' . $target .'"');
             }
+        }
+
+        if (file_exists($target)) {
+            $this->log('  - Overwriting existing file <info>' . $target . '</info> (' . $this->getSize($target) . ')');
+        }
+
+        if (rename($tmp, $target) === false) {
+            throw new \UnexpectedValueException('Unable to rename temporary phar archive to "'.$target.'"');
         }
 
         $time = max(microtime(true) - $time, 0);
