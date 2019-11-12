@@ -62,6 +62,34 @@ class PharComposerTest extends TestCase
         $this->assertEquals(__DIR__ . '/phar-composer.phar', $pharer->getTarget());
     }
 
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage not properly installed
+     */
+    public function testBuildThrowsWhen()
+    {
+        $pharer = new PharComposer(__DIR__ . '/../fixtures/01-empty/composer.json');
+        $pharer->setOutput(false);
+        $pharer->setTarget('/dev/null');
+        $pharer->build();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedException Unable to write phar:
+     */
+    public function testBuildThrowsWhenTargetCanNotBeWritten()
+    {
+        if (!Phar::canWrite() || !file_exists('/dev/null')) {
+            $this->markTestSkipped('Test required "phar.readonly=off" setting and /dev/null');
+        }
+
+        $pharer = new PharComposer(__DIR__ . '/../fixtures/03-project-with-phars/composer.json');
+        $pharer->setOutput(false);
+        $pharer->setTarget('/dev/null');
+        $pharer->build();
+    }
+
     private function getPathProjectAbsolute($path)
     {
         return realpath(__DIR__ . '/../../' . $path);
