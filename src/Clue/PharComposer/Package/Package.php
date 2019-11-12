@@ -80,6 +80,12 @@ class Package
     public function bundle()
     {
         $bundle = new Bundle();
+
+        // return empty bundle if this package does not define any files and directory does not exist
+        if (empty($this->package['autoload']) && !is_dir($this->directory . $this->getPathVendor())) {
+            return $bundle;
+        }
+
         $iterator = Finder::create()
             ->files()
             ->ignoreVCS(true)
