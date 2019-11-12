@@ -160,7 +160,7 @@ class PharComposer
 
         $targetPhar = new TargetPhar(new \Phar($target), $this);
         $this->log('  - Adding main package "' . $this->package->getName() . '"');
-        $targetPhar->addBundle($this->package->getBundler($this->logger)->bundle());
+        $targetPhar->addBundle($this->package->bundle());
 
         $this->log('  - Adding composer base files');
         // explicitly add composer autoloader
@@ -173,7 +173,7 @@ class PharComposer
 
         foreach ($this->getPackagesDependencies() as $package) {
             $this->log('  - Adding dependency "' . $package->getName() . '" from "' . $this->getPathLocalToBase($package->getDirectory()) . '"');
-            $targetPhar->addBundle($package->getBundler($this->logger)->bundle());
+            $targetPhar->addBundle($package->bundle());
         }
 
         $this->log('  - Setting main/stub');

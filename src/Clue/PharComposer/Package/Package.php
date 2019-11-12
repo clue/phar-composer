@@ -1,11 +1,8 @@
 <?php
 
-namespace Clue\PharComposer\Package;;
+namespace Clue\PharComposer\Package;
 
-use Clue\PharComposer\Package\Bundler\BundlerInterface;
-use Clue\PharComposer\Package\Bundler\Complete as CompleteBundler;
-use Clue\PharComposer\Package\Bundler\Explicit as ExplicitBundler;
-use Clue\PharComposer\Logger;
+use Symfony\Component\Finder\Finder;
 
 /**
  * The package represents either the main/root package or one of the vendor packages.
@@ -78,38 +75,20 @@ class Package
     }
 
     /**
-     * Get Bundler instance to bundle this package
-     *
-     * @param Logger $logger
-     * @return BundlerInterface
+     * @return \Clue\PharComposer\Package\Bundle
      */
-    public function getBundler(Logger $logger)
+    public function bundle()
     {
-        $bundlerName = 'complete';
-        if (isset($this->package['extra']['phar']['bundler'])) {
-            $bundlerName = $this->package['extra']['phar']['bundler'];
-        }
+        $bundle = new Bundle();
+        $iterator = Finder::create()
+            ->files()
+            ->ignoreVCS(true)
+            ->exclude(rtrim($this->getPathVendor(), '/'))
+            ->notPath('/^composer\.phar/')
+            ->notPath('/^phar-composer\.phar/')
+            ->in($this->getDirectory());
 
-        if ($bundlerName === 'composer') {
-            return new ExplicitBundler($this, $logger);
-        } elseif ($bundlerName === 'complete') {
-            return new CompleteBundler($this, $logger);
-        } else {
-            $logger->log('Invalid bundler "' . $bundlerName . '" specified in package "' . $this->getName() . '", will fall back to "complete" bundler');
-            return new CompleteBundler($this, $logger);
-        }
-    }
-
-    /**
-     * Get Autoload instance containing all autoloading information
-     *
-     * Only used for ExplicitBundler at the moment.
-     *
-     * @return Autoload
-     */
-    public function getAutoload()
-    {
-        return new Autoload(isset($this->package['autoload']) ? $this->package['autoload'] : array());
+        return $bundle->addDir($iterator);
     }
 
     /**

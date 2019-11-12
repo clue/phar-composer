@@ -1,7 +1,6 @@
 <?php
 
 use Clue\PharComposer\Package\Package;
-use Clue\PharComposer\Package\Autoload;
 
 class PackageTest extends TestCase
 {
@@ -9,7 +8,6 @@ class PackageTest extends TestCase
     {
         $package = new Package(array(), 'dir/');
 
-        $this->assertEquals(new Autoload(array()), $package->getAutoload());
         $this->assertEquals(array(), $package->getBins());
         $this->assertEquals('dir/', $package->getDirectory());
         $this->assertEquals(null, $package->getName());
@@ -47,62 +45,34 @@ class PackageTest extends TestCase
                     ->getMock();
     }
 
-    public function testConstructorBundlerComposer()
+    public function testBundleWillContainComposerJsonButNotVendor()
     {
-        $package = new Package(array(
-            'extra' => array(
-                'phar' => array(
-                    'bundler' => 'composer'
-                 )
-            )
-        ), 'dir/');
+        $dir = realpath(__DIR__ . '/../fixtures/03-project-with-phars') . '/';
+        $package = new Package(array(), $dir);
+        $bundle = $package->bundle();
 
-        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Explicit',
-                                $package->getBundler($this->createMockLogger())
-        );
+        $this->assertTrue($bundle->contains($dir . 'composer.json'));
+        $this->assertFalse($bundle->contains($dir . 'vendor/autoload.php'));
     }
 
-    public function testConstructorBundlerCompleteWithExplicitConfig()
+    public function testBundleWillNotContainComposerPharInRoot()
     {
-        $package = new Package(array(
-            'extra' => array(
-                'phar' => array(
-                    'bundler' => 'complete'
-                 )
-            )
-        ), 'dir/');
+        $dir = realpath(__DIR__ . '/../fixtures/03-project-with-phars') . '/';
+        $package = new Package(array(), $dir);
+        $bundle = $package->bundle();
 
-        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Complete',
-                                $package->getBundler($this->createMockLogger())
-        );
+        $this->assertFalse($bundle->contains($dir . 'composer.phar'));
+        $this->assertFalse($bundle->contains($dir . 'phar-composer.phar'));
     }
 
-    public function testConstructorBundlerCompleteAsDefault()
+    public function testBundleWillContainComposerPharFromSrc()
     {
-        $package = new Package(array(), 'dir/');
+        $dir = realpath(__DIR__ . '/../fixtures/04-project-with-phars-in-src') . '/';
+        $package = new Package(array(), $dir);
+        $bundle = $package->bundle();
 
-        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Complete',
-                                $package->getBundler($this->createMockLogger())
-        );
-    }
-
-    public function testConstructorBundlerInvalid()
-    {
-        $package = new Package(array(
-            'name'  => 'cool-package',
-            'extra' => array(
-                'phar' => array(
-                    'bundler' => 'foo'
-                )
-            )
-        ), 'dir/');
-
-        $mockLogger = $this->createMockLogger();
-        $mockLogger->expects($this->once())
-                   ->method('log')
-                   ->with($this->equalTo('Invalid bundler "foo" specified in package "cool-package", will fall back to "complete" bundler'));
-        $this->assertInstanceOf('Clue\PharComposer\Package\Bundler\Complete',
-                                $package->getBundler($mockLogger)
-        );
+        $this->assertTrue($bundle->contains($dir . 'composer.json'));
+        $this->assertTrue($bundle->contains($dir . 'src/composer.phar'));
+        $this->assertTrue($bundle->contains($dir . 'src/phar-composer.phar'));
     }
 }

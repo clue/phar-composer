@@ -24,11 +24,6 @@
         "psr-0": {"Clue": "src/"}
     },
     "bin": ["bin/phar-composer"],
-    "extra": {
-        "phar": {
-            "bundler": "composer"
-        }
-    },
     "config": {
         "platform": {
             "php": "5.3.6"
