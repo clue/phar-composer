@@ -33,5 +33,8 @@
         "platform": {
             "php": "5.3.6"
         }
+    },
+    "scripts": {
+        "build": "@php bin/build.php"
     }
 }
