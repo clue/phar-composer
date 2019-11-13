@@ -90,6 +90,24 @@ class PharComposerTest extends TestCase
         $pharer->build();
     }
 
+    public function testBundlePackageWithNoVendorReturnsEmptyBundle()
+    {
+        $pharer = new PharComposer(__DIR__ . '/../fixtures/06-dependency-without-dir/composer.json');
+
+        $deps = $pharer->getPackagesDependencies();
+
+        $this->assertCount(1, $deps);
+        $this->assertInstanceOf('Clue\PharComposer\Package\Package', reset($deps));
+
+        /* @var Clue\PharComposer\Package\Package $package */
+        $package = reset($deps);
+
+        $bundle = $package->bundle();
+
+        $this->assertInstanceOf('Clue\PharComposer\Package\Bundle', $bundle);
+        $this->assertSame(0, iterator_count($bundle));
+    }
+
     private function getPathProjectAbsolute($path)
     {
         return realpath(__DIR__ . '/../../' . $path);
