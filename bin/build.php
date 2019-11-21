@@ -16,7 +16,7 @@ $out = isset($argv[1]) ? $argv[1] : ('phar-composer-' . $version . '.phar');
 passthru('
 rm -rf build && mkdir build &&
 cp -r bin/ src/ composer.json composer.lock LICENSE build/ && rm build/bin/build.php &&
-sed -i \'s/@git_tag@/' . $version .'/g\' build/src/Clue/PharComposer/App.php &&
+sed -i \'s/@dev/' . $version .'/g\' build/src/Clue/PharComposer/App.php &&
 composer install -d build/ --no-dev &&
 
 cd build/vendor && rm -rf */*/tests/ */*/src/tests/ */*/docs/ */*/*.md */*/composer.* */*/phpunit.* */*/.gitignore */*/.*.yml */*/*.xml && cd - >/dev/null &&

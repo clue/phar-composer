@@ -35,7 +35,7 @@ class InstallTest extends TestCase
         $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn('targetPath');
         $packager->expects($this->once())->method('install')->with($pharer, 'targetPath');
 
-        $command = new Install($packager);
+        $command = new Install($packager, false);
         $command->run($input, $output);
     }
 
@@ -58,7 +58,7 @@ class InstallTest extends TestCase
         $packager->expects($this->once())->method('getSystemBin')->with($package, 'targetDir')->willReturn('targetPath');
         $packager->expects($this->once())->method('install')->with($pharer, 'targetPath');
 
-        $command = new Install($packager);
+        $command = new Install($packager, false);
         $command->run($input, $output);
     }
 
@@ -104,7 +104,7 @@ class InstallTest extends TestCase
         $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn(__FILE__);
         $packager->expects($this->once())->method('install')->with($pharer, __FILE__);
 
-        $command = new Install($packager);
+        $command = new Install($packager, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -139,8 +139,23 @@ class InstallTest extends TestCase
         $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn(__FILE__);
         $packager->expects($this->never())->method('install');
 
-        $command = new Install($packager);
+        $command = new Install($packager, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
+    }
+
+    public function testExecuteInstallWillReportErrorOnWindows()
+    {
+        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output->expects($this->once())->method('writeln')->with($this->stringContains('platform'));
+
+        $command = new Install(null, true);
+
+        $this->assertStringEndsWith(' (not available on Windows)', $command->getDescription());
+
+        $ret = $command->run($input, $output);
+
+        $this->assertEquals(1, $ret);
     }
 }
