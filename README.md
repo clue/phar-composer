@@ -105,6 +105,9 @@ $ phpunit
 `sudo mv $target.phar /usr/local/bin/$target`. It will ask you for your sudo password
 when necessary, so it's not needed (and in fact not *recommended*) to run the whole
 comamnd via `sudo`.
+>
+> Windows limitation: Note that this subcommand is not available on Windows.
+  Please use the `build` command and place Phar in your `$PATH` manually.
 
 ### phar-composer search
 

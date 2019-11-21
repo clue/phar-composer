@@ -2,6 +2,7 @@
 
 use Clue\PharComposer\Command\Search;
 use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class SearchTest extends TestCase
 {
@@ -57,7 +58,7 @@ class SearchTest extends TestCase
         $packagist = $this->getMock('Packagist\Api\Client');
         $packagist->expects($this->once())->method('search')->with('foo')->willThrowException(new RuntimeException('stop1'));
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -85,7 +86,7 @@ class SearchTest extends TestCase
         $packagist = $this->getMock('Packagist\Api\Client');
         $packagist->expects($this->once())->method('search')->with('foo')->willThrowException(new RuntimeException('stop1'));
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -117,7 +118,7 @@ class SearchTest extends TestCase
         $packagist = $this->getMock('Packagist\Api\Client');
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array());
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -147,7 +148,7 @@ class SearchTest extends TestCase
         $packagist = $this->getMock('Packagist\Api\Client');
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -185,7 +186,7 @@ class SearchTest extends TestCase
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willThrowException(new RuntimeException('stop1'));
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -225,7 +226,7 @@ class SearchTest extends TestCase
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -269,7 +270,7 @@ class SearchTest extends TestCase
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }
@@ -317,7 +318,59 @@ class SearchTest extends TestCase
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
 
-        $command = new Search($packager, $packagist);
+        $command = new Search($packager, $packagist, false);
+        $command->setHelperSet($helpers);
+        $command->run($input, $output);
+    }
+
+    /**
+     * @depends testNotBlockedByLegacyInstallation
+     */
+    public function testExecuteWithProjectAndVersionSelectedOnWindowsWillNotOfferInstallWhenAskedForAction()
+    {
+        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
+        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+
+        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper->expects($this->exactly(3))->method('ask')->withConsecutive(
+            $this->anything(),
+            $this->anything(),
+            array(
+                $input,
+                $output,
+                $this->callback(function (ChoiceQuestion $question) {
+                    return count($question->getChoices()) === 2;
+                })
+            )
+        )->willReturnOnConsecutiveCalls(
+            '<info>foo</info>/bar                                  (⤓)',
+            'dev-master (<error>no executable bin</error>)',
+            'Quit'
+        );
+
+        $helpers = new HelperSet(array(
+            'question' => $questionHelper
+        ));
+
+        $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
+
+        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+
+        $result = $this->getMock('Packagist\Api\Result\Result');
+        $result->expects($this->exactly(2))->method('getName')->willReturn('foo/bar');
+
+        $version = $this->getMock('Packagist\Api\Result\Package\Version');
+        $version->expects($this->exactly(2))->method('getVersion')->willReturn('dev-master');
+
+        $package = $this->getMock('Packagist\Api\Result\Package');
+        $package->expects($this->once())->method('getVersions')->willReturn(array($version));
+
+        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
+        $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
+
+        $command = new Search($packager, $packagist, true);
         $command->setHelperSet($helpers);
         $command->run($input, $output);
     }

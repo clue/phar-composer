@@ -15,26 +15,38 @@ class Install extends Command
     /** @var Packager */
     private $packager;
 
-    public function __construct(Packager $packager = null)
-    {
-        parent::__construct();
+    /** @var bool */
+    private $isWindows;
 
+    public function __construct(Packager $packager = null, $isWindows = null)
+    {
         if ($packager === null) {
             $packager = new Packager();
         }
+        if ($isWindows === null) {
+            $isWindows = DIRECTORY_SEPARATOR === '\\';
+        }
         $this->packager = $packager;
+        $this->isWindows = $isWindows;
+
+        parent::__construct();
     }
 
     protected function configure()
     {
         $this->setName('install')
-             ->setDescription('Install phar into system wide binary directory')
+             ->setDescription('Install phar into system wide binary directory' . ($this->isWindows ? ' (not available on Windows)' : ''))
              ->addArgument('project', InputArgument::OPTIONAL, 'Project name or path', '.')
              ->addArgument('target', InputArgument::OPTIONAL, 'Path to install to', '/usr/local/bin');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($this->isWindows) {
+            $output->writeln('<error>Command not available on this platform. Please use the "build" command and place Phar in your $PATH manually.</error>');
+            return 1;
+        }
+
         $this->packager->setOutput($output);
         $this->packager->coerceWritable();
 

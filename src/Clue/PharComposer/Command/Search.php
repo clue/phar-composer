@@ -24,18 +24,25 @@ class Search extends Command
     /** @var Client */
     private $packagist;
 
-    public function __construct(Packager $packager = null, Client $packagist = null)
-    {
-        parent::__construct();
+    /** @var bool */
+    private $isWindows;
 
+    public function __construct(Packager $packager = null, Client $packagist = null, $isWindows = null)
+    {
         if ($packager === null) {
             $packager = new Packager();
         }
         if ($packagist === null) {
             $packagist = new Client();
         }
+        if ($isWindows === null) {
+            $isWindows = DIRECTORY_SEPARATOR === '\\';
+        }
         $this->packager = $packager;
         $this->packagist = $packagist;
+        $this->isWindows = $isWindows;
+
+        parent::__construct();
     }
 
     protected function configure()
@@ -139,10 +146,10 @@ class Search extends Command
             $input,
             $output,
             'Action',
-            array(
+            array_filter(array(
                 'build'   => 'Build project',
-                'install' => 'Install project system-wide'
-            ),
+                'install' => $this->isWindows ? null : 'Install project system-wide'
+            )),
             'Quit'
         );
 
