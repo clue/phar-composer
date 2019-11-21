@@ -325,9 +325,9 @@ class Packager
         return !!preg_match('/^[^\s\/]+\/[^\s\/]+(\:[^\s]+)?$/i', $path);
     }
 
-    private function isPackageUrl($path)
+    public function isPackageUrl($path)
     {
-        return (strpos($path, '://') !== false && @parse_url($path) !== false);
+        return (strpos($path, '://') !== false && @parse_url($path) !== false) || preg_match('/^[^-\s][^:\s]*:\S+/', $path);
     }
 
     private function getDirTemporary()

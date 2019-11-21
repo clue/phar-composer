@@ -124,4 +124,43 @@ class PackagerTest extends TestCase
 
         $this->assertEquals('/home/me/phar-composer', $this->packager->getSystemBin($package, '/home/me'));
     }
+
+    public function provideValidPackageUrl()
+    {
+        return array(
+            array('https://github.com/clue/phar-composer.git'),
+            array('git@github.com:clue/phar-composer.git'),
+            array('github.com:clue/phar-composer.git')
+        );
+    }
+
+    /**
+     * @param string $path
+     * @dataProvider provideValidPackageUrl
+     */
+    public function testIsPackageUrlReturnsTrue($path)
+    {
+        $this->assertTrue($this->packager->isPackageUrl($path));
+    }
+
+    public function provideInvalidPackageUrl()
+    {
+        return array(
+            array('clue/phar-composer'),
+            array('phar-composer.git'),
+            array('github.com/clue/phar-composer.git'),
+            array('git @github.com:clue/phar-composer.git'),
+            array('-invalid@github.com:clue/phar-composer.git'),
+            array(':clue/phar-composer.git'),
+        );
+    }
+
+    /**
+     * @param string $path
+     * @dataProvider provideInvalidPackageUrl
+     */
+    public function testIsPackageUrlReturnsFalseForInvalidUrl($path)
+    {
+        $this->assertFalse($this->packager->isPackageUrl($path));
+    }
 }
