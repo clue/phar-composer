@@ -1,13 +1,13 @@
 {
     "name": "clue/phar-composer",
-    "description": "Simple phar creation for your projects managed via composer",
-    "keywords": ["executable phar", "build process", "bundle dependencies"],
+    "description": "Simple phar creation for any project managed via Composer",
+    "keywords": ["executable phar", "build process", "bundle dependencies", "phar", "composer"],
     "homepage": "https://github.com/clue/phar-composer",
     "license": "MIT",
     "authors": [
         {
             "name": "Christian Lück",
-            "email": "christian@lueck.tv"
+            "email": "christian@clue.engineering"
         }
     ],
     "require": {

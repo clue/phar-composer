@@ -1,6 +1,6 @@
 # clue/phar-composer [![Build Status](https://travis-ci.org/clue/phar-composer.png?branch=master)](https://travis-ci.org/clue/phar-composer)
 
-Simple phar creation for any project managed via composer.
+Simple phar creation for any project managed via Composer.
 
 It takes your existing project's `composer.json` and builds an executable phar
 for your project among with its bundled dependencies.
@@ -18,9 +18,7 @@ for your project among with its bundled dependencies.
   * [phar-composer search](#phar-composer-search)
 * [Install](#install)
   * [As a phar (recommended)](#as-a-phar-recommended)
-    * [Updating phar](#updating-phar)
   * [Installation using Composer](#installation-using-composer)
-    * [Updating dependency](#updating-dependency)
 * [Development](#development)
 * [Tests](#tests)
 * [License](#license)
@@ -173,12 +171,10 @@ If you have installed phar-composer system-wide, you can now verify everything w
 $ phar-composer --version
 ```
 
-#### Updating phar
-
 There's no separate `update` procedure, simply download the latest release again
 and overwrite the existing phar.
 
-Again, if you have already installed phar-composer system-wide, this is as easy as
+Again, if you have already installed phar-composer system-wide, updating is as easy as
 running a self-installation like this:
 
 ```bash
@@ -206,9 +202,7 @@ $ ./vendor/bin/phar-composer --version
 Installing this project as a non-dev dependency in order to use its
 source code as a library is *not supported*.
 
-#### Updating dependency
-
-Just run `composer update clue/phar-composer` to update to the latest release.
+To update to the latest release, just run `composer update clue/graph-composer`.
 
 ## Development
 
@@ -294,4 +288,7 @@ $ php vendor/bin/phpunit
 
 ## License
 
-MIT
+This project is released under the permissive [MIT license](LICENSE).
+
+> Did you know that I offer custom development services and issuing invoices for
+  sponsorships of releases and for contributions? Contact me (@clue) for details.

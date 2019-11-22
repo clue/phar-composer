@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.1.0 (2019-11-22)
+
+*   Feature: Update all dependencies and improve forward compatibility with symfony/console v5 through legacy v2.5.
+    (#87 by @clue)
+
+*   Feature: Significantly improve performance when adding phar contents.
+    (#90 by @clue)
+
+*   Feature: Support cloning projects from git SSH URLs.
+    (#96 by @clue)
+
+*   Feature: Ignore packages without autoload definition and missing vendor directory.
+    (#94 by @clue)
+
+*   Feature: Write phar to temporary file to support any extension and overwriting.
+    (#93 by @clue)
+
+*   Feature / Fix: Disable install subcommand on Windows.
+    (#95 by @clue)
+
+*   Improve test suite by adding PHPUnit to require-dev and support legacy PHP 5.3 through PHP 7.2 and HHVM,
+    add tests for all commands and perform some minor code cleanup/maintenance,
+    minor internal refactoring to clean up some unneeded code duplication and unneeded references and
+    remove dedicated bundler classes, always bundle complete package.
+    (#85, #86, #89 and #92 by @clue)
+
+*   Add build script removing uneeded files and update development docs.
+    (#91 by @clue)
+
 ## 1.0.0 (2015-11-15)
 
 *   First stable release, now following SemVer.
