@@ -134,12 +134,16 @@ It's *highly recommended to use PHP 7+* for this project.
 
 You can simply download a pre-compiled and ready-to-use version as a Phar
 to any directory.
-Simply download the latest `phar-composer.phar` file from our
-[releases page](https://github.com/clue/phar-composer/releases):
+You can simply download the latest `phar-composer.phar` file from our
+[releases page](https://github.com/clue/phar-composer/releases).
+The [latest release](https://github.com/clue/phar-composer/releases/latest) can
+always be downloaded like this:
 
-[Latest release](https://github.com/clue/phar-composer/releases/latest)
+```bash
+$ curl -JOL https://clue.engineering/phar-composer-latest.phar
+```
 
-That's it already. You can now verify everything works by running this:
+That's it already. Once downloaded, you can verify everything works by running this:
 
 ```bash
 $ cd ~/Downloads
