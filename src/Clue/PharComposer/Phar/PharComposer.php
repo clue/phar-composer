@@ -126,6 +126,10 @@ class PharComposer
             // file does not exist if there's nothing to be installed
             $installed = $this->loadJson($pathVendor . 'composer/installed.json');
 
+            if($this->isComposerV2($installed)) {
+                $installed = $installed['packages'];
+            }
+
             foreach ($installed as $package) {
                 $dir = $package['name'] . '/';
                 if (isset($package['target-dir'])) {
@@ -264,5 +268,15 @@ class PharComposer
             throw new \InvalidArgumentException('Unable to parse given path "' . $path . '"', json_last_error());
         }
         return $ret;
+    }
+
+    /**
+     * @param array $installed
+     *
+     * @return bool
+     */
+    private function isComposerV2(array $installed)
+    {
+        return isset($installed['packages']);
     }
 }
