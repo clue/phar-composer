@@ -126,8 +126,8 @@ class PharComposer
             // file does not exist if there's nothing to be installed
             $installed = $this->loadJson($pathVendor . 'composer/installed.json');
 
-            // composer 2 compatibility packages come in a subindex named packages
-            $installed = is_array($installed['packages']) ? $installed['packages'] : $installed;
+            // composer 2 compatibility packages come in a index named packages
+            $installed = empty($installed['packages']) ? $installed : $installed['packages'];
             
             foreach ($installed as $package) {
                 $dir = $package['name'] . '/';
