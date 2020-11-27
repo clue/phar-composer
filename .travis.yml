@@ -39,6 +39,10 @@ jobs:
   allow_failures:
     - php: "hhvm"
 
+before_install:
+  # Use Composer v1
+  - "composer self-update --1"
+
 install:
   - "composer install --no-interaction"
 
