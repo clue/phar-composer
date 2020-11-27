@@ -1,35 +1,46 @@
-language: php
+# TravisCI configuration for clue/phar-composer
+
+os: "linux"
+
+# Lock distro so future defaults will not break the build
+dist: "trusty"
+
+language: "php"
 
 php:
-# - 5.3 # requires old distro, see below
-  - 5.4
-  - 5.5
-  - 5.6
-  - 7.0
-  - 7.1
-  - 7.2
-  - 7.3
-  - hhvm # ignore errors, see below
+  # Requires old distro, see below
+  #- "5.3"
+  - "5.4"
+  - "5.5"
+  - "5.6"
+  - "7.0"
+  - "7.1"
+  - "7.2"
+  - "7.3"
+  # Ignore errors for HHVM, see below
+  - "hhvm"
 
-# lock distro so future defaults will not break the build
-dist: trusty
-
-matrix:
+jobs:
   include:
-    - php: 5.3
-      dist: precise
-    - php: 7.3
-      install: []
-      script: composer install --dry-run --working-dir=tests/install-as-dep
-    - php: 7.3
-      script: composer build
-  allow_failures:
-    - php: hhvm
+    - php: "5.3"
+      dist: "precise"
 
-sudo: false
+    - php: "7.4"
+      dist: "bionic"
+
+    - name: "Install as dependency"
+      php: "7.3"
+      install: "skip"
+      script: "composer install --no-interaction --dry-run --working-dir=tests/install-as-dep"
+
+    - name: "Build PHAR-s"
+      php: "7.3"
+      script: "composer run-script build"
+  allow_failures:
+    - php: "hhvm"
 
 install:
-  - composer install --no-interaction
+  - "composer install --no-interaction"
 
 script:
-  - vendor/bin/phpunit --coverage-text
+  - "vendor/bin/phpunit --verbose --coverage-text"
