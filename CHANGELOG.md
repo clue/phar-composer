@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0 (2020-12-11)
+
+*   Feature: Support Composer 2.0!
+    (#114 by @thojou and @clue)
+
+*   Minor documentation improvements and simplify install instructions.
+    (#98 and #99 by @clue)
+
+*   Use GitHub actions for continuous integration (CI).
+    (#112 by @SimonFrings and #113 by @szepeviktor)
+
 ## 1.1.0 (2019-11-22)
 
 *   Feature: Update all dependencies and improve forward compatibility with symfony/console v5 through legacy v2.5.

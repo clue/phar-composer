@@ -13,6 +13,7 @@ for your project among with its bundled dependencies.
 
 **Table of contents**
 
+* [Support us](#support-us)
 * [Usage](#usage)
   * [phar-composer](#phar-composer)
   * [phar-composer build](#phar-composer-build)
@@ -24,6 +25,16 @@ for your project among with its bundled dependencies.
 * [Development](#development)
 * [Tests](#tests)
 * [License](#license)
+
+## Support us
+
+We invest a lot of time developing, maintaining and updating our awesome
+open-source projects. You can help us sustain this high-quality of our work by
+[becoming a sponsor on GitHub](https://github.com/sponsors/clue). Sponsors get
+numerous benefits in return, see our [sponsoring page](https://github.com/sponsors/clue)
+for details.
+
+Let's take these projects to the next level together! 🚀
 
 ## Usage
 
