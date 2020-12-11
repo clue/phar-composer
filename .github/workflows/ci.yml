@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         php:
+          - 7.4
           - 7.3
           - 7.2
           - 7.1
