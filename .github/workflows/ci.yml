@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  PHPUnit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php:
+          - 7.3
+          - 7.2
+          - 7.1
+          - 7.0
+          - 5.6
+          - 5.5
+          - 5.4
+          - 5.3
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:1.10.19
+      - run: composer install
+      - run: vendor/bin/phpunit --coverage-text
+
+  PHPUnit-hhvm:
+    name: PHPUnit (HHVM)
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azjezz/setup-hhvm@v1
+        with:
+          version: lts-3.30
+      - run: curl -O https://getcomposer.org/download/1.10.19/composer.phar
+      - run: hhvm composer.phar install
+      - run: hhvm vendor/bin/phpunit
+
+  Install-with-Symfony-4:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.3
+      - run: composer install --dry-run --working-dir=tests/install-as-dep
+
+  Build-phar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.3
+          tools: composer:1.10.19
+      - run: composer install
+      - run: composer build

@@ -1,4 +1,6 @@
-# clue/phar-composer [![Build Status](https://travis-ci.org/clue/phar-composer.png?branch=master)](https://travis-ci.org/clue/phar-composer)
+# clue/phar-composer
+
+[![CI status](https://github.com/clue/phar-composer/workflows/CI/badge.svg)](https://github.com/clue/phar-composer/actions)
 
 Simple phar creation for any project managed via Composer.
 
