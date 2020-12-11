@@ -25,7 +25,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: composer:1.10.19
       - run: composer install
       - run: vendor/bin/phpunit --coverage-text
 
@@ -37,8 +36,7 @@ jobs:
       - uses: azjezz/setup-hhvm@v1
         with:
           version: lts-3.30
-      - run: curl -O https://getcomposer.org/download/1.10.19/composer.phar
-      - run: hhvm composer.phar install
+      - run: hhvm $(which composer) install
       - run: hhvm vendor/bin/phpunit
 
   Install-with-Symfony-4:
@@ -59,6 +57,5 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.3
-          tools: composer:1.10.19
       - run: composer install
       - run: composer build

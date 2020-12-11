@@ -126,6 +126,11 @@ class PharComposer
             // file does not exist if there's nothing to be installed
             $installed = $this->loadJson($pathVendor . 'composer/installed.json');
 
+            // Composer 2.0 format wrapped in additional root key
+            if (isset($installed['packages'])) {
+                $installed = $installed['packages'];
+            }
+
             foreach ($installed as $package) {
                 $dir = $package['name'] . '/';
                 if (isset($package['target-dir'])) {
