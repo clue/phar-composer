@@ -122,7 +122,7 @@ class PackagerTest extends TestCase
             'name' => 'clue/phar-composer'
         ), '');
 
-        $this->assertEquals('/home/me/phar-composer', $this->packager->getSystemBin($package, '/home/me'));
+        $this->assertEquals('/usr/bin/phar-composer', $this->packager->getSystemBin($package, '/usr/bin'));
     }
 
     public function provideValidPackageUrl()
