@@ -327,7 +327,7 @@ class Packager
 
     public function isPackageUrl($path)
     {
-        return (strpos($path, '://') !== false && @parse_url($path) !== false) || preg_match('/^[^-\s][^:\s]*:\S+/', $path);
+        return (strpos($path, '://') !== false && @parse_url($path) !== false) || preg_match('/^[^-\/\s][^:\/\s]*:\S+/', $path);
     }
 
     private function getDirTemporary()

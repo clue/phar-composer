@@ -147,6 +147,12 @@ class PackagerTest extends TestCase
     {
         return array(
             array('clue/phar-composer'),
+            array('clue/phar-composer:^1.0'),
+            array('clue/phar-composer:~1.0'),
+            array('clue/packagewithoutdashes'),
+            array('clue/packagewithoutdashes:1.2.34'),
+            array('clue/packagewithoutdashes:^1.2.34'),
+            array('clue/packagewithoutdashes:~1.2.34'),
             array('phar-composer.git'),
             array('github.com/clue/phar-composer.git'),
             array('git @github.com:clue/phar-composer.git'),
