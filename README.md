@@ -1,6 +1,8 @@
 # clue/phar-composer
 
-[![CI status](https://github.com/clue/phar-composer/workflows/CI/badge.svg)](https://github.com/clue/phar-composer/actions)
+[![CI status](https://github.com/clue/phar-composer/workflows/CI/badge.svg)](https://github.com/clue/phar-composer/actions) 
+[![downloads on GitHub](https://img.shields.io/github/downloads/clue/phar-composer/total?color=blue&label=downloads%20on%20GitHub)](https://github.com/clue/phar-composer/releases)
+[![installs on Packagist](https://img.shields.io/packagist/dt/clue/phar-composer?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/phar-composer)  
 
 Simple phar creation for any project managed via Composer.
 
