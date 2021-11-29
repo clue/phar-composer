@@ -4,7 +4,7 @@ namespace Clue\PharComposer\Phar;
 
 use Clue\PharComposer\Logger;
 use Clue\PharComposer\Package\Package;
-use Herrera\Box\StubGenerator;
+use Clue\PharComposer\Box\StubGenerator;
 
 /**
  * The PharComposer is responsible for collecting options and then building the target phar

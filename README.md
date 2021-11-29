@@ -309,5 +309,9 @@ $ php vendor/bin/phpunit
 
 This project is released under the permissive [MIT license](LICENSE).
 
+This project bundles the `StubGenerator` and `Extract` classes with minor changes
+from the original herrera-io/box v1.6.1 licensed under MIT which no longer has
+an installable candidate. Copyright (c) 2013 Kevin Herrera.
+
 > Did you know that I offer custom development services and issuing invoices for
   sponsorships of releases and for contributions? Contact me (@clue) for details.
