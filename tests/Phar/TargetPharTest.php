@@ -19,8 +19,10 @@ class TargetPharTest extends TestCase
 
     /**
      * set up test environment
+     *
+     * @before
      */
-    public function setUp()
+    public function setUpPhar()
     {
         if (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID <= 50600) {
             $this->markTestSkipped('Unable to mock \Phar on PHP 5.4/5.5');

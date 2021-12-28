@@ -13,8 +13,10 @@ class LoggerTest extends TestCase
 
     /**
      * set up test environment
+     *
+     * @before
      */
-    public function setUp()
+    public function setUpLogger()
     {
         $this->logger = new Logger();
     }

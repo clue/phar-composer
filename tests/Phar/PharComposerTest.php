@@ -19,12 +19,9 @@ class PharComposerTest extends TestCase
         return $pharcomposer;
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Unable to parse given path
-     */
     public function testConstructorThrowsWhenPathIsNotFile()
     {
+        $this->setExpectedException('InvalidArgumentException', 'Unable to parse given path');
         new PharComposer(__DIR__);
     }
 
@@ -43,14 +40,11 @@ class PharComposerTest extends TestCase
         return $pharcomposer;
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     * @expectedExceptionMessage Bin file "bin/invalid" does not exist
-     */
     public function testGetMainThrowsWhenBinDoesNotExist()
     {
         $pharer = new PharComposer(__DIR__ . '/../fixtures/05-invalid-bin/composer.json');
 
+        $this->setExpectedException('UnexpectedValueException', 'Bin file "bin/invalid" does not exist');
         $pharer->getMain();
     }
 
@@ -62,22 +56,16 @@ class PharComposerTest extends TestCase
         $this->assertEquals(__DIR__ . '/phar-composer.phar', $pharer->getTarget());
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage not properly installed
-     */
     public function testBuildThrowsWhen()
     {
         $pharer = new PharComposer(__DIR__ . '/../fixtures/01-empty/composer.json');
         $pharer->setOutput(false);
         $pharer->setTarget('/dev/null');
+
+        $this->setExpectedException('RuntimeException', 'not properly installed');
         $pharer->build();
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedException Unable to write phar:
-     */
     public function testBuildThrowsWhenTargetCanNotBeWritten()
     {
         if (!Phar::canWrite() || !file_exists('/dev/null')) {
@@ -87,6 +75,8 @@ class PharComposerTest extends TestCase
         $pharer = new PharComposer(__DIR__ . '/../fixtures/03-project-with-phars/composer.json');
         $pharer->setOutput(false);
         $pharer->setTarget('/dev/null');
+
+        $this->setExpectedException('RuntimeException', 'Unable to write phar:');
         $pharer->build();
     }
 

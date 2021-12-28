@@ -22,10 +22,6 @@ class SearchTest extends TestCase
         $this->assertInstanceOf('Packagist\Api\Client', $packagist);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage stop1
-     */
     public function testExecuteWithoutProjectWillAskForProjectAndRunSearch()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
@@ -46,13 +42,11 @@ class SearchTest extends TestCase
 
         $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
+
+        $this->setExpectedException('RuntimeException', 'stop1');
         $command->run($input, $output);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage stop1
-     */
     public function testExecuteWithProjectWillRunSearchWithoutAskingForProject()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
@@ -73,13 +67,11 @@ class SearchTest extends TestCase
 
         $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
+
+        $this->setExpectedException('RuntimeException', 'stop1');
         $command->run($input, $output);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage stop1
-     */
     public function testExecuteWithProjectAndSearchReturnsNoMatchesWillReportAndAskForOtherProject()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
@@ -104,13 +96,11 @@ class SearchTest extends TestCase
 
         $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
+
+        $this->setExpectedException('RuntimeException', 'stop1');
         $command->run($input, $output);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage stop1
-     */
     public function testExecuteWithProjectAndSearchReturnsOneMatchWillAskForProject()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
@@ -133,13 +123,11 @@ class SearchTest extends TestCase
 
         $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
+
+        $this->setExpectedException('RuntimeException', 'stop1');
         $command->run($input, $output);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage stop1
-     */
     public function testExecuteWithProjectSelectedWillSearchVersions()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
@@ -170,6 +158,8 @@ class SearchTest extends TestCase
 
         $command = new Search($packager, $packagist, false);
         $command->setHelperSet($helpers);
+
+        $this->setExpectedException('RuntimeException', 'stop1');
         $command->run($input, $output);
     }
 

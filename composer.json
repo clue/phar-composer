@@ -18,7 +18,7 @@
         "symfony/process": "^5.0 || ^4.0 || ^3.0 || ^2.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.5 || ^5.7 || ^4.8.36"
+        "phpunit/phpunit": "^9.5 || ^5.7 || ^4.8.36"
     },
     "autoload": {
         "psr-0": {"Clue": "src/"}
