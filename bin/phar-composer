@@ -10,5 +10,8 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     exit(1);
 }
 
+// hide PHP 8.1 deprecations
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 $app = new Clue\PharComposer\App();
 $app->run();

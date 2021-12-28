@@ -86,6 +86,7 @@ class Bundle implements \IteratorAggregate
      *
      * @return  \Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->resources);
