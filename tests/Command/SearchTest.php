@@ -304,8 +304,8 @@ class SearchTest extends TestCase
 
         $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->exactly(3))->method('ask')->withConsecutive(
-            $this->anything(),
-            $this->anything(),
+            array($this->anything()),
+            array($this->anything()),
             array(
                 $input,
                 $output,
