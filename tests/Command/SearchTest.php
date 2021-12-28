@@ -117,6 +117,7 @@ class SearchTest extends TestCase
         $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
         $result = $this->getMockBuilder('Packagist\Api\Result\Result')->getMock();
+        $result->expects($this->exactly(2))->method('getName')->willReturn('foo/bar');
 
         $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));

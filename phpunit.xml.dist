@@ -5,7 +5,8 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          cacheResult="false"
-         colors="true">
+         colors="true"
+         convertDeprecationsToExceptions="true">
     <testsuites>
         <testsuite name="PharComposer Test Suite">
             <directory>./tests/</directory>
