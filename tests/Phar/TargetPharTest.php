@@ -19,23 +19,18 @@ class TargetPharTest extends TestCase
 
     /**
      * set up test environment
+     *
+     * @before
      */
-    public function setUp()
+    public function setUpPhar()
     {
         if (PHP_VERSION_ID >= 50400 && PHP_VERSION_ID <= 50600) {
             $this->markTestSkipped('Unable to mock \Phar on PHP 5.4/5.5');
         }
 
-        $this->mockPhar = $this->createMock('\Phar');
-        $this->mockPharComposer = $this->createMock('Clue\PharComposer\Phar\PharComposer');
+        $this->mockPhar = $this->getMockBuilder('\Phar')->disableOriginalConstructor()->getMock();
+        $this->mockPharComposer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
         $this->targetPhar       = new TargetPhar($this->mockPhar, $this->mockPharComposer);
-    }
-
-    private function createMock($class)
-    {
-        return $this->getMockBuilder($class)
-                    ->disableOriginalConstructor()
-                    ->getMock();
     }
 
     /**
@@ -59,7 +54,7 @@ class TargetPharTest extends TestCase
     public function buildFromIteratorProvidesBasePathForBox()
     {
         $mockPackage = new Package(array(), 'path/to/package');
-        $mockTraversable = $this->getMock('\Iterator');
+        $mockTraversable = $this->getMockBuilder('\Iterator')->getMock();
         $this->mockPharComposer->expects($this->once())
                                ->method('getPackageRoot')
                                ->willReturn($mockPackage);
@@ -83,7 +78,7 @@ class TargetPharTest extends TestCase
         $this->mockPhar->expects($this->once())
                       ->method('addFile')
                       ->with($this->equalTo('path/to/package/file.php'), $this->equalTo('file.php'));
-        $mockFinder = $this->createMock('Symfony\Component\Finder\Finder');
+        $mockFinder = $this->getMockBuilder('Symfony\Component\Finder\Finder')->disableOriginalConstructor()->getMock();
         $bundle->addDir($mockFinder);
         $mockPackage = new Package(array(), 'path/to/package');
         $this->mockPharComposer->expects($this->once())

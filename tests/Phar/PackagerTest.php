@@ -7,7 +7,8 @@ class PackagerTest extends TestCase
 {
     private $packager;
 
-    public function setUp()
+    /** @before */
+    public function setUpPackager()
     {
         $this->packager = new Packager();
     }
@@ -48,30 +49,21 @@ class PackagerTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage not installed
-     */
     public function testEmptyNotInstalled()
     {
+        $this->setExpectedException('RuntimeException', 'not installed');
         $this->packager->getPharer(__DIR__ . '/../fixtures/01-empty');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage not a readable file
-     */
     public function testNoComposer()
     {
+        $this->setExpectedException('InvalidArgumentException', 'not a readable file');
         $this->packager->getPharer(__DIR__ . '/../fixtures/02-no-composer');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage not a readable file
-     */
     public function testNoComposerMissing()
     {
+        $this->setExpectedException('InvalidArgumentException', 'not a readable file');
         $this->packager->getPharer(__DIR__ . '/../fixtures/02-no-composer/composer.json');
     }
 

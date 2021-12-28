@@ -18,18 +18,18 @@ class InstallTest extends TestCase
 
     public function testExecuteInstallWillInstallPackager()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->exactly(2))->method('getArgument')->withConsecutive(
             array('project'),
             array('target')
         )->willReturnOnConsecutiveCalls('dir', null);
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
         $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
         $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
         $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn('targetPath');
@@ -41,18 +41,18 @@ class InstallTest extends TestCase
 
     public function testExecuteInstallWillInstallPackagerWithExplicitTarget()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->exactly(2))->method('getArgument')->withConsecutive(
             array('project'),
             array('target')
         )->willReturnOnConsecutiveCalls('dir', 'targetDir');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
         $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
         $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
         $packager->expects($this->once())->method('getSystemBin')->with($package, 'targetDir')->willReturn('targetPath');
@@ -62,32 +62,16 @@ class InstallTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
-    public function testNotBlockedByLegacyInstallation()
-    {
-        // Symfony 5+ added parameter type declarations, so we can use this to check which version is installed
-        $ref = new ReflectionMethod('Symfony\Component\Console\Command\Command', 'setName');
-        $params = $ref->getParameters();
-        if (PHP_VERSION_ID >= 70000 && isset($params[0]) && $params[0]->hasType()) {
-            $this->markTestSkipped('Unable to run this test (mocked QuestionHelper) with legacy PHPUnit against Symfony v5+');
-        }
-    }
-
-    /**
-     * @depends testNotBlockedByLegacyInstallation
-     */
     public function testExecuteInstallWillInstallPackagerWhenTargetPathAlreadyExistsAndDialogQuestionYieldsYes()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->exactly(2))->method('getArgument')->withConsecutive(
             array('project'),
             array('target')
         )->willReturnOnConsecutiveCalls('dir', null);
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->once())->method('ask')->willReturn(true);
 
         $helpers = new HelperSet(array(
@@ -98,7 +82,7 @@ class InstallTest extends TestCase
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
         $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
         $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn(__FILE__);
@@ -109,20 +93,17 @@ class InstallTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @depends testNotBlockedByLegacyInstallation
-     */
     public function testExecuteInstallWillNotInstallPackagerWhenTargetPathAlreadyExistsAndDialogQuestionShouldNotOverwrite()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->exactly(2))->method('getArgument')->withConsecutive(
             array('project'),
             array('target')
         )->willReturnOnConsecutiveCalls('dir', null);
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output->expects($this->once())->method('writeln')->with('Aborting');
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->once())->method('ask')->willReturn(false);
 
         $helpers = new HelperSet(array(
@@ -133,7 +114,7 @@ class InstallTest extends TestCase
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
         $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
         $packager->expects($this->once())->method('setOutput')->with($output);
         $packager->expects($this->once())->method('getPharer')->with('dir')->willReturn($pharer);
         $packager->expects($this->once())->method('getSystemBin')->with($package, null)->willReturn(__FILE__);
@@ -146,8 +127,8 @@ class InstallTest extends TestCase
 
     public function testExecuteInstallWillReportErrorOnWindows()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output->expects($this->once())->method('writeln')->with($this->stringContains('platform'));
 
         $command = new Install(null, true);
