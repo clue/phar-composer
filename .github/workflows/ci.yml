@@ -27,6 +27,7 @@ jobs:
           php-version: ${{ matrix.php }}
       - run: composer install
       - run: vendor/bin/phpunit --coverage-text
+      - run: composer build
 
   PHPUnit-hhvm:
     name: PHPUnit (HHVM)
@@ -48,14 +49,3 @@ jobs:
         with:
           php-version: 7.3
       - run: composer install --dry-run --working-dir=tests/install-as-dep
-
-  Build-phar:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.3
-      - run: composer install
-      - run: composer build
