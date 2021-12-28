@@ -1,3 +1,4 @@
-/vendor
-/build
+/build/
+/composer.lock
 /phar-composer-*.phar
+/vendor/

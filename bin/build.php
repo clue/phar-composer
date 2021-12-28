@@ -15,14 +15,15 @@ $out = isset($argv[1]) ? $argv[1] : ('phar-composer-' . $version . '.phar');
 
 passthru('
 rm -rf build && mkdir build &&
-cp -r bin/ src/ composer.json composer.lock LICENSE build/ && rm build/bin/build.php build/src/Clue/PharComposer/Box/Extract.php &&
+cp -r bin/ src/ composer.json LICENSE build/ && rm build/bin/build.php build/src/Clue/PharComposer/Box/Extract.php &&
 sed -i \'s/@dev/' . $version .'/g\' build/src/Clue/PharComposer/App.php &&
+composer config -d build/ platform.php 5.3.6 &&
 composer install -d build/ --no-dev &&
 
 cd build/vendor && rm -rf */*/tests/ */*/src/tests/ */*/docs/ */*/*.md */*/composer.* */*/phpunit.* */*/.gitignore */*/.*.yml */*/*.xml && cd - >/dev/null &&
 cd build/vendor/symfony/ && rm -rf */Symfony/Component/*/Tests/ */Symfony/Component/*/*.md */Symfony/Component/*/composer.* */Symfony/Component/*/phpunit.* */Symfony/Component/*/.gitignore && cd ->/dev/null &&
 cd build/vendor/guzzle/guzzle && rm -r phar-stub.php phing/ && cd ->/dev/null &&
-bin/phar-composer build build/ ' . escapeshellarg($out) . ' &&
+build/bin/phar-composer build build/ ' . escapeshellarg($out) . ' &&
 
 echo -n "Reported version is: " && php ' . escapeshellarg($out) . ' --version', $code);
 exit($code);
