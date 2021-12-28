@@ -23,39 +23,25 @@ class SearchTest extends TestCase
     }
 
     /**
-     * @doesNotPerformAssertions
-     */
-    public function testNotBlockedByLegacyInstallation()
-    {
-        // Symfony 5+ added parameter type declarations, so we can use this to check which version is installed
-        $ref = new ReflectionMethod('Symfony\Component\Console\Command\Command', 'setName');
-        $params = $ref->getParameters();
-        if (PHP_VERSION_ID >= 70000 && isset($params[0]) && $params[0]->hasType()) {
-            $this->markTestSkipped('Unable to run this test (mocked QuestionHelper) with legacy PHPUnit against Symfony v5+');
-        }
-    }
-
-    /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
-     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithoutProjectWillAskForProjectAndRunSearch()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn(null);
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->once())->method('ask')->willReturn('foo');
 
         $helpers = new HelperSet(array(
             'question' => $questionHelper
         ));
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willThrowException(new RuntimeException('stop1'));
 
         $command = new Search($packager, $packagist, false);
@@ -66,24 +52,23 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
-     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectWillRunSearchWithoutAskingForProject()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->never())->method('ask');
 
         $helpers = new HelperSet(array(
             'question' => $questionHelper
         ));
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willThrowException(new RuntimeException('stop1'));
 
         $command = new Search($packager, $packagist, false);
@@ -94,28 +79,27 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
-     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectAndSearchReturnsNoMatchesWillReportAndAskForOtherProject()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output->expects($this->exactly(2))->method('writeln')->withConsecutive(
             array('Searching for <info>foo</info>...'),
             array('<error>No matching packages found</error>')
         );
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->once())->method('ask')->willThrowException(new RuntimeException('stop1'));
 
         $helpers = new HelperSet(array(
             'question' => $questionHelper
         ));
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array());
 
         $command = new Search($packager, $packagist, false);
@@ -126,26 +110,25 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
-     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectAndSearchReturnsOneMatchWillAskForProject()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->once())->method('ask')->willThrowException(new RuntimeException('stop1'));
 
         $helpers = new HelperSet(array(
             'question' => $questionHelper
         ));
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
-        $result = $this->getMock('Packagist\Api\Result\Result');
+        $result = $this->getMockBuilder('Packagist\Api\Result\Result')->getMock();
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
 
         $command = new Search($packager, $packagist, false);
@@ -156,19 +139,18 @@ class SearchTest extends TestCase
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage stop1
-     * @depends testNotBlockedByLegacyInstallation
      */
     public function testExecuteWithProjectSelectedWillSearchVersions()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
         $output->expects($this->exactly(2))->method('writeln')->withConsecutive(
             array('Searching for <info>foo</info>...'),
             array('Selected <info>foo/bar</info>, listing versions...')
         );
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->once())->method('ask')->willReturn(
             '<info>foo</info>/bar                                  (⤓)'
         );
@@ -177,12 +159,12 @@ class SearchTest extends TestCase
             'question' => $questionHelper
         ));
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
-        $result = $this->getMock('Packagist\Api\Result\Result');
+        $result = $this->getMockBuilder('Packagist\Api\Result\Result')->getMock();
         $result->expects($this->exactly(2))->method('getName')->willReturn('foo/bar');
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willThrowException(new RuntimeException('stop1'));
 
@@ -191,20 +173,13 @@ class SearchTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @depends testNotBlockedByLegacyInstallation
-     */
     public function testExecuteWithProjectAndVersionSelectedWillQuitWhenAskedForActionYieldsQuit()
     {
-        if (PHP_VERSION_ID >= 70100 && PHP_VERSION_ID < 70200) {
-            $this->markTestSkipped('Test broken with PHP 7.1 on legacy PHPUnit');
-        }
-
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->exactly(3))->method('ask')->willReturnOnConsecutiveCalls(
             '<info>foo</info>/bar                                  (⤓)',
             'dev-master (<error>no executable bin</error>)',
@@ -215,18 +190,18 @@ class SearchTest extends TestCase
             'question' => $questionHelper
         ));
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
-        $result = $this->getMock('Packagist\Api\Result\Result');
+        $result = $this->getMockBuilder('Packagist\Api\Result\Result')->getMock();
         $result->expects($this->exactly(2))->method('getName')->willReturn('foo/bar');
 
-        $version = $this->getMock('Packagist\Api\Result\Package\Version');
+        $version = $this->getMockBuilder('Packagist\Api\Result\Package\Version')->getMock();
         $version->expects($this->exactly(2))->method('getVersion')->willReturn('dev-master');
 
-        $package = $this->getMock('Packagist\Api\Result\Package');
+        $package = $this->getMockBuilder('Packagist\Api\Result\Package')->getMock();
         $package->expects($this->once())->method('getVersions')->willReturn(array($version));
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
 
@@ -235,17 +210,13 @@ class SearchTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @depends testNotBlockedByLegacyInstallation
-     * @depends testExecuteWithProjectAndVersionSelectedWillQuitWhenAskedForActionYieldsQuit
-     */
     public function testExecuteWithProjectAndVersionSelectedWillBuildWhenAskedForActionYieldsBuild()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->exactly(3))->method('ask')->willReturnOnConsecutiveCalls(
             '<info>foo</info>/bar                                  (⤓)',
             'dev-master (<error>no executable bin</error>)',
@@ -259,19 +230,19 @@ class SearchTest extends TestCase
         $pharer = $this->getMockBuilder('Clue\PharComposer\Phar\PharComposer')->disableOriginalConstructor()->getMock();
         $pharer->expects($this->once())->method('build');
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
         $packager->expects($this->once())->method('getPharer')->with('foo/bar', 'dev-master')->willReturn($pharer);
 
-        $result = $this->getMock('Packagist\Api\Result\Result');
+        $result = $this->getMockBuilder('Packagist\Api\Result\Result')->getMock();
         $result->expects($this->exactly(2))->method('getName')->willReturn('foo/bar');
 
-        $version = $this->getMock('Packagist\Api\Result\Package\Version');
+        $version = $this->getMockBuilder('Packagist\Api\Result\Package\Version')->getMock();
         $version->expects($this->exactly(2))->method('getVersion')->willReturn('dev-master');
 
-        $package = $this->getMock('Packagist\Api\Result\Package');
+        $package = $this->getMockBuilder('Packagist\Api\Result\Package')->getMock();
         $package->expects($this->once())->method('getVersions')->willReturn(array($version));
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
 
@@ -280,17 +251,13 @@ class SearchTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @depends testNotBlockedByLegacyInstallation
-     * @depends testExecuteWithProjectAndVersionSelectedWillQuitWhenAskedForActionYieldsQuit
-     */
     public function testExecuteWithProjectAndVersionSelectedWillInstallWhenAskedForActionYieldsInstall()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->exactly(3))->method('ask')->willReturnOnConsecutiveCalls(
             '<info>foo</info>/bar                                  (⤓)',
             'dev-master (<error>no executable bin</error>)',
@@ -306,21 +273,21 @@ class SearchTest extends TestCase
         $pharer->expects($this->once())->method('getPackageRoot')->willReturn($package);
         $pharer->expects($this->never())->method('build');
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
         $packager->expects($this->once())->method('getPharer')->with('foo/bar', 'dev-master')->willReturn($pharer);
         $packager->expects($this->once())->method('getSystemBin')->with($package)->willReturn('targetPath');
         $packager->expects($this->once())->method('install')->with($pharer, 'targetPath');
 
-        $result = $this->getMock('Packagist\Api\Result\Result');
+        $result = $this->getMockBuilder('Packagist\Api\Result\Result')->getMock();
         $result->expects($this->exactly(2))->method('getName')->willReturn('foo/bar');
 
-        $version = $this->getMock('Packagist\Api\Result\Package\Version');
+        $version = $this->getMockBuilder('Packagist\Api\Result\Package\Version')->getMock();
         $version->expects($this->exactly(2))->method('getVersion')->willReturn('dev-master');
 
-        $package = $this->getMock('Packagist\Api\Result\Package');
+        $package = $this->getMockBuilder('Packagist\Api\Result\Package')->getMock();
         $package->expects($this->once())->method('getVersions')->willReturn(array($version));
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
 
@@ -329,17 +296,13 @@ class SearchTest extends TestCase
         $command->run($input, $output);
     }
 
-    /**
-     * @depends testNotBlockedByLegacyInstallation
-     * @depends testExecuteWithProjectAndVersionSelectedWillQuitWhenAskedForActionYieldsQuit
-     */
     public function testExecuteWithProjectAndVersionSelectedOnWindowsWillNotOfferInstallWhenAskedForAction()
     {
-        $input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\InputInterface')->getMock();
         $input->expects($this->once())->method('getArgument')->with('project')->willReturn('foo');
-        $output = $this->getMock('Symfony\Component\Console\Output\OutputInterface');
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\OutputInterface')->getMock();
 
-        $questionHelper = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper');
+        $questionHelper = $this->getMockBuilder('Symfony\Component\Console\Helper\QuestionHelper')->getMock();
         $questionHelper->expects($this->exactly(3))->method('ask')->withConsecutive(
             $this->anything(),
             $this->anything(),
@@ -362,18 +325,18 @@ class SearchTest extends TestCase
 
         $package = $this->getMockBuilder('Clue\PharComposer\Package\Package')->disableOriginalConstructor()->getMock();
 
-        $packager = $this->getMock('Clue\PharComposer\Phar\Packager');
+        $packager = $this->getMockBuilder('Clue\PharComposer\Phar\Packager')->getMock();
 
-        $result = $this->getMock('Packagist\Api\Result\Result');
+        $result = $this->getMockBuilder('Packagist\Api\Result\Result')->getMock();
         $result->expects($this->exactly(2))->method('getName')->willReturn('foo/bar');
 
-        $version = $this->getMock('Packagist\Api\Result\Package\Version');
+        $version = $this->getMockBuilder('Packagist\Api\Result\Package\Version')->getMock();
         $version->expects($this->exactly(2))->method('getVersion')->willReturn('dev-master');
 
-        $package = $this->getMock('Packagist\Api\Result\Package');
+        $package = $this->getMockBuilder('Packagist\Api\Result\Package')->getMock();
         $package->expects($this->once())->method('getVersions')->willReturn(array($version));
 
-        $packagist = $this->getMock('Packagist\Api\Client');
+        $packagist = $this->getMockBuilder('Packagist\Api\Client')->getMock();
         $packagist->expects($this->once())->method('search')->with('foo')->willReturn(array($result));
         $packagist->expects($this->once())->method('get')->with('foo/bar')->willReturn($package);
 
