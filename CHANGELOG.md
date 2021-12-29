@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.0 (2021-12-29)
+
+*   Feature: Support Symfony 6 and PHP 8.1 release.
+    (#122 and #123 by @clue)
+
+*   Feature: Bundle `StubGenerator` and `Extract` from legacy herrera-io/box v1.6.1.
+    (#119 by @clue)
+
+*   Feature / Fix: Fix check for valid package URL.
+    (#117 by @icedream)
+
+*   Update project setup, use PSR-4 autoloading, drop `composer.lock` and instead lock PHP version when building phar.
+    (#120 and #124 by @clue and #118 by @PaulRotmann)
+
+*   Improve test suite and add `.gitattributes` to exclude dev files from exports.
+    Update test suite to support PHPUnit 9 and test against PHP 8.1 release.
+    (#121 and #125 by @clue)
+
 ## 1.2.0 (2020-12-11)
 
 *   Feature: Support Composer 2.0!

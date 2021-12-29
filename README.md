@@ -141,9 +141,9 @@ its version and will then offer you to either `build` or `install` it.
 You can grab a copy of clue/phar-composer in either of the following ways.
 
 This project aims to run on any platform and thus does not require any PHP
-extensions and supports running on legacy PHP 5.3 through current PHP 7+ and
+extensions and supports running on legacy PHP 5.3 through current PHP 8+ and
 HHVM.
-It's *highly recommended to use PHP 7+* for this project.
+It's *highly recommended to use the latest supported PHP version* for this project.
 
 ### As a phar (recommended)
 
@@ -214,7 +214,7 @@ $ composer require --dev clue/phar-composer
 Now you should be able to invoke the following command in your project root:
 
 ```bash
-$ ./vendor/bin/phar-composer --version
+$ vendor/bin/phar-composer --version
 ```
 
 > Note: You should only invoke and rely on the main phar-composer bin file.
@@ -232,7 +232,7 @@ to contribute to the development of clue/phar-composer?
 Then this section is for you!
 
 The recommended way to install clue/phar-composer is to clone (or download) this repository
-and use [Composer](http://getcomposer.org) to download its dependencies.
+and use [Composer](https://getcomposer.org/) to download its dependencies.
 Therefore you'll need PHP, Composer, git and curl installed.
 For example, on a recent Ubuntu/Debian-based system, simply run:
 
@@ -273,14 +273,14 @@ You can now verify the resulting `phar-composer.phar` file works by running it
 like this:
 
 ```bash
-$ ./phar-composer.phar --version
+$ php phar-composer.phar --version
 ```
 
 To update your development version to the latest version, just run this:
 
 ```bash
 $ git pull
-$ php composer.phar install
+$ composer install
 ```
 
 Made some changes to your local development version?
@@ -293,7 +293,7 @@ Happy hacking!
 ## Tests
 
 To run the test suite, you first need to clone this repo and then install all
-dependencies [through Composer](http://getcomposer.org):
+dependencies [through Composer](https://getcomposer.org/):
 
 ```bash
 $ composer install
@@ -302,7 +302,7 @@ $ composer install
 To run the test suite, go to the project root and run:
 
 ```bash
-$ php vendor/bin/phpunit
+$ vendor/bin/phpunit
 ```
 
 ## License
