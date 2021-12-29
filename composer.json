@@ -21,7 +21,7 @@
         "phpunit/phpunit": "^9.5 || ^5.7 || ^4.8.36"
     },
     "autoload": {
-        "psr-0": {"Clue": "src/"}
+        "psr-4": {"Clue\\PharComposer\\": "src/"}
     },
     "bin": ["bin/phar-composer"],
     "scripts": {

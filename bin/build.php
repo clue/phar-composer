@@ -15,8 +15,8 @@ $out = isset($argv[1]) ? $argv[1] : ('phar-composer-' . $version . '.phar');
 
 passthru('
 rm -rf build && mkdir build &&
-cp -r bin/ src/ composer.json LICENSE build/ && rm build/bin/build.php build/src/Clue/PharComposer/Box/Extract.php &&
-sed -i \'s/@dev/' . $version .'/g\' build/src/Clue/PharComposer/App.php &&
+cp -r bin/ src/ composer.json LICENSE build/ && rm build/bin/build.php build/src/Box/Extract.php &&
+sed -i \'s/@dev/' . $version .'/g\' build/src/App.php &&
 composer config -d build/ platform.php 5.3.6 &&
 composer install -d build/ --no-dev &&
 
