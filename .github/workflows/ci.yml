@@ -6,10 +6,13 @@ on:
 
 jobs:
   PHPUnit:
-    name: PHPUnit (PHP ${{ matrix.php }})
-    runs-on: ubuntu-20.04
+    name: PHPUnit (PHP ${{ matrix.php }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os:
+          - ubuntu-20.04
+          - windows-2019
         php:
           - 8.1
           - 8.0
@@ -37,7 +40,7 @@ jobs:
       - run: composer require symfony/console:^6.0 --dry-run --working-dir=tests/install-as-dep
         if: ${{ matrix.php >= 8.0 }}
       - run: composer require symfony/console:^5.0 --dry-run --working-dir=tests/install-as-dep
-        if: ${{ matrix.php >= 7.2 }}
+        if: ${{ matrix.php >= 7.2 && (matrix.php < 8.0 || matrix.os != 'windows-2019') }}
       - run: composer require symfony/console:^4.0 --dry-run --working-dir=tests/install-as-dep
         if: ${{ matrix.php >= 7.1 && matrix.php < 8.0 }}
       - run: composer require symfony/console:^3.0 --dry-run --working-dir=tests/install-as-dep

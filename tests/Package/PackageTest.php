@@ -47,17 +47,17 @@ class PackageTest extends TestCase
 
     public function testBundleWillContainComposerJsonButNotVendor()
     {
-        $dir = realpath(__DIR__ . '/../fixtures/03-project-with-phars') . '/';
+        $dir = realpath(__DIR__ . '/../fixtures/03-project-with-phars') . DIRECTORY_SEPARATOR;
         $package = new Package(array(), $dir);
         $bundle = $package->bundle();
 
         $this->assertTrue($bundle->contains($dir . 'composer.json'));
-        $this->assertFalse($bundle->contains($dir . 'vendor/autoload.php'));
+        $this->assertFalse($bundle->contains($dir . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php'));
     }
 
     public function testBundleWillNotContainComposerPharInRoot()
     {
-        $dir = realpath(__DIR__ . '/../fixtures/03-project-with-phars') . '/';
+        $dir = realpath(__DIR__ . '/../fixtures/03-project-with-phars') . DIRECTORY_SEPARATOR;
         $package = new Package(array(), $dir);
         $bundle = $package->bundle();
 
@@ -67,12 +67,12 @@ class PackageTest extends TestCase
 
     public function testBundleWillContainComposerPharFromSrc()
     {
-        $dir = realpath(__DIR__ . '/../fixtures/04-project-with-phars-in-src') . '/';
+        $dir = realpath(__DIR__ . '/../fixtures/04-project-with-phars-in-src') . DIRECTORY_SEPARATOR;
         $package = new Package(array(), $dir);
         $bundle = $package->bundle();
 
         $this->assertTrue($bundle->contains($dir . 'composer.json'));
-        $this->assertTrue($bundle->contains($dir . 'src/composer.phar'));
-        $this->assertTrue($bundle->contains($dir . 'src/phar-composer.phar'));
+        $this->assertTrue($bundle->contains($dir . 'src' . DIRECTORY_SEPARATOR . 'composer.phar'));
+        $this->assertTrue($bundle->contains($dir . 'src' . DIRECTORY_SEPARATOR . 'phar-composer.phar'));
     }
 }
