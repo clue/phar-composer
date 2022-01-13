@@ -132,6 +132,10 @@ class Packager
             $finder = new ExecutableFinder();
 
             $git = $finder->find('git', '/usr/bin/git');
+            
+            if (preg_match('/\s/', $git)) {
+                $git = '"' . $git . '"';
+            }
 
             $that = $this;
             $this->displayMeasure(
@@ -154,6 +158,11 @@ class Packager
             } else {
                 $command = $finder->find('composer', '/usr/bin/composer');
             }
+            
+            if (preg_match('/\s/', $command)) {
+                $command = '"' . $command . '"';
+            }
+            
             $command .= ' install --no-dev --no-progress --no-scripts';
 
             $this->displayMeasure(
@@ -182,11 +191,12 @@ class Packager
                 $command = $finder->find('php', '/usr/bin/php') . ' composer.phar';
             } else {
                 $command = $finder->find('composer', '/usr/bin/composer');
-                
-                if (preg_match('/\s/', $command)) {
-                    $command = '"' . $command . '"';
-                }
             }
+            
+            if (preg_match('/\s/', $command)) {
+                $command = '"' . $command . '"';
+            }
+            
             $command .= ' create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts';
 
             $that = $this;
