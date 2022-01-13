@@ -182,6 +182,10 @@ class Packager
                 $command = $finder->find('php', '/usr/bin/php') . ' composer.phar';
             } else {
                 $command = $finder->find('composer', '/usr/bin/composer');
+                
+                if (preg_match('/\s/', $command)) {
+                    $command = '"' . $command . '"';
+                }
             }
             $command .= ' create-project ' . escapeshellarg($package) . ' ' . escapeshellarg($path) . ' --no-dev --no-progress --no-scripts';
 
