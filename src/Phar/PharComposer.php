@@ -208,6 +208,7 @@ class PharComposer
         // failure to write will emit a warning (ignore) and throw an (uncaught) exception
         try {
             @$targetPhar->stopBuffering();
+            $targetPhar = null;
         } catch (\PharException $e) {
             throw new \RuntimeException('Unable to write phar: ' . $e->getMessage());
         }
@@ -223,8 +224,12 @@ class PharComposer
             $this->log('  - Overwriting existing file <info>' . $target . '</info> (' . $this->getSize($target) . ')');
         }
 
-        if (rename($tmp, $target) === false) {
-            throw new \UnexpectedValueException('Unable to rename temporary phar archive to "'.$target.'"');
+        if (@rename($tmp, $target) === false) {
+            // retry renaming after sleeping to give slow network drives some time to flush data
+            sleep(5);
+            if (rename($tmp, $target) === false) {
+                throw new \UnexpectedValueException('Unable to rename temporary phar archive to "'.$target.'"');
+            }
         }
 
         $time = max(microtime(true) - $time, 0);
