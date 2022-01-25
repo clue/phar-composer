@@ -141,8 +141,7 @@ its version and will then offer you to either `build` or `install` it.
 You can grab a copy of clue/phar-composer in either of the following ways.
 
 This project aims to run on any platform and thus does not require any PHP
-extensions and supports running on legacy PHP 5.3 through current PHP 8+ and
-HHVM.
+extensions and supports running on legacy PHP 5.3 through current PHP 8+.
 It's *highly recommended to use the latest supported PHP version* for this project.
 
 ### As a phar (recommended)
