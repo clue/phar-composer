@@ -67,6 +67,30 @@ class PackagerTest extends TestCase
         $this->packager->getPharer(__DIR__ . '/../fixtures/02-no-composer/composer.json');
     }
 
+    public function testGetPharerTriesToExecuteGitStubInDirectoryWithSpaceAndThrowsWhenGitStubDoesNotCreateTargetDirectory()
+    {
+        $path = getenv('PATH');
+
+        $temp = sys_get_temp_dir() . '/test phar-composer-' . mt_rand();
+        mkdir($temp);
+        symlink(exec('which echo'), $temp . '/git');
+
+        putenv('PATH=' . $temp);
+
+        try {
+            $this->packager->setOutput(false);
+            $this->packager->getPharer('user@git.example.com:user/project.git');
+
+            $this->fail();
+        } catch (Exception $e) {
+            putenv('PATH=' . $path);
+            unlink($temp . '/git');
+            rmdir($temp);
+
+            $this->assertStringMatchesFormat('Unable to parse given path "/%s/phar-composer%d/composer.json"', $e->getMessage());
+        }
+    }
+
     public function testGetSystemBinDefaultsToPackageNameInBin()
     {
         $package = new Package(array(
