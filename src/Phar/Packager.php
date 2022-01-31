@@ -264,12 +264,12 @@ class Packager
         $process->setTimeout(null);
         $code = $process->run(function($type, $data) use ($output, &$nl) {
             if ($nl === true) {
-                $data = "\n" . $data;
+                $data = PHP_EOL . $data;
                 $nl = false;
             }
             if (substr($data, -1) === "\n") {
                 $nl = true;
-                $data = substr($data, 0, -1);
+                $data = substr($data, 0, -strlen(PHP_EOL));
             }
             $data = str_replace("\n", "\n    ", $data);
 
@@ -327,7 +327,7 @@ class Packager
 
     public function isPackageUrl($path)
     {
-        return (strpos($path, '://') !== false && @parse_url($path) !== false) || preg_match('/^[^-\/\s][^:\/\s]*:\S+/', $path);
+        return (strpos($path, '://') !== false && @parse_url($path) !== false) || preg_match('/^[^-\/\s][^:\/\s]*:[^\s\\\\]\S*/', $path);
     }
 
     private function getDirTemporary()
