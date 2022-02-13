@@ -27,10 +27,10 @@ jobs:
           - 5.3
     steps:
       - uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          coverage: xdebug
       - run: composer install
       - run: vendor/bin/phpunit --coverage-text
         if: ${{ matrix.php >= 7.3 }}
@@ -45,4 +45,5 @@ jobs:
         if: ${{ matrix.php >= 7.1 && matrix.php < 8.0 }}
       - run: composer require symfony/console:^3.0 --dry-run --working-dir=tests/install-as-dep
         if: ${{ matrix.php >= 5.5 && matrix.php < 8.0 }}
-      - run: composer install --dry-run --working-dir=tests/install-as-dep
+      - run: cd tests/install-as-dep && composer install && php query.php
+      - run: cd tests/install-as-dep && php -d phar.readonly=0 vendor/bin/phar-composer build . query.phar && php query.phar
