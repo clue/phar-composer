@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.4.0 (2022-02-14)
+
+*   Feature: Windows support, improve package path detection, and retry rename to fix slow network drives.
+    (#129 and #130 by @clue)
+
+*   Feature / Fix: Escape binary path when executing system binaries (git, php, composer).
+    (#128 by @clue)
+
+*   Drop legacy HHVM support due to lack of support.
+    (#127 by @clue)
+
 ## 1.3.0 (2021-12-29)
 
 *   Feature: Support Symfony 6 and PHP 8.1 release.
