@@ -5,10 +5,16 @@
     "require-dev": {
         "clue/phar-composer": "*@dev"
     },
+    "bin": [
+        "query.php"
+    ],
     "repositories": [
         {
             "type": "path",
-            "url": "../../"
+            "url": "../../",
+            "options": {
+                "symlink": false
+            }
         }
     ]
 }
