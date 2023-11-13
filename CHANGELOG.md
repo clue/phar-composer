@@ -66,7 +66,7 @@
     remove dedicated bundler classes, always bundle complete package.
     (#85, #86, #89 and #92 by @clue)
 
-*   Add build script removing uneeded files and update development docs.
+*   Add build script removing unneeded files and update development docs.
     (#91 by @clue)
 
 ## 1.0.0 (2015-11-15)
