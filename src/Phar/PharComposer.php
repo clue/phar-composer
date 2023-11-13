@@ -155,7 +155,7 @@ class PharComposer
             throw new \RuntimeException('Directory "' . $pathVendor . '" not properly installed, did you run "composer install"?');
         }
 
-        // get target and tempory file name to write to
+        // get target and temporary file name to write to
         $target = $this->getTarget();
         do {
             $tmp = $target . '.' . mt_rand() . '.phar';

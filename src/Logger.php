@@ -3,7 +3,7 @@
 namespace Clue\PharComposer;
 
 /**
- * Interface for logging outout.
+ * Interface for logging out.
  *
  * TODO: should be used in the Command classes as well
  */
