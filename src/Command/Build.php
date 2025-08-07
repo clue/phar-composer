@@ -31,7 +31,7 @@ class Build extends Command
              ->addArgument('target', InputArgument::OPTIONAL, 'Path to write phar output to (defaults to project name)');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->packager->setOutput($output);
         $this->packager->coerceWritable();

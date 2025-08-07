@@ -40,7 +40,7 @@ class Install extends Command
              ->addArgument('target', InputArgument::OPTIONAL, 'Path to install to', '/usr/local/bin');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->isWindows) {
             $output->writeln('<error>Command not available on this platform. Please use the "build" command and place Phar in your $PATH manually.</error>');

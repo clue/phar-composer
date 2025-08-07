@@ -87,7 +87,7 @@ class Search extends Command
         return $indices[$index - 1];
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->packager->setOutput($output);
         $this->packager->coerceWritable();
